@@ -23,18 +23,29 @@ export interface ProfileData {
   iy_cm: number;
 }
 
-export interface CraneInput {
+export type CraneCapacity =
+  | "5" | "8" | "10" | "12.5" | "16" | "16/3.2" | "20/5" | "32/5" | "50/12.5";
+
+export interface OverheadCrane {
   enabled: boolean;
-  type: "overhead" | "suspended";
-  capacity_t: number;
+  capacity: CraneCapacity;
+  /** Catalog span — must be one of {12, 18, 24, 30, 36}. */
   span_m: number;
   count: "one" | "two";
   singleSpan: boolean;
   railLevel_m: number;
+  /** Auto-filled from catalog by (capacity, span). */
   wheelLoad_kN: number;
-  trolleyMass_t: number;
+  /** Auto-filled. Crane base (between two crane wheels), m. */
   base_m: number;
-  clearance_m: number;
+  /** Auto-filled. Crane gauge / габарит (between rails), m. */
+  gauge_m: number;
+}
+
+export interface SuspendedCrane {
+  enabled: boolean;
+  capacity_t: number;
+  singleSpan: boolean;
 }
 
 export interface SteelPrices {
@@ -59,11 +70,15 @@ export interface CalculationInput {
   terrainType: TerrainType;
   w0_kPa: number;
   Sg_kPa: number;
+  /** Roof structure id from `structures.json` (autofills `roofLoad_kPa`). */
+  roofStructure: string;
   roofLoad_kPa: number;
+  /** Wall structure id from `structures.json` (autofills `wallLoad_kPa`). */
+  wallStructure: string;
   wallLoad_kPa: number;
   loadAddition_pct: number;
-  mu: number;
-  crane: CraneInput;
+  overheadCrane: OverheadCrane;
+  suspendedCrane: SuspendedCrane;
   prices: SteelPrices;
 }
 
@@ -91,6 +106,7 @@ export interface CalculationOutput {
   N_kN: number;
   M_kNm: number;
   Q_kN: number;
+  mu: number;
   snowLoad_kPa: number;
   windPressure_kPa: number;
   windSuction_kPa: number;

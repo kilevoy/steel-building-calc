@@ -1,9 +1,10 @@
 import { useMemo, useState, useCallback } from "react";
-import { runCalculation } from "./calc/engine";
+import { runCalculation, computeMu } from "./calc/engine";
 import type {
   CalculationInput,
   CalculationOutput,
   ColumnType,
+  CraneCapacity,
   RoofType,
   SpanCount,
 } from "./calc/types";
@@ -12,6 +13,38 @@ import {
   searchSettlements,
   getSettlementClimateById,
 } from "./types/climate";
+import structuresJson from "./data/structures/structures.json";
+import cranesJson from "./data/cranes/cranes.json";
+
+interface StructureRow {
+  id: string;
+  kPa: number;
+}
+interface CraneRow {
+  capacity: string;
+  span_m: number;
+  base_mm: number;
+  gauge_mm: number;
+  wheelLoad_kN: number;
+  trolleyMass_t: number;
+  craneMass_t: number;
+}
+
+const STRUCTURES = structuresJson as StructureRow[];
+const CRANES = cranesJson as CraneRow[];
+
+const CRANE_CAPACITIES: CraneCapacity[] = [
+  "5", "8", "10", "12.5", "16", "16/3.2", "20/5", "32/5", "50/12.5",
+];
+const CRANE_SPANS = [12, 18, 24, 30, 36];
+
+function lookupCrane(capacity: string, span_m: number): CraneRow | undefined {
+  return CRANES.find((c) => c.capacity === capacity && c.span_m === span_m);
+}
+
+function lookupStructure(id: string): StructureRow | undefined {
+  return STRUCTURES.find((s) => s.id === id);
+}
 
 const DEFAULT_INPUT: CalculationInput = {
   height_m: 11.5,
@@ -28,22 +61,26 @@ const DEFAULT_INPUT: CalculationInput = {
   terrainType: "B",
   w0_kPa: 0.6,
   Sg_kPa: 1.7,
+  roofStructure: "профлист",
   roofLoad_kPa: 0.105,
+  wallStructure: "профлист",
   wallLoad_kPa: 0.105,
   loadAddition_pct: 15,
-  mu: 0.7,
-  crane: {
+  overheadCrane: {
     enabled: false,
-    type: "overhead",
-    capacity_t: 5,
-    span_m: 42,
+    capacity: "5",
+    span_m: 12,
     count: "one",
     singleSpan: true,
     railLevel_m: 3.5,
-    wheelLoad_kN: 0,
-    trolleyMass_t: 0,
-    base_m: 0,
-    clearance_m: 0,
+    wheelLoad_kN: 50,
+    base_m: 3.7,
+    gauge_m: 4.7,
+  },
+  suspendedCrane: {
+    enabled: false,
+    capacity_t: 2,
+    singleSpan: true,
   },
   prices: {
     "С255Б": 148.8,
@@ -94,6 +131,51 @@ export function App() {
 
   const upd = (patch: Partial<CalculationInput>) =>
     setInput((p) => ({ ...p, ...patch }));
+
+  const setRoofStructure = (id: string) => {
+    const s = lookupStructure(id);
+    upd({
+      roofStructure: id,
+      roofLoad_kPa: s ? s.kPa : input.roofLoad_kPa,
+    });
+  };
+  const setWallStructure = (id: string) => {
+    const s = lookupStructure(id);
+    upd({
+      wallStructure: id,
+      wallLoad_kPa: s ? s.kPa : input.wallLoad_kPa,
+    });
+  };
+
+  const setOverhead = (
+    patch: Partial<CalculationInput["overheadCrane"]>,
+  ) => {
+    setInput((p) => {
+      const next = { ...p.overheadCrane, ...patch };
+      // Re-lookup catalog when (capacity, span) changes.
+      if (
+        patch.capacity !== undefined ||
+        patch.span_m !== undefined
+      ) {
+        const r = lookupCrane(next.capacity, next.span_m);
+        if (r) {
+          next.wheelLoad_kN = r.wheelLoad_kN;
+          next.base_m = r.base_mm / 1000;
+          next.gauge_m = r.gauge_mm / 1000;
+        }
+      }
+      return { ...p, overheadCrane: next };
+    });
+  };
+  const setSuspended = (
+    patch: Partial<CalculationInput["suspendedCrane"]>,
+  ) =>
+    setInput((p) => ({
+      ...p,
+      suspendedCrane: { ...p.suspendedCrane, ...patch },
+    }));
+
+  const muAuto = computeMu(input);
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 1400, margin: "0 auto", padding: 16 }}>
@@ -184,7 +266,19 @@ export function App() {
           />
           <Field label="w₀ (ветер), кПа" value={input.w0_kPa} onChange={(v) => upd({ w0_kPa: v })} step={0.01} />
           <Field label="Sg (снег), кПа" value={input.Sg_kPa} onChange={(v) => upd({ Sg_kPa: v })} step={0.01} />
+          <SelectField
+            label="Конструкция покрытия"
+            value={input.roofStructure}
+            options={STRUCTURES.map((s) => [s.id, `${s.id} (${s.kPa.toFixed(3)} кПа)`])}
+            onChange={setRoofStructure}
+          />
           <Field label="Нагрузка от кровли, кПа" value={input.roofLoad_kPa} onChange={(v) => upd({ roofLoad_kPa: v })} step={0.001} />
+          <SelectField
+            label="Конструкция ограждения"
+            value={input.wallStructure}
+            options={STRUCTURES.map((s) => [s.id, `${s.id} (${s.kPa.toFixed(3)} кПа)`])}
+            onChange={setWallStructure}
+          />
           <Field label="Нагрузка от ограждения, кПа" value={input.wallLoad_kPa} onChange={(v) => upd({ wallLoad_kPa: v })} step={0.001} />
           <Field label="Ур. ответственности γₙ" value={input.responsibilityCoeff} onChange={(v) => upd({ responsibilityCoeff: v })} step={0.05} />
         </fieldset>
@@ -202,7 +296,11 @@ export function App() {
             ]}
             onChange={(v) => upd({ columnType: v as ColumnType })}
           />
-          <Field label="μ (к-т расч. длины)" value={input.mu} onChange={(v) => upd({ mu: v })} step={0.05} />
+          <ReadOnlyField
+            label="μ (к-т расч. длины, авто)"
+            value={muAuto.toFixed(2)}
+            hint="Считается по типу колонны / связям / кол-ву пролётов"
+          />
           <Field label="Надбавка, %" value={input.loadAddition_pct} onChange={(v) => upd({ loadAddition_pct: v })} />
           <hr style={{ margin: "8px 0" }} />
           <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Цены стали, руб/кг</div>
@@ -217,6 +315,82 @@ export function App() {
               step={0.1}
             />
           ))}
+        </fieldset>
+      </div>
+
+      {/* Cranes row */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+          <legend style={{ fontWeight: 600 }}>Кран опорный (по ГОСТ)</legend>
+          <CheckField
+            label="Есть"
+            checked={input.overheadCrane.enabled}
+            onChange={(v) => setOverhead({ enabled: v })}
+          />
+          {input.overheadCrane.enabled && (
+            <>
+              <SelectField
+                label="Грузоподъёмность, т"
+                value={input.overheadCrane.capacity}
+                options={CRANE_CAPACITIES.map((c) => [c, c])}
+                onChange={(v) => setOverhead({ capacity: v as CraneCapacity })}
+              />
+              <SelectField
+                label="Пролёт крана (каталог), м"
+                value={String(input.overheadCrane.span_m)}
+                options={CRANE_SPANS.map((s) => [String(s), String(s)])}
+                onChange={(v) => setOverhead({ span_m: Number(v) })}
+              />
+              <SelectField
+                label="Кол-во кранов в пролёте"
+                value={input.overheadCrane.count}
+                options={[
+                  ["one", "Один"],
+                  ["two", "Два"],
+                ]}
+                onChange={(v) =>
+                  setOverhead({ count: v as "one" | "two" })
+                }
+              />
+              <CheckField
+                label="Только в одном пролёте"
+                checked={input.overheadCrane.singleSpan}
+                onChange={(v) => setOverhead({ singleSpan: v })}
+              />
+              <Field
+                label="Отметка верха рельса, м"
+                value={input.overheadCrane.railLevel_m}
+                onChange={(v) => setOverhead({ railLevel_m: v })}
+                step={0.1}
+              />
+              <ReadOnlyField label="Нагрузка на колесо, кН" value={input.overheadCrane.wheelLoad_kN.toFixed(0)} />
+              <ReadOnlyField label="База, м" value={input.overheadCrane.base_m.toFixed(2)} />
+              <ReadOnlyField label="Габарит, м" value={input.overheadCrane.gauge_m.toFixed(2)} />
+            </>
+          )}
+        </fieldset>
+        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+          <legend style={{ fontWeight: 600 }}>Кран подвесной</legend>
+          <CheckField
+            label="Есть"
+            checked={input.suspendedCrane.enabled}
+            onChange={(v) => setSuspended({ enabled: v })}
+          />
+          {input.suspendedCrane.enabled && (
+            <>
+              <Field
+                label="Грузоподъёмность, т"
+                value={input.suspendedCrane.capacity_t}
+                onChange={(v) => setSuspended({ capacity_t: v })}
+                step={0.5}
+              />
+              <CheckField
+                label="Только в одном пролёте"
+                checked={input.suspendedCrane.singleSpan}
+                onChange={(v) => setSuspended({ singleSpan: v })}
+              />
+            </>
+          )}
         </fieldset>
       </div>
 
@@ -244,6 +418,7 @@ export function App() {
           <div style={{ display: "flex", gap: 24, marginBottom: 12, flexWrap: "wrap" }}>
             <Stat label="N (осевая)" value={`${result.N_kN.toFixed(1)} кН`} />
             <Stat label="M (момент)" value={`${result.M_kNm.toFixed(1)} кН·м`} />
+            <Stat label="μ" value={result.mu.toFixed(2)} />
             <Stat label="Снег расч." value={`${result.snowLoad_kPa.toFixed(3)} кПа`} />
             <Stat label="Ветер давл." value={`${result.windPressure_kPa.toFixed(3)} кПа`} />
             <Stat label="Ветер отс." value={`${result.windSuction_kPa.toFixed(3)} кПа`} />
@@ -350,9 +525,40 @@ function Field({
         type="number"
         step={step ?? 1}
         value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        onChange={(e) => onChange(Number(e.target.value))}
         style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       />
+    </div>
+  );
+}
+
+function ReadOnlyField({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+}) {
+  return (
+    <div style={{ marginBottom: 6 }}>
+      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+      <input
+        type="text"
+        readOnly
+        value={value}
+        style={{
+          width: "100%",
+          padding: 4,
+          boxSizing: "border-box",
+          background: "#f8fafc",
+          color: "#475569",
+        }}
+      />
+      {hint && (
+        <div style={{ fontSize: 11, color: "#888" }}>{hint}</div>
+      )}
     </div>
   );
 }
@@ -374,7 +580,7 @@ function SelectField({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", padding: 4 }}
+        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       >
         {options.map(([v, l]) => (
           <option key={v} value={v}>
@@ -396,22 +602,25 @@ function CheckField({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label style={{ fontSize: 13, display: "flex", gap: 6, alignItems: "center", marginBottom: 6 }}>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-      />
-      {label}
-    </label>
+    <div style={{ marginBottom: 6 }}>
+      <label style={{ fontSize: 13 }}>
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+          style={{ marginRight: 6 }}
+        />
+        {label}
+      </label>
+    </div>
   );
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <span style={{ fontSize: 12, color: "#666" }}>{label}:</span>{" "}
-      <span style={{ fontWeight: 600, fontSize: 14 }}>{value}</span>
+      <div style={{ fontSize: 11, color: "#888" }}>{label}</div>
+      <div style={{ fontSize: 16, fontWeight: 600 }}>{value}</div>
     </div>
   );
 }
