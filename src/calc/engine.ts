@@ -1,9 +1,11 @@
 import type {
   CalculationInput,
   CalculationOutput,
+  OverheadCrane,
   ProfileData,
   ProfileResult,
   SteelGrade,
+  SuspendedCrane,
 } from "./types";
 import { getRy, steelsForCategory, pricePerKg } from "./steel";
 import { calcWind } from "./wind";
@@ -11,6 +13,19 @@ import profilesJson from "../data/profiles/profiles.json";
 
 const PROFILES = profilesJson as ProfileData[];
 const E_MPA = 206000;
+
+/**
+ * μ (расчётная длина) per Excel `Сводка!B130`:
+ *   фахверковая → 0.7
+ *   крайняя/средняя со связями  → 2.0 (один пролёт), 0.7 (многопрол.)
+ *   крайняя/средняя без связей  → 2.0 (один пролёт), 1.5 (многопрол.)
+ */
+export function computeMu(input: CalculationInput): number {
+  if (input.columnType === "fachwerk") return 0.7;
+  const multi = input.spanCount === "multi";
+  if (input.perimeterTies) return multi ? 0.7 : 2.0;
+  return multi ? 1.5 : 2.0;
+}
 
 function momentReductionCoeff(input: CalculationInput): number {
   const { columnType, perimeterTies, spanCount } = input;
@@ -43,32 +58,42 @@ function wallArea(input: CalculationInput): number {
   return height_m * framePitch_m;
 }
 
-function calcCraneLoads(input: CalculationInput): {
-  G_kN: number;
-  T_kN: number;
-  M_kNm: number;
-} {
-  const c = input.crane;
+/** H44 (overhead) / H45 (suspended) — multi-span middle column gets 2× when crane spans multiple spans. */
+function multiSpanFactor(
+  input: CalculationInput,
+  singleSpan: boolean,
+): number {
+  if (
+    input.spanCount === "multi" &&
+    input.columnType === "middle" &&
+    !singleSpan
+  ) {
+    return 2;
+  }
+  return 1;
+}
+
+function calcOverheadCrane(
+  c: OverheadCrane,
+  input: CalculationInput,
+): { G_kN: number; T_kN: number; M_kNm: number } {
   if (!c.enabled) return { G_kN: 0, T_kN: 0, M_kNm: 0 };
 
   const step = input.framePitch_m;
   const y1 = 1;
-  const y2 = y1 * (step - c.base_m) / step;
-  const y3 = c.count === "two" ? y1 * (step - (c.clearance_m - c.base_m)) / step : 0;
-  const y4 = c.count === "two" ? y1 * (step - c.clearance_m) / step : 0;
+  const y2 = (y1 * (step - c.base_m)) / step;
+  const y3 = c.count === "two" ? (y1 * (step - (c.gauge_m - c.base_m))) / step : 0;
+  const y4 = c.count === "two" ? (y1 * (step - c.gauge_m)) / step : 0;
   const sumY = y1 + y2 + y3 + y4;
 
-  const multiSpanFactor =
-    input.spanCount === "multi" && input.columnType === "middle" && !c.singleSpan
-      ? 2
-      : 1;
+  const H44 = multiSpanFactor(input, c.singleSpan);
 
-  const G = c.wheelLoad_kN * sumY * 1.3 * 1.06 * multiSpanFactor;
+  const G = c.wheelLoad_kN * sumY * 1.3 * 1.06 * H44;
   const T = 0.05 * G;
 
   let M: number;
   if (input.columnType === "middle") {
-    M = (G * 0.75) / multiSpanFactor + T * c.railLevel_m;
+    M = (G * 0.75) / H44 + T * c.railLevel_m;
   } else {
     M = G * 0.75 + T * c.railLevel_m;
   }
@@ -76,12 +101,22 @@ function calcCraneLoads(input: CalculationInput): {
   return { G_kN: G, T_kN: T, M_kNm: M };
 }
 
+/** Suspended crane axial load (Excel `Сводка!E36`). No moment contribution. */
+function calcSuspendedCraneG(
+  c: SuspendedCrane,
+  input: CalculationInput,
+): number {
+  if (!c.enabled) return 0;
+  const H45 = multiSpanFactor(input, c.singleSpan);
+  return (c.capacity_t * 10 + 0.5 * 10) * 1.2 * 1.1 * H45;
+}
+
 function calcPhi(lambdaBar: number, alpha: number, beta: number): number {
   if (lambdaBar <= 0.01) return 1;
   const delta = 9.87 * (1 - alpha + beta * lambdaBar) + lambdaBar * lambdaBar;
   const disc = delta * delta - 39.48 * lambdaBar * lambdaBar;
   if (disc < 0) return 0.001;
-  return 0.5 * (delta - Math.sqrt(disc)) / (lambdaBar * lambdaBar);
+  return (0.5 * (delta - Math.sqrt(disc))) / (lambdaBar * lambdaBar);
 }
 
 function checkProfile(
@@ -92,6 +127,7 @@ function checkProfile(
   M_kNm: number,
   input: CalculationInput,
   Ry: number,
+  mu: number,
 ): ProfileResult | null {
   const gamma_c = 0.95;
   const A_m2 = profile.A_cm2 / 10000;
@@ -99,11 +135,10 @@ function checkProfile(
   const ix_cm = profile.ix_cm;
   const iy_cm = profile.iy_cm;
 
-  const mu = input.mu;
   const H = input.height_m;
 
-  const lambdaBarX = (mu * H * 100 / ix_cm) * Math.sqrt(Ry / E_MPA);
-  const lambdaBarY = (H / (struts + 1) * 100 / iy_cm) * Math.sqrt(Ry / E_MPA);
+  const lambdaBarX = ((mu * H * 100) / ix_cm) * Math.sqrt(Ry / E_MPA);
+  const lambdaBarY = ((H / (struts + 1) * 100) / iy_cm) * Math.sqrt(Ry / E_MPA);
 
   const phiX = calcPhi(lambdaBarX, 0.04, 0.09);
   const phiY = calcPhi(lambdaBarY, 0.04, 0.14);
@@ -114,22 +149,22 @@ function checkProfile(
   const sigma = N_MN / A_m2 + M_MNm / Wx_m3;
   const utilizationSigma = sigma / (Ry * gamma_c);
 
-  const stabX = Math.max(N_MN / (A_m2 * phiX / 2), M_MNm / (0.7 * Wx_m3));
+  const stabX = Math.max(N_MN / ((A_m2 * phiX) / 2), M_MNm / (0.7 * Wx_m3));
   const utilizationStabX = stabX / (Ry * gamma_c);
 
-  const mx = (M_kNm * 100 / N_kN) / (profile.Wx_cm3 / profile.A_cm2);
+  const mx = ((M_kNm * 100) / N_kN) / (profile.Wx_cm3 / profile.A_cm2);
   const c = Math.min(1 / (1 + 0.7 * mx), 1);
   const stabY = N_MN / (A_m2 * phiY * c);
   const utilizationStabY = stabY / (Ry * gamma_c);
 
   const sigmaCompress = N_MN / (phiX * A_m2 * Ry * gamma_c);
   const slendLimitX = 180 - 60 * Math.max(0.5, sigmaCompress);
-  const lambdaActualX = mu * H * 100 / ix_cm;
+  const lambdaActualX = (mu * H * 100) / ix_cm;
   const utilizationSlendX = lambdaActualX / slendLimitX;
 
   const sigmaCompressY = N_MN / (phiY * A_m2 * Ry * gamma_c);
   const slendLimitY = 180 - 60 * Math.max(0.5, sigmaCompressY);
-  const lambdaActualY = H / (struts + 1) * 100 / iy_cm;
+  const lambdaActualY = ((H / (struts + 1)) * 100) / iy_cm;
   const utilizationSlendY = lambdaActualY / slendLimitY;
 
   const maxUtil = Math.max(
@@ -156,8 +191,7 @@ function checkProfile(
   const strutMass = struts * 12 * strutStep * 1.15;
   const columnMass = profile.mass_kg_per_m * H;
   const totalMass = columnMass + strutMass;
-  const cost =
-    totalMass * pricePerKg(steel, input.prices) / 1000;
+  const cost = (totalMass * pricePerKg(steel, input.prices)) / 1000;
 
   return {
     rank: 0,
@@ -182,7 +216,6 @@ function checkProfile(
 
 export function runCalculation(input: CalculationInput): CalculationOutput {
   const gamma_f_snow = 1.4;
-  const gamma_f_wind = 1.4;
   const gamma_n = input.responsibilityCoeff;
 
   const snowCalc =
@@ -204,22 +237,24 @@ export function runCalculation(input: CalculationInput): CalculationOutput {
   const areaVert = tributaryArea(input);
   const areaWall = wallArea(input);
 
-  const crane = calcCraneLoads(input);
+  const overhead = calcOverheadCrane(input.overheadCrane, input);
+  const suspG = calcSuspendedCraneG(input.suspendedCrane, input);
 
   const N =
     ((snowCalc + windVert + roofCalc) * areaVert +
       wallCalc * areaWall +
-      crane.G_kN) *
-    (1 + input.loadAddition_pct / 100);
+      overhead.G_kN) *
+      (1 + input.loadAddition_pct / 100) +
+    suspG;
 
   const pitch =
     input.columnType === "fachwerk" ? input.fachverkPitch_m : input.framePitch_m;
-  const momentBase =
-    windHoriz * pitch * input.height_m * input.height_m / 2;
+  const momentBase = (windHoriz * pitch * input.height_m * input.height_m) / 2;
   const momentCoeff = momentReductionCoeff(input);
 
-  const M = momentBase * momentCoeff + crane.M_kNm;
+  const M = momentBase * momentCoeff + overhead.M_kNm;
 
+  const mu = computeMu(input);
   const allResults: ProfileResult[] = [];
 
   for (const profile of PROFILES) {
@@ -227,7 +262,7 @@ export function runCalculation(input: CalculationInput): CalculationOutput {
     for (const steel of steels) {
       const Ry = getRy(steel, profile);
       for (let struts = 0; struts <= 4; struts++) {
-        const res = checkProfile(profile, steel, struts, N, M, input, Ry);
+        const res = checkProfile(profile, steel, struts, N, M, input, Ry, mu);
         if (res) allResults.push(res);
       }
     }
@@ -242,6 +277,7 @@ export function runCalculation(input: CalculationInput): CalculationOutput {
     N_kN: N,
     M_kNm: M,
     Q_kN: 0,
+    mu,
     snowLoad_kPa: snowCalc,
     windPressure_kPa: windHoriz,
     windSuction_kPa: windVert,
