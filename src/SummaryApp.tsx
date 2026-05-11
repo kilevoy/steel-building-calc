@@ -5,6 +5,7 @@ import {
   type BuildingResults,
   type ResultItem,
 } from "./building/results";
+import { useCraneBeamRunner } from "./building/craneBeamRunner";
 
 function fmtKg(v: number): string {
   if (!Number.isFinite(v)) return "—";
@@ -147,6 +148,7 @@ export function SummaryApp() {
           и результат сразу появится здесь.
         </p>
         <BuildingBlock />
+        <CraneBeamTrigger />
       </div>
     );
   }
@@ -160,6 +162,7 @@ export function SummaryApp() {
       </p>
 
       <BuildingBlock />
+      <CraneBeamTrigger />
 
       <h3 style={{ marginBottom: 6 }}>Подобранные элементы</h3>
       <div style={{ overflow: "auto", marginBottom: 24 }}>
@@ -307,6 +310,67 @@ function BuildingBlock() {
         <div>Покр.: <b>{building.roofStructure}</b></div>
         <div>γₙ: <b>{building.responsibilityCoeff}</b></div>
       </div>
+    </fieldset>
+  );
+}
+
+function CraneBeamTrigger() {
+  const { result, calculating, error, handleCalc } = useCraneBeamRunner();
+  return (
+    <fieldset
+      style={{
+        border: "1px solid #cbd5e1",
+        padding: 12,
+        borderRadius: 6,
+        marginBottom: 24,
+        background: "#f0f9ff",
+      }}
+    >
+      <legend style={{ fontWeight: 600 }}>Подкрановая балка (медленный расчёт)</legend>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <button
+          onClick={() => void handleCalc()}
+          disabled={calculating}
+          style={{
+            padding: "8px 18px",
+            fontSize: 14,
+            fontWeight: 600,
+            background: calculating ? "#94a3b8" : "#0369a1",
+            color: "white",
+            border: "none",
+            borderRadius: 6,
+            cursor: calculating ? "wait" : "pointer",
+          }}
+        >
+          {calculating ? "Расчёт..." : result ? "Пересчитать" : "Рассчитать"}
+        </button>
+        <span style={{ fontSize: 12, color: "#475569" }}>
+          {result
+            ? "Готово — параметры с вкладки «Подкрановая балка»."
+            : "Расчёт ~3–10 секунд через HyperFormula. Параметры — на вкладке «Подкрановая балка»."}
+        </span>
+      </div>
+
+      {error && (
+        <div style={{ marginTop: 8, color: "#b91c1c", fontSize: 13 }}>Ошибка: {error}</div>
+      )}
+
+      {result && (
+        <div
+          style={{
+            marginTop: 10,
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: 8,
+            fontSize: 13,
+          }}
+        >
+          <div>Профиль: <b>{result.profile ?? "—"}</b></div>
+          <div>K (Iпр+IIпр): <b>{result.utilizationPercent != null ? result.utilizationPercent.toFixed(2) + " %" : "—"}</b></div>
+          <div>Масса 1 балки: <b>{result.weightKg != null ? result.weightKg.toFixed(1) + " кг" : "—"}</b></div>
+          <div>Шаг рёбер: <b>{result.ribStepSelectedM != null ? result.ribStepSelectedM.toFixed(2) + " м" : "—"}</b></div>
+        </div>
+      )}
     </fieldset>
   );
 }

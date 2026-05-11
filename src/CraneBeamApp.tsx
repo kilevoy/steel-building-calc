@@ -1,17 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
-import { useBuildingResults, type ResultItem } from "./building/results";
-import {
-  calculateCraneBeam,
-  craneOptions,
-  defaultCraneInputs,
-} from "./calc/craneBeam/engine";
-import type {
-  CraneCalculationResult,
-  CraneCalculatorInputs,
-  CraneCheckValue,
-} from "./calc/craneBeam/types";
+import { useCraneBeamRunner } from "./building/craneBeamRunner";
+import { craneOptions } from "./calc/craneBeam/engine";
+import type { CraneCheckValue } from "./calc/craneBeam/types";
 
 function fmt(n: number | string | null | undefined, digits = 3): string {
   if (n === null || n === undefined) return "—";
@@ -25,59 +16,16 @@ function fmtN(n: number | null | undefined, digits = 2): string {
 }
 
 export function CraneBeamApp() {
-  const [inputs, setInputs] = useState<CraneCalculatorInputs>(defaultCraneInputs);
-  const [result, setResult] = useState<CraneCalculationResult | null>(null);
-  const [calculating, setCalculating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [autoRecalc, setAutoRecalc] = useState(false);
-  const { setResult: publishResult } = useBuildingResults();
-
-  // Publish selected crane-beam profile (per piece) into shared bus.
-  useEffect(() => {
-    if (!result || !result.profile || result.weightKg == null) {
-      publishResult("craneBeam", null);
-      return;
-    }
-    const item: ResultItem = {
-      profile: result.profile,
-      steel: "С345", // crane beams are typically С345
-      massPerPiece_kg: result.weightKg,
-      count: 1,
-      totalMass_kg: result.weightKg,
-      cost_rub: 0, // crane-beam cost is not in the current PricesBlock
-    };
-    publishResult("craneBeam", item);
-  }, [result, publishResult]);
-
-  const upd = <K extends keyof CraneCalculatorInputs>(k: K, v: CraneCalculatorInputs[K]) =>
-    setInputs((cur) => ({ ...cur, [k]: v }));
-
-  const handleCalc = async () => {
-    setCalculating(true);
-    setError(null);
-    // defer to next tick so UI shows "calculating"
-    await new Promise((r) => setTimeout(r, 0));
-    try {
-      const r = calculateCraneBeam(inputs);
-      setResult(r);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-      setResult(null);
-    } finally {
-      setCalculating(false);
-    }
-  };
-
-  // Auto-recompute when enabled — debounced 600 ms so rapid edits don't stack.
-  // HyperFormula takes ~3–10 s, hence opt-in.
-  useEffect(() => {
-    if (!autoRecalc) return;
-    const t = setTimeout(() => {
-      void handleCalc();
-    }, 600);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputs, autoRecalc]);
+  const {
+    inputs,
+    upd,
+    result,
+    calculating,
+    error,
+    autoRecalc,
+    setAutoRecalc,
+    handleCalc,
+  } = useCraneBeamRunner();
 
   return (
     <div>
