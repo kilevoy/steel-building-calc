@@ -6,7 +6,7 @@ export type SpanCount = "single" | "multi";
 
 export interface ProfileData {
   name: string;
-  category: "beam_normal" | "beam_wide" | "beam_column" | "square_tube" | "rect_tube";
+  category: "beam_normal" | "beam_wide" | "beam_column" | "square_tube" | "rect_tube" | "channel_parallel";
   h_mm: number | null;
   b_mm: number | null;
   s_mm: number | null;

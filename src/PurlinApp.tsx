@@ -3,6 +3,11 @@ import { runPurlinCalculation, getCassetteHeightFilter } from "./calc/purlin/eng
 import { useBuilding, type Building } from "./building/context";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
+import {
+  selectRolledTop10,
+  type RolledCandidate,
+  type RolledPrices,
+} from "./calc/purlin/rolled";
 import type {
   PurlinInput,
   PurlinOutput,
@@ -71,11 +76,23 @@ export function PurlinApp() {
     cassetteHeightFilter_mm: getCassetteHeightFilter(building.roofStructure),
   }));
   const [out, setOut] = useState<PurlinOutput | null>(null);
+  const [rolledTop10, setRolledTop10] = useState<RolledCandidate[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [cityQuery, setCityQuery] = useState(building.city);
   const [showCityMatches, setShowCityMatches] = useState(false);
   const [maxUtilFixed, setMaxUtilFixed] = useState<boolean>(false);
   const [maxUtilValue, setMaxUtilValue] = useState<number>(0.85);
+  const [rolledMaxK, setRolledMaxK] = useState<number>(0.8);
+  // Prices for rolled-section selection are mapped from the synced building-level
+  // prices block (С255Б / С355Б / С245 / С345). Channels reuse C245/C345 like tubes.
+  const rolledPrices: RolledPrices = {
+    beam_C255B: building.priceC255B_rubKg,
+    beam_C355B: building.priceC355B_rubKg,
+    tube_C245: building.priceC245_rubKg,
+    tube_C345: building.priceC345_rubKg,
+    channel_C245: building.priceC245_rubKg,
+    channel_C345: building.priceC345_rubKg,
+  };
 
   useEffect(() => {
     const roof = lookupStructure(building.roofStructure);
@@ -127,8 +144,32 @@ export function PurlinApp() {
       };
       const r = runPurlinCalculation(eff);
       setOut(r);
+
+      // SLS load (II ПС) for deflection, per Excel F11+F13 = 0.5·1.1·Sg·cosα·γn + roofLoad/1.2·γn
+      const cosA = Math.cos((eff.roofSlope_deg * Math.PI) / 180);
+      const q_SLS_kPa =
+        0.5 * 1.1 * eff.Sg_kPa * cosA * eff.gamma_n + (eff.roofLoad_kPa / 1.2) * eff.gamma_n;
+      // Axial wind on facade transferred to purlin (Excel D18) — placeholder; full computation
+      // requires facade wind formula. Default Excel scenario value ≈ 29.65 kN.
+      const N_axial_kN = 29.65;
+
+      const rolled = selectRolledTop10(
+        {
+          ...eff,
+          // Force fixed step = 1500 mm (mirrors Excel default for rolled top-10)
+          minStep_mm: 1500,
+          maxStep_mm: 1500,
+          N_axial_kN_externalOverride: N_axial_kN,
+          rolledMaxK,
+          rolledPrices,
+        },
+        r.q_total_kPa,
+        q_SLS_kPa,
+      );
+      setRolledTop10(rolled);
     } catch (e) {
       setOut(null);
+      setRolledTop10([]);
       setError(e instanceof Error ? e.message : String(e));
     }
   };
@@ -137,9 +178,9 @@ export function PurlinApp() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Калькулятор прогонов покрытия (ЛСТК)</h1>
+      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Калькулятор прогонов покрытия</h1>
       <p style={{ color: "#666", fontSize: 13, marginTop: 0 }}>
-        Подбор лёгких стальных тонкостенных профилей (2ТПС, 2ПС, Z) под профлист/сэндвич-панели. Каталог 100 профилей × 2 марки стали (МП350, МП390).
+        Два каталога рядом: ЛСТК (2ТПС/2ПС/Z, МП350/МП390) и прокатные трубы (кв./пр., С245/С345). Шаг прокатных прогонов фиксирован 1500&nbsp;мм.
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
@@ -421,39 +462,93 @@ export function PurlinApp() {
             </table>
           </div>
 
-          <h2 style={{ fontSize: 18, marginBottom: 6 }}>Топ-10 по массе на здание</h2>
-          <div style={{ overflow: "auto" }}>
-            <table style={{ borderCollapse: "collapse", fontSize: 13, minWidth: 720 }}>
-              <thead style={{ background: "#f1f5f9" }}>
-                <tr>
-                  <th style={th}>#</th>
-                  <th style={th}>Сталь</th>
-                  <th style={th}>Профиль</th>
-                  <th style={th}>Шаг, мм</th>
-                  <th style={th}>K</th>
-                  <th style={th}>Кол-во</th>
-                  <th style={th}>Масса/м, кг</th>
-                  <th style={th}>Масса на здание, кг</th>
-                </tr>
-              </thead>
-              <tbody>
-                {out.top10.map((c, i) => (
-                  <tr
-                    key={i}
-                    style={{ background: c.K > 0.95 ? "#fef2f2" : undefined }}
-                  >
-                    <td style={td}>{i + 1}</td>
-                    <td style={td}>{c.profile.Ry_MPa === 350 ? "МП350" : "МП390"}</td>
-                    <td style={td}>{c.profile.name}</td>
-                    <td style={td}>{c.spacing_mm}</td>
-                    <td style={td}>{c.K.toFixed(3)}</td>
-                    <td style={td}>{c.nPurlins}</td>
-                    <td style={td}>{c.profile.mass_kg_per_m.toFixed(3)}</td>
-                    <td style={td}>{c.massPerBuilding_kg.toFixed(2)}</td>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 16,
+              alignItems: "start",
+            }}
+          >
+            <div style={{ overflow: "auto" }}>
+              <h2 style={{ fontSize: 17, marginBottom: 6 }}>
+                Топ-10 ЛСТК (по массе на здание)
+              </h2>
+              <table style={{ borderCollapse: "collapse", fontSize: 12, minWidth: 540 }}>
+                <thead style={{ background: "#f1f5f9" }}>
+                  <tr>
+                    <th style={th}>#</th>
+                    <th style={th}>Сталь</th>
+                    <th style={th}>Профиль</th>
+                    <th style={th}>Шаг, мм</th>
+                    <th style={th}>K</th>
+                    <th style={th}>Кол-во</th>
+                    <th style={th}>Масса/м, кг</th>
+                    <th style={th}>Масса, кг</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {out.top10.map((c, i) => (
+                    <tr
+                      key={i}
+                      style={{ background: c.K > 0.95 ? "#fef2f2" : undefined }}
+                    >
+                      <td style={td}>{i + 1}</td>
+                      <td style={td}>{c.profile.Ry_MPa === 350 ? "МП350" : "МП390"}</td>
+                      <td style={td}>{c.profile.name}</td>
+                      <td style={td}>{c.spacing_mm}</td>
+                      <td style={td}>{c.K.toFixed(3)}</td>
+                      <td style={td}>{c.nPurlins}</td>
+                      <td style={td}>{c.profile.mass_kg_per_m.toFixed(3)}</td>
+                      <td style={td}>{c.massPerBuilding_kg.toFixed(0)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ overflow: "auto" }}>
+              <h2 style={{ fontSize: 17, marginBottom: 6 }}>
+                Топ-10 прокатных труб (по стоимости, шаг 1500&nbsp;мм)
+              </h2>
+              {rolledTop10.length === 0 ? (
+                <div style={{ color: "#999", fontSize: 13, padding: 8 }}>
+                  Нет подходящих прокатных профилей при K&nbsp;≤&nbsp;{rolledMaxK.toFixed(2)}.
+                </div>
+              ) : (
+                <table style={{ borderCollapse: "collapse", fontSize: 12, minWidth: 540 }}>
+                  <thead style={{ background: "#f1f5f9" }}>
+                    <tr>
+                      <th style={th}>#</th>
+                      <th style={th}>Сталь</th>
+                      <th style={th}>Профиль</th>
+                      <th style={th}>Шаг, мм</th>
+                      <th style={th}>K</th>
+                      <th style={th}>Масса/м, кг</th>
+                      <th style={th}>Масса, кг</th>
+                      <th style={th}>₽ за шаг, тыс.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rolledTop10.map((c, i) => (
+                      <tr
+                        key={i}
+                        style={{ background: c.K > 0.95 ? "#fef2f2" : undefined }}
+                      >
+                        <td style={td}>{i + 1}</td>
+                        <td style={td}>{c.steel}</td>
+                        <td style={td}>{c.profile.name}</td>
+                        <td style={td}>{c.spacing_mm}</td>
+                        <td style={td}>{c.K.toFixed(3)}</td>
+                        <td style={td}>{c.profile.mass_kg_per_m.toFixed(2)}</td>
+                        <td style={td}>{c.massPerBuilding_kg.toFixed(0)}</td>
+                        <td style={td}>{c.costPerFrameStep_kRub.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         </div>
       )}
