@@ -1,6 +1,8 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { runCalculation, computeMu } from "./calc/engine";
 import { useBuilding, type Building } from "./building/context";
+import { useBuildingResults, type ColumnResultByType, type ResultItem } from "./building/results";
+import { useRoofTotalLoad_kPa } from "./building/loadPropagation";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import type {
@@ -129,10 +131,58 @@ export function ColumnApp() {
   const [error, setError] = useState<string | null>(null);
   const [cityQuery, setCityQuery] = useState(building.city);
   const [showCityMatches, setShowCityMatches] = useState(false);
+  const { setResult } = useBuildingResults();
+
+  // Publish current column selection into the shared results bus for the Summary tab.
+  useEffect(() => {
+    if (!results) {
+      setResult("column", null);
+      return;
+    }
+    const n_frames = Math.max(2, Math.floor(input.length_m / input.framePitch_m) + 1);
+    const fachverkPerGable = Math.max(
+      0,
+      Math.round(input.span_m / input.fachverkPitch_m) - 1,
+    );
+    const counts: Record<ColumnType, number> = {
+      edge: 2 * n_frames,
+      middle: input.spanCount === "multi" ? n_frames : 0,
+      fachwerk: 2 * fachverkPerGable,
+    };
+    const buildItem = (ct: ColumnType): ResultItem | null => {
+      if (counts[ct] === 0) return null;
+      const r = results[ct].results[0];
+      if (!r) return null;
+      return {
+        profile: r.profileName,
+        steel: r.steel,
+        massPerPiece_kg: r.totalMass_kg,
+        count: counts[ct],
+        totalMass_kg: r.totalMass_kg * counts[ct],
+        // engine's cost_rub is in тыс. руб per single column; convert to руб × count.
+        cost_rub: r.cost_rub * 1000 * counts[ct],
+      };
+    };
+    const payload: ColumnResultByType = {
+      edge: buildItem("edge"),
+      middle: buildItem("middle"),
+      fachwerk: buildItem("fachwerk"),
+    };
+    setResult("column", payload);
+  }, [
+    results,
+    input.length_m,
+    input.span_m,
+    input.framePitch_m,
+    input.fachverkPitch_m,
+    input.spanCount,
+    setResult,
+  ]);
 
   // Pull updates from BuildingContext when other tabs change shared fields.
+  // Roof load includes self-weight of purlins / beam-cell (auto-propagation).
+  const roofLoad = useRoofTotalLoad_kPa();
   useEffect(() => {
-    const roof = lookupStructure(building.roofStructure);
     setInput((cur) => ({
       ...cur,
       span_m: building.span_m,
@@ -144,7 +194,7 @@ export function ColumnApp() {
       Sg_kPa: building.Sg_kPa,
       terrainType: building.terrainType,
       roofStructure: building.roofStructure,
-      roofLoad_kPa: roof ? roof.kPa : cur.roofLoad_kPa,
+      roofLoad_kPa: roofLoad.total_kPa > 0 ? roofLoad.total_kPa : cur.roofLoad_kPa,
       responsibilityCoeff: building.responsibilityCoeff,
       prices: {
         "С255Б": building.priceC255B_rubKg,
@@ -154,7 +204,7 @@ export function ColumnApp() {
       },
     }));
     setCityQuery(building.city);
-  }, [building]);
+  }, [building, roofLoad.total_kPa]);
 
   const updSynced = <K extends keyof Building>(key: K, value: Building[K]) => {
     setBuilding({ [key]: value } as Partial<Building>);
@@ -343,6 +393,15 @@ export function ColumnApp() {
             onChange={(v) => updSynced("roofStructure", v)}
           />
           <Field label="Нагрузка от кровли, кПа" value={input.roofLoad_kPa} onChange={(v) => upd({ roofLoad_kPa: v })} step={0.001} />
+          {(roofLoad.purlin_kPa > 0 || roofLoad.beamCell_kPa > 0) && (
+            <div style={{ fontSize: 11, color: "#0369a1", marginTop: -4, marginBottom: 6 }}>
+              🔗 авто: {roofLoad.structure_kPa.toFixed(3)} (покрытие)
+              {roofLoad.purlin_kPa > 0 && ` + ${roofLoad.purlin_kPa.toFixed(3)} (прогоны)`}
+              {roofLoad.beamCell_kPa > 0 && ` + ${roofLoad.beamCell_kPa.toFixed(3)} (балка покр.)`}
+              {" = "}
+              <b>{roofLoad.total_kPa.toFixed(3)} кПа</b>
+            </div>
+          )}
           <SelectField
             label="Конструкция ограждения"
             value={input.wallStructure}
@@ -449,6 +508,9 @@ export function ColumnApp() {
           )}
         </fieldset>
       </div>
+
+      {/* Auto-propagation info banner */}
+      <LoadPropagationBanner />
 
       <button
         onClick={handleCalc}
@@ -601,6 +663,53 @@ export function ColumnApp() {
 
 const TD: React.CSSProperties = { padding: "3px 6px", whiteSpace: "nowrap" };
 
+/** Compact info banner showing auto-propagated loads from other tabs. */
+function LoadPropagationBanner() {
+  const { results } = useBuildingResults();
+  const roofLoad = useRoofTotalLoad_kPa();
+  const hasRoof = roofLoad.purlin_kPa > 0 || roofLoad.beamCell_kPa > 0;
+  const hasTruss = !!results.truss?.reactions;
+  const hasCrane = !!results.craneBeam;
+  if (!hasRoof && !hasTruss && !hasCrane) return null;
+  const rx = results.truss?.reactions;
+  return (
+    <div
+      style={{
+        marginBottom: 12,
+        padding: "8px 12px",
+        background: "#eff6ff",
+        border: "1px dashed #3b82f6",
+        borderRadius: 6,
+        fontSize: 12,
+        color: "#1e40af",
+        lineHeight: 1.6,
+      }}
+    >
+      <b>🔗 Автопередача нагрузок</b>
+      {hasRoof && (
+        <div>
+          Кровля → {roofLoad.structure_kPa.toFixed(3)}
+          {roofLoad.purlin_kPa > 0 && ` + ${roofLoad.purlin_kPa.toFixed(3)} (прогоны)`}
+          {roofLoad.beamCell_kPa > 0 && ` + ${roofLoad.beamCell_kPa.toFixed(3)} (балка покр.)`}
+          {" = "}<b>{roofLoad.total_kPa.toFixed(3)} кПа</b> → нагрузка от кровли
+        </div>
+      )}
+      {hasTruss && rx && (
+        <div>
+          Ферма (реакции на опоры) → V<sub>пост</sub> = {rx.V_perm_kN.toFixed(1)} кН,
+          V<sub>снег</sub> = {rx.V_snow_kN.toFixed(1)} кН,
+          V<sub>ветер</sub> = {rx.V_wind_kN.toFixed(1)} кН
+        </div>
+      )}
+      {hasCrane && (
+        <div>
+          Подкрановая балка → {results.craneBeam!.profile} ({results.craneBeam!.steel})
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Field({
   label,
   value,
@@ -724,8 +833,9 @@ import { PurlinApp } from "./PurlinApp";
 import { BeamCellApp } from "./BeamCellApp";
 import { WindowRiegelApp } from "./WindowRiegelApp";
 import { CraneBeamApp } from "./CraneBeamApp";
+import { SummaryApp } from "./SummaryApp";
 
-type Mode = "column" | "truss" | "purlins" | "beamCell" | "windowRiegel" | "craneBeam";
+type Mode = "column" | "truss" | "purlins" | "beamCell" | "windowRiegel" | "craneBeam" | "summary";
 
 export function App() {
   const [mode, setMode] = useState<Mode>("column");
@@ -740,11 +850,13 @@ export function App() {
       ? "Балка покрытия"
       : m === "windowRiegel"
       ? "Оконные ригели"
-      : "Подкрановая балка";
+      : m === "craneBeam"
+      ? "Подкрановая балка"
+      : "Сводка";
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 1400, margin: "0 auto", padding: 16 }}>
       <div style={{ display: "flex", gap: 8, marginBottom: 16, borderBottom: "2px solid #e2e8f0", flexWrap: "wrap" }}>
-        {(["column", "truss", "purlins", "beamCell", "windowRiegel", "craneBeam"] as const).map((m) => {
+        {(["column", "truss", "purlins", "beamCell", "windowRiegel", "craneBeam", "summary"] as const).map((m) => {
           const isActive = mode === m;
           return (
             <button
@@ -775,6 +887,7 @@ export function App() {
       {mode === "beamCell" && <BeamCellApp />}
       {mode === "windowRiegel" && <WindowRiegelApp />}
       {mode === "craneBeam" && <CraneBeamApp />}
+      {mode === "summary" && <SummaryApp />}
     </div>
   );
 }

@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PricesBlock } from "./building/PricesBlock";
+import { useBuildingResults, type ResultItem } from "./building/results";
 import {
   calculateCraneBeam,
   craneOptions,
@@ -27,6 +28,24 @@ export function CraneBeamApp() {
   const [result, setResult] = useState<CraneCalculationResult | null>(null);
   const [calculating, setCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { setResult: publishResult } = useBuildingResults();
+
+  // Publish selected crane-beam profile (per piece) into shared bus.
+  useEffect(() => {
+    if (!result || !result.profile || result.weightKg == null) {
+      publishResult("craneBeam", null);
+      return;
+    }
+    const item: ResultItem = {
+      profile: result.profile,
+      steel: "С345", // crane beams are typically С345
+      massPerPiece_kg: result.weightKg,
+      count: 1,
+      totalMass_kg: result.weightKg,
+      cost_rub: 0, // crane-beam cost is not in the current PricesBlock
+    };
+    publishResult("craneBeam", item);
+  }, [result, publishResult]);
 
   const upd = <K extends keyof CraneCalculatorInputs>(k: K, v: CraneCalculatorInputs[K]) =>
     setInputs((cur) => ({ ...cur, [k]: v }));

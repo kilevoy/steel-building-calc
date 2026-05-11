@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { calculate, defaultInputs } from "./calc/beamCell/engine";
 import { useBuilding, type Building } from "./building/context";
+import { useBuildingResults, type ResultItem } from "./building/results";
 import { SyncedNumField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import type {
@@ -65,6 +66,27 @@ export function BeamCellApp() {
   const result = useMemo(() => calculate(inputs), [inputs]);
   const upd = <K extends keyof CalculatorInputs>(k: K, v: CalculatorInputs[K]) =>
     setInputs((cur) => ({ ...cur, [k]: v }));
+
+  // Publish accepted main beam selection to shared results bus for the Summary tab.
+  const { setResult } = useBuildingResults();
+  useEffect(() => {
+    const sol = result.main[inputs.acceptedMainSteel];
+    if (!sol || sol.status !== "OK" || !sol.profile || sol.weightKg === undefined) {
+      setResult("beamCell", null);
+      return;
+    }
+    const n_beams = Math.max(2, Math.floor(building.length_m / building.framePitch_m) + 1);
+    const steelLabel = sol.material === "C245" ? "С245" : "С345";
+    const item: ResultItem = {
+      profile: sol.profile,
+      steel: steelLabel,
+      massPerPiece_kg: sol.weightKg,
+      count: n_beams,
+      totalMass_kg: sol.weightKg * n_beams,
+      cost_rub: (sol.costRub ?? 0) * n_beams,
+    };
+    setResult("beamCell", item);
+  }, [result, inputs.acceptedMainSteel, building.length_m, building.framePitch_m, setResult]);
 
   return (
     <div>
