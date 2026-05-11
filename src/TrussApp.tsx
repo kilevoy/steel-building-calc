@@ -1,6 +1,8 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { runTrussCalculation, getDefaultMinThickness } from "./calc/truss/engine";
 import { useBuilding, type Building } from "./building/context";
+import { useBuildingResults, type TrussResult } from "./building/results";
+import { useRoofTotalLoad_kPa } from "./building/loadPropagation";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import {
@@ -66,9 +68,46 @@ export function TrussApp() {
   const [error, setError] = useState<string | null>(null);
   const [cityQuery, setCityQuery] = useState(building.city);
   const [showCityMatches, setShowCityMatches] = useState(false);
+  const { setResult } = useBuildingResults();
 
+  // Publish truss selection into shared results bus for the Summary tab.
   useEffect(() => {
-    const roof = lookupStructure(building.roofStructure);
+    if (!out) {
+      setResult("truss", null);
+      return;
+    }
+    const n_trusses = Math.max(2, Math.floor(input.length_m / input.framePitch_m) + 1);
+    const sections = TRUSS_SECTIONS.flatMap((sec) => {
+      const r = out.sections[sec];
+      const sel = r.selected;
+      if (!sel) return [];
+      return [{
+        section: TRUSS_SECTION_SHORT[sec],
+        profile: sel.profile.name,
+        steel: "С345", // truss tubes are typically С345
+        totalMass_kg: sel.totalMass_kg * n_trusses,
+      }];
+    });
+    const totalMass = out.totalMass_kg * n_trusses;
+    const totalCost = totalMass * building.priceC345_rubKg;
+    const payload: TrussResult = {
+      sections,
+      totalMass_kg: totalMass,
+      totalCost_rub: totalCost,
+      unitMass_kg_per_m2: out.unitMass_kg_per_m2,
+      n_trusses,
+      reactions: {
+        V_perm_kN: out.loads.roof_kN_per_m * input.span_m / 2,
+        V_snow_kN: out.loads.snow_kN_per_m * input.span_m / 2,
+        V_wind_kN: out.loads.wind_kN_per_m * input.span_m / 2,
+        H_kN: 0, // horizontal not computed here; placeholder
+      },
+    };
+    setResult("truss", payload);
+  }, [out, input.length_m, input.framePitch_m, input.span_m, building.priceC345_rubKg, setResult]);
+
+  const roofLoad = useRoofTotalLoad_kPa();
+  useEffect(() => {
     setInput((cur) => ({
       ...cur,
       span_m: building.span_m,
@@ -80,11 +119,12 @@ export function TrussApp() {
       Sg_kPa: building.Sg_kPa,
       terrainType: building.terrainType,
       roofStructure: building.roofStructure,
-      roofLoad_kPa: roof ? roof.kPa : cur.roofLoad_kPa,
+      // Auto-propagation: roof load = panel + purlin self-weight + beam-cell self-weight.
+      roofLoad_kPa: roofLoad.total_kPa > 0 ? roofLoad.total_kPa : cur.roofLoad_kPa,
       responsibilityCoeff: building.responsibilityCoeff,
     }));
     setCityQuery(building.city);
-  }, [building]);
+  }, [building, roofLoad.total_kPa]);
 
   const updSynced = <K extends keyof Building>(key: K, value: Building[K]) => {
     setBuilding({ [key]: value } as Partial<Building>);
@@ -223,6 +263,15 @@ export function TrussApp() {
             onChange={(v) => upd({ roofLoad_kPa: v })}
             step={0.01}
           />
+          {(roofLoad.purlin_kPa > 0 || roofLoad.beamCell_kPa > 0) && (
+            <div style={{ fontSize: 11, color: "#0369a1", marginTop: -4, marginBottom: 6 }}>
+              🔗 авто: {roofLoad.structure_kPa.toFixed(3)} (покрытие)
+              {roofLoad.purlin_kPa > 0 && ` + ${roofLoad.purlin_kPa.toFixed(3)} (прогоны)`}
+              {roofLoad.beamCell_kPa > 0 && ` + ${roofLoad.beamCell_kPa.toFixed(3)} (балка покр.)`}
+              {" = "}
+              <b>{roofLoad.total_kPa.toFixed(3)} кПа</b>
+            </div>
+          )}
           <Field
             label="Надбавка к нагрузке, %"
             value={input.loadAddition_pct}
