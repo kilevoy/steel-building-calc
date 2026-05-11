@@ -3,12 +3,15 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { BuildingProvider } from "./building/context";
 import { BuildingResultsProvider } from "./building/results";
+import { CraneBeamRunnerProvider } from "./building/craneBeamRunner";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BuildingProvider>
       <BuildingResultsProvider>
-        <App />
+        <CraneBeamRunnerProvider>
+          <App />
+        </CraneBeamRunnerProvider>
       </BuildingResultsProvider>
     </BuildingProvider>
   </StrictMode>,
