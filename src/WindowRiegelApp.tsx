@@ -134,16 +134,16 @@ export function WindowRiegelApp() {
             </datalist>
           </div>
           <NumField label="Высота окна, м" value={inputs.windowHeightM} step={0.1} onChange={(v) => upd("windowHeightM", v)} />
-          <SyncedNumField label="Шаг рам, м" value={inputs.frameStepM} step={0.5} onChange={(v) => updSynced("framePitch_m", v)} />
+          <SyncedNumField label="Шаг рам, м" value={inputs.frameStepM} step={0.5} onChange={(v) => updSynced("framePitch_m", v)} validationKind="positive" />
           <SelField
             label="Тип окна"
             value={String(inputs.windowType)}
             options={windowRiegelOptions.windowTypes.map((t) => [String(t), WINDOW_TYPE_LABELS[t] ?? `Тип ${t}`])}
             onChange={(v) => upd("windowType", Number(v))}
           />
-          <SyncedNumField label="Высота здания, м" value={inputs.buildingHeightM} step={0.5} onChange={(v) => updSynced("height_m", v)} />
-          <SyncedNumField label="Пролёт здания, м" value={inputs.buildingSpanM} step={1} onChange={(v) => updSynced("span_m", v)} />
-          <SyncedNumField label="Длина здания, м" value={inputs.buildingLengthM} step={1} onChange={(v) => updSynced("length_m", v)} />
+          <SyncedNumField label="Высота здания, м" value={inputs.buildingHeightM} step={0.5} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
+          <SyncedNumField label="Пролёт здания, м" value={inputs.buildingSpanM} step={1} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+          <SyncedNumField label="Длина здания, м" value={inputs.buildingLengthM} step={1} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
         </fieldset>
 
         {/* Column 2: Wind & loads */}
@@ -155,7 +155,7 @@ export function WindowRiegelApp() {
             options={windowRiegelOptions.terrainTypes.map((t) => [String(t), String(t)])}
             onChange={(v) => updSynced("terrainType", v as Building["terrainType"])}
           />
-          <SyncedNumField label="Ветровая нагрузка w₀, кПа" value={inputs.windLoadKpa} step={0.01} onChange={(v) => updSynced("w0_kPa", v)} />
+          <SyncedNumField label="Ветровая нагрузка w₀, кПа" value={inputs.windLoadKpa} step={0.01} onChange={(v) => updSynced("w0_kPa", v)} validationKind="nonNegative" />
           <SyncedSelectField
             label="Уровень ответственности γₙ"
             value={String(inputs.responsibilityLevel)}

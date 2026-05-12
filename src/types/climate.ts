@@ -9,6 +9,8 @@
  * карты районирования) и СП 14.13330 (сейсмика).
  */
 
+import type { TerrainType } from "./common";
+
 /** Статус достоверности отдельного климатического параметра. */
 export type ClimateParameterStatus =
   /** Значение проверено вручную и совпадает с актуальным СП. */
@@ -23,7 +25,7 @@ export type ClimateParameterStatus =
   | "not_applicable";
 
 /** Тип местности по СП 20.13330.2016, табл. 11.2. */
-export type TerrainType = "A" | "B" | "C";
+export type { TerrainType };
 
 /** Сводный статус достоверности всей записи населённого пункта. */
 export type SettlementDataStatus =

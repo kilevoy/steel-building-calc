@@ -1,14 +1,28 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import type { ReactNode } from "react";
-import {
-  calculateCraneBeam,
-  defaultCraneInputs,
-} from "../calc/craneBeam/engine";
 import type {
   CraneCalculationResult,
   CraneCalculatorInputs,
 } from "../calc/craneBeam/types";
 import { useBuildingResults, type ResultItem } from "./results";
+
+const defaultCraneInputs: CraneCalculatorInputs = {
+  capacity: 5,
+  craneSpan: 24,
+  wheelCount: 4,
+  suspensionType: "гибкий",
+  workGroup: "3К",
+  craneCount: "один",
+  rail: "Р50",
+  beamSpan: 6,
+  brakeStructure: "нет",
+  ribStep: 0,
+  gammaF: 1.2,
+  gammaDynamic: 1.2,
+  gammaC: 1,
+  selfWeightFactor: 1.06,
+  fatigueCalculation: "нет",
+};
 
 /**
  * Поднятое состояние подкрановой балки (HyperFormula, ~3–10 сек).
@@ -65,6 +79,7 @@ export function CraneBeamRunnerProvider({ children }: { children: ReactNode }) {
     setError(null);
     await new Promise((r) => setTimeout(r, 0));
     try {
+      const { calculateCraneBeam } = await import("../calc/craneBeam/engine");
       const r = calculateCraneBeam(inputs);
       setResult(r);
     } catch (e) {

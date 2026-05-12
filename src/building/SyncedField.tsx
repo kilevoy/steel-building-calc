@@ -1,4 +1,9 @@
 import type { ReactNode } from "react";
+import {
+  userValidationMessage,
+  validateNumberByKind,
+  type ValidationKind,
+} from "../utils/validation";
 
 const SYNCED_BG = "#fef9c3";       // light yellow
 const SYNCED_BORDER = "#eab308";   // amber-500
@@ -57,13 +62,16 @@ export function SyncedNumField({
   onChange,
   step = 1,
   hint = "Синхронизировано со всеми вкладками",
+  validationKind,
 }: {
   label: string;
   value: number;
   onChange: (v: number) => void;
   step?: number;
   hint?: string;
+  validationKind?: ValidationKind;
 }) {
+  const validationMessage = validateNumberByKind(value, label, validationKind);
   return (
     <div title={hint} style={SYNCED_FIELD_STYLE}>
       <label style={{ fontSize: 13, display: "block" }}>
@@ -77,6 +85,11 @@ export function SyncedNumField({
         onChange={(e) => onChange(Number(e.target.value))}
         style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       />
+      {validationMessage && (
+        <div style={{ marginTop: 3, fontSize: 12, color: "#b91c1c" }}>
+          {userValidationMessage(validationMessage)}
+        </div>
+      )}
     </div>
   );
 }

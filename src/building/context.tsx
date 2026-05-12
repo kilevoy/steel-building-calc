@@ -1,12 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import type { TerrainType } from "../types/common";
 
 /**
  * Общие параметры здания, синхронизируемые между вкладками калькулятора.
  * Каждая вкладка может игнорировать любое поле — оно не обязано присутствовать
  * во всех расчётах.
  */
-export type TerrainType = "A" | "B" | "C";
 export type RoofShape = "gable" | "monoslope"; // Двускатная / Односкатная
 
 export interface Building {

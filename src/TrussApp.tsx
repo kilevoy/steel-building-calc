@@ -6,6 +6,7 @@ import { useRoofTotalLoad_kPa } from "./building/loadPropagation";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
+import { validateBuildingNumericInput } from "./utils/validation";
 import {
   TRUSS_SECTIONS,
   TRUSS_SECTION_LABELS,
@@ -68,15 +69,29 @@ export function TrussApp() {
   const [cityQuery, setCityQuery] = useState(building.city);
   const [showCityMatches, setShowCityMatches] = useState(false);
   const { setResult } = useBuildingResults();
+  const validationErrors = useMemo(
+    () => validateBuildingNumericInput({
+      span_m: input.span_m,
+      length_m: input.length_m,
+      height_m: input.height_m,
+      framePitch_m: input.framePitch_m,
+      w0_kPa: input.w0_kPa,
+      Sg_kPa: input.Sg_kPa,
+    }),
+    [input.span_m, input.length_m, input.height_m, input.framePitch_m, input.w0_kPa, input.Sg_kPa],
+  );
 
   // Auto-recompute on every input change — no «Рассчитать» button needed.
   const { out, error } = useMemo<{ out: TrussOutput | null; error: string | null }>(() => {
+    if (validationErrors.length > 0) {
+      return { out: null, error: validationErrors[0] };
+    }
     try {
       return { out: runTrussCalculation(input), error: null };
     } catch (e) {
       return { out: null, error: e instanceof Error ? e.message : String(e) };
     }
-  }, [input]);
+  }, [input, validationErrors]);
 
   // Publish truss selection into shared results bus for the Summary tab.
   useEffect(() => {
@@ -180,11 +195,11 @@ export function TrussApp() {
         {/* Column 1: geometry */}
         <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
           <legend style={{ fontWeight: 600 }}>Геометрия фермы</legend>
-          <SyncedNumField label="Пролёт, м (18–30)" value={input.span_m} onChange={(v) => updSynced("span_m", v)} />
-          <SyncedNumField label="Длина здания, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} />
-          <SyncedNumField label="Высота до низа фермы, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} />
+          <SyncedNumField label="Пролёт, м (18–30)" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+          <SyncedNumField label="Длина здания, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
+          <SyncedNumField label="Высота до низа фермы, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
           <SyncedNumField label="Уклон кровли, °" value={input.roofSlope_deg} onChange={(v) => updSynced("roofSlope_deg", v)} />
-          <SyncedNumField label="Шаг рам, м" value={input.framePitch_m} onChange={(v) => updSynced("framePitch_m", v)} />
+          <SyncedNumField label="Шаг рам, м" value={input.framePitch_m} onChange={(v) => updSynced("framePitch_m", v)} validationKind="positive" />
           <Field
             label="Шаг прогонов, мм (0 = без прогонов)"
             value={input.purlinPitch_mm}
@@ -250,8 +265,8 @@ export function TrussApp() {
             ]}
             onChange={(v) => updSynced("terrainType", v as Building["terrainType"])}
           />
-          <SyncedNumField label="w₀ (ветер), кПа" value={input.w0_kPa} onChange={(v) => updSynced("w0_kPa", v)} step={0.01} />
-          <SyncedNumField label="Sg (снег), кПа" value={input.Sg_kPa} onChange={(v) => updSynced("Sg_kPa", v)} step={0.01} />
+          <SyncedNumField label="w₀ (ветер), кПа" value={input.w0_kPa} onChange={(v) => updSynced("w0_kPa", v)} step={0.01} validationKind="nonNegative" />
+          <SyncedNumField label="Sg (снег), кПа" value={input.Sg_kPa} onChange={(v) => updSynced("Sg_kPa", v)} step={0.01} validationKind="nonNegative" />
           <SyncedSelectField
             label="Конструкция покрытия"
             value={input.roofStructure}
@@ -335,6 +350,10 @@ export function TrussApp() {
 
       {out && (
         <div>
+          <div style={{ background: "#fef3c7", border: "1px solid #fde68a", padding: 8, marginBottom: 12, color: "#92400e", fontSize: 13 }}>
+            Внимание: горизонтальная реакция H пока не рассчитывается и временно принимается равной 0. Для расчёта колонн это допущение нужно проверить отдельно.
+          </div>
+
           {/* Sticky summary */}
           <div style={{ display: "flex", gap: 16, padding: "12px 16px", background: "#f1f5f9", borderRadius: 6, marginBottom: 12, alignItems: "center", flexWrap: "wrap" }}>
             <Stat label="Общая масса фермы, кг" value={out.totalMass_kg.toFixed(1)} />

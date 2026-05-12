@@ -1,5 +1,7 @@
 /** Light-gauge steel framing (ЛСТК) purlin types. */
 
+import type { TerrainType } from "../../types/common";
+
 export type LstkProfileType = "2TPS" | "2PS" | "Z";
 export type SteelGrade = "MP350" | "MP390";
 
@@ -40,7 +42,7 @@ export interface PurlinInput {
   framePitch_m: number;
 
   /** Wind */
-  terrainType: "A" | "B" | "C";
+  terrainType: TerrainType;
   w0_kPa: number;
   /** Snow ground load, kN/m² */
   Sg_kPa: number;

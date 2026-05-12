@@ -5,6 +5,7 @@ import { useBuildingResults, type ResultItem } from "./building/results";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
+import { validateBuildingNumericInput } from "./utils/validation";
 import {
   selectRolledTop10,
   type RolledCandidate,
@@ -84,14 +85,30 @@ export function PurlinApp() {
   const [rolledMaxK, setRolledMaxK] = useState<number>(0.8);
   // Prices for rolled-section selection are mapped from the synced building-level
   // prices block (С255Б / С355Б / С245 / С345). Channels reuse C245/C345 like tubes.
-  const rolledPrices: RolledPrices = {
+  const rolledPrices = useMemo<RolledPrices>(() => ({
     beam_C255B: building.priceC255B_rubKg,
     beam_C355B: building.priceC355B_rubKg,
     tube_C245: building.priceC245_rubKg,
     tube_C345: building.priceC345_rubKg,
     channel_C245: building.priceC245_rubKg,
     channel_C345: building.priceC345_rubKg,
-  };
+  }), [
+    building.priceC255B_rubKg,
+    building.priceC355B_rubKg,
+    building.priceC245_rubKg,
+    building.priceC345_rubKg,
+  ]);
+  const validationErrors = useMemo(
+    () => validateBuildingNumericInput({
+      span_m: input.span_m,
+      length_m: input.length_m,
+      height_m: input.height_m,
+      framePitch_m: input.framePitch_m,
+      w0_kPa: input.w0_kPa,
+      Sg_kPa: input.Sg_kPa,
+    }),
+    [input.span_m, input.length_m, input.height_m, input.framePitch_m, input.w0_kPa, input.Sg_kPa],
+  );
 
   useEffect(() => {
     const roof = lookupStructure(building.roofStructure);
@@ -141,6 +158,9 @@ export function PurlinApp() {
     rolledTop10: RolledCandidate[];
     error: string | null;
   }>(() => {
+    if (validationErrors.length > 0) {
+      return { out: null, rolledTop10: [], error: validationErrors[0] };
+    }
     try {
       const eff: PurlinInput = {
         ...input,
@@ -169,7 +189,7 @@ export function PurlinApp() {
     } catch (e) {
       return { out: null, rolledTop10: [], error: e instanceof Error ? e.message : String(e) };
     }
-  }, [input, maxUtilFixed, maxUtilValue, rolledMaxK, rolledPrices]);
+  }, [input, maxUtilFixed, maxUtilValue, rolledMaxK, rolledPrices, validationErrors]);
 
   // Publish ЛСТК top-1 selection to shared results bus for the Summary tab.
   useEffect(() => {
@@ -214,11 +234,11 @@ export function PurlinApp() {
             ]}
             onChange={(v) => updSynced("roofShape", v as Building["roofShape"])}
           />
-          <SyncedNumField label="Пролёт, м" value={input.span_m} onChange={(v) => updSynced("span_m", v)} />
-          <SyncedNumField label="Длина здания, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} />
-          <SyncedNumField label="Высота до низа фермы, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} />
+          <SyncedNumField label="Пролёт, м" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+          <SyncedNumField label="Длина здания, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
+          <SyncedNumField label="Высота до низа фермы, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
           <SyncedNumField label="Уклон кровли, °" value={input.roofSlope_deg} onChange={(v) => updSynced("roofSlope_deg", v)} />
-          <SyncedNumField label="Шаг рам / пролёт прогона, м" value={input.framePitch_m} onChange={(v) => updSynced("framePitch_m", v)} />
+          <SyncedNumField label="Шаг рам / пролёт прогона, м" value={input.framePitch_m} onChange={(v) => updSynced("framePitch_m", v)} validationKind="positive" />
           <SyncedNumField
             label="γₙ (коэф. ответственности)"
             value={input.gamma_n}
@@ -278,8 +298,8 @@ export function PurlinApp() {
             ]}
             onChange={(v) => updSynced("terrainType", v as Building["terrainType"])}
           />
-          <SyncedNumField label="w₀ (ветер), кПа" value={input.w0_kPa} onChange={(v) => updSynced("w0_kPa", v)} step={0.01} />
-          <SyncedNumField label="Sg (снег), кПа" value={input.Sg_kPa} onChange={(v) => updSynced("Sg_kPa", v)} step={0.05} />
+          <SyncedNumField label="w₀ (ветер), кПа" value={input.w0_kPa} onChange={(v) => updSynced("w0_kPa", v)} step={0.01} validationKind="nonNegative" />
+          <SyncedNumField label="Sg (снег), кПа" value={input.Sg_kPa} onChange={(v) => updSynced("Sg_kPa", v)} step={0.05} validationKind="nonNegative" />
           <SyncedSelectField
             label="Конструкция покрытия"
             value={input.roofStructure}
@@ -392,6 +412,10 @@ export function PurlinApp() {
 
       {out && (
         <div style={{ marginTop: 18 }}>
+          <div style={{ background: "#fef3c7", border: "1px solid #fde68a", padding: 8, marginBottom: 12, color: "#92400e", fontSize: 13 }}>
+            Внимание: осевая ветровая нагрузка для прокатных прогонов пока задана временным допущением. Требуется последующая замена на полноценный расчёт.
+          </div>
+
           <h2 style={{ fontSize: 18, marginBottom: 6 }}>Нагрузки</h2>
           <div
             style={{

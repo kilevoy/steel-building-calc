@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from "react";
+import { lazy, Suspense, useMemo, useState, useCallback, useEffect } from "react";
 import { runCalculation, computeMu } from "./calc/engine";
 import { useBuilding, type Building } from "./building/context";
 import { useBuildingResults, type ColumnResultByType, type ResultItem } from "./building/results";
@@ -6,13 +6,14 @@ import { useRoofTotalLoad_kPa } from "./building/loadPropagation";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { validateBuildingNumericInput } from "./utils/validation";
 import type {
   CalculationInput,
   CalculationOutput,
   ColumnType,
   CraneCapacity,
   SpanCount,
-  TerrainType,
 } from "./calc/types";
 import {
   searchSettlements,
@@ -20,6 +21,19 @@ import {
 } from "./types/climate";
 import structuresJson from "./data/structures/structures.json";
 import cranesJson from "./data/cranes/cranes.json";
+
+const TrussApp = lazy(() => import("./TrussApp").then((module) => ({ default: module.TrussApp })));
+const PurlinApp = lazy(() => import("./PurlinApp").then((module) => ({ default: module.PurlinApp })));
+const BeamCellApp = lazy(() => import("./BeamCellApp").then((module) => ({ default: module.BeamCellApp })));
+const WindowRiegelApp = lazy(() => import("./WindowRiegelApp").then((module) => ({ default: module.WindowRiegelApp })));
+const CraneBeamApp = lazy(() => import("./CraneBeamApp").then((module) => ({ default: module.CraneBeamApp })));
+const SummaryApp = lazy(() => import("./SummaryApp").then((module) => ({ default: module.SummaryApp })));
+
+const TAB_FALLBACK = (
+  <div className="p-4 text-sm text-slate-500">
+    Загрузка модуля расчёта…
+  </div>
+);
 
 const COLUMN_TYPES: ColumnType[] = ["edge", "fachwerk", "middle"];
 const COLUMN_LABELS: Record<ColumnType, string> = {
@@ -130,9 +144,23 @@ export function ColumnApp() {
   const [cityQuery, setCityQuery] = useState(building.city);
   const [showCityMatches, setShowCityMatches] = useState(false);
   const { setResult } = useBuildingResults();
+  const validationErrors = useMemo(
+    () => validateBuildingNumericInput({
+      span_m: input.span_m,
+      length_m: input.length_m,
+      height_m: input.height_m,
+      framePitch_m: input.framePitch_m,
+      w0_kPa: input.w0_kPa,
+      Sg_kPa: input.Sg_kPa,
+    }),
+    [input.span_m, input.length_m, input.height_m, input.framePitch_m, input.w0_kPa, input.Sg_kPa],
+  );
 
   // Auto-recompute results on every input change — no «Рассчитать» button needed.
   const { results, error } = useMemo<{ results: Results | null; error: string | null }>(() => {
+    if (validationErrors.length > 0) {
+      return { results: null, error: validationErrors[0] };
+    }
     try {
       const out: Partial<Results> = {};
       for (const ct of COLUMN_TYPES) {
@@ -142,7 +170,7 @@ export function ColumnApp() {
     } catch (e) {
       return { results: null, error: e instanceof Error ? e.message : String(e) };
     }
-  }, [input]);
+  }, [input, validationErrors]);
 
   // Publish current column selection into the shared results bus for the Summary tab.
   useEffect(() => {
@@ -302,11 +330,11 @@ export function ColumnApp() {
         {/* Column 1: building geometry */}
         <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
           <legend style={{ fontWeight: 600 }}>Геометрия здания</legend>
-          <SyncedNumField label="Пролёт, м" value={input.span_m} onChange={(v) => updSynced("span_m", v)} />
-          <SyncedNumField label="Длина, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} />
-          <SyncedNumField label="Высота, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} />
+          <SyncedNumField label="Пролёт, м" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+          <SyncedNumField label="Длина, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
+          <SyncedNumField label="Высота, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
           <SyncedNumField label="Уклон кровли, °" value={input.roofSlope_deg} onChange={(v) => updSynced("roofSlope_deg", v)} />
-          <SyncedNumField label="Шаг рам, м" value={input.framePitch_m} onChange={(v) => updSynced("framePitch_m", v)} />
+          <SyncedNumField label="Шаг рам, м" value={input.framePitch_m} onChange={(v) => updSynced("framePitch_m", v)} validationKind="positive" />
           <Field label="Шаг стоек фахверка, м" value={input.fachverkPitch_m} onChange={(v) => upd({ fachverkPitch_m: v })} />
           <SelectField
             label="Кол-во пролётов"
@@ -384,8 +412,8 @@ export function ColumnApp() {
             ]}
             onChange={(v) => updSynced("terrainType", v as Building["terrainType"])}
           />
-          <SyncedNumField label="w₀ (ветер), кПа" value={input.w0_kPa} onChange={(v) => updSynced("w0_kPa", v)} step={0.01} />
-          <SyncedNumField label="Sg (снег), кПа" value={input.Sg_kPa} onChange={(v) => updSynced("Sg_kPa", v)} step={0.01} />
+          <SyncedNumField label="w₀ (ветер), кПа" value={input.w0_kPa} onChange={(v) => updSynced("w0_kPa", v)} step={0.01} validationKind="nonNegative" />
+          <SyncedNumField label="Sg (снег), кПа" value={input.Sg_kPa} onChange={(v) => updSynced("Sg_kPa", v)} step={0.01} validationKind="nonNegative" />
           <SyncedSelectField
             label="Конструкция покрытия"
             value={input.roofStructure}
@@ -813,13 +841,6 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-import { TrussApp } from "./TrussApp";
-import { PurlinApp } from "./PurlinApp";
-import { BeamCellApp } from "./BeamCellApp";
-import { WindowRiegelApp } from "./WindowRiegelApp";
-import { CraneBeamApp } from "./CraneBeamApp";
-import { SummaryApp } from "./SummaryApp";
-
 type Mode = "column" | "truss" | "purlins" | "beamCell" | "windowRiegel" | "craneBeam" | "summary";
 
 export function App() {
@@ -867,12 +888,48 @@ export function App() {
       </div>
       <BuildingSummaryBanner />
       {mode === "column" && <ColumnApp />}
-      {mode === "truss" && <TrussApp />}
-      {mode === "purlins" && <PurlinApp />}
-      {mode === "beamCell" && <BeamCellApp />}
-      {mode === "windowRiegel" && <WindowRiegelApp />}
-      {mode === "craneBeam" && <CraneBeamApp />}
-      {mode === "summary" && <SummaryApp />}
+      {mode === "truss" && (
+        <ErrorBoundary key={mode}>
+          <Suspense fallback={TAB_FALLBACK}>
+            <TrussApp />
+          </Suspense>
+        </ErrorBoundary>
+      )}
+      {mode === "purlins" && (
+        <ErrorBoundary key={mode}>
+          <Suspense fallback={TAB_FALLBACK}>
+            <PurlinApp />
+          </Suspense>
+        </ErrorBoundary>
+      )}
+      {mode === "beamCell" && (
+        <ErrorBoundary key={mode}>
+          <Suspense fallback={TAB_FALLBACK}>
+            <BeamCellApp />
+          </Suspense>
+        </ErrorBoundary>
+      )}
+      {mode === "windowRiegel" && (
+        <ErrorBoundary key={mode}>
+          <Suspense fallback={TAB_FALLBACK}>
+            <WindowRiegelApp />
+          </Suspense>
+        </ErrorBoundary>
+      )}
+      {mode === "craneBeam" && (
+        <ErrorBoundary key={mode}>
+          <Suspense fallback={TAB_FALLBACK}>
+            <CraneBeamApp />
+          </Suspense>
+        </ErrorBoundary>
+      )}
+      {mode === "summary" && (
+        <ErrorBoundary key={mode}>
+          <Suspense fallback={TAB_FALLBACK}>
+            <SummaryApp />
+          </Suspense>
+        </ErrorBoundary>
+      )}
     </div>
   );
 }

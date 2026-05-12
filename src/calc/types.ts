@@ -1,6 +1,8 @@
+import type { TerrainType } from "../types/common";
+
 export type ColumnType = "edge" | "middle" | "fachwerk";
 export type RoofType = "gable" | "single_slope";
-export type TerrainType = "A" | "B" | "C";
+export type { TerrainType };
 export type SteelGrade = "С255Б" | "С355Б" | "С245" | "С345";
 export type SpanCount = "single" | "multi";
 
