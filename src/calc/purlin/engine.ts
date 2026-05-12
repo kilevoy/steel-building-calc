@@ -101,7 +101,6 @@ function evaluateProfile(
   spacing_mm: number,
   q_total_kPa: number,
   input: PurlinInput,
-  L_slope_m: number,
 ): PurlinCandidate | null {
   // Cassette height filter (Лист1!C97)
   if (input.cassetteHeightFilter_mm > 0 && profile.h_mm !== input.cassetteHeightFilter_mm) {
@@ -163,7 +162,6 @@ function evaluateProfile(
 export function enumerateCandidates(
   input: PurlinInput,
   q_total_kPa: number,
-  L_slope_m: number,
 ): PurlinCandidate[] {
   const out: PurlinCandidate[] = [];
   const minS = Math.min(input.minStep_mm, input.maxStep_mm);
@@ -171,7 +169,7 @@ export function enumerateCandidates(
   for (let s = minS; s <= maxS; s += 5) {
     for (const grade of ["MP350", "MP390"] as SteelGrade[]) {
       for (const profile of ALL_PROFILES[grade]) {
-        const cand = evaluateProfile(profile, s, q_total_kPa, input, L_slope_m);
+        const cand = evaluateProfile(profile, s, q_total_kPa, input);
         if (cand) out.push(cand);
       }
     }
@@ -203,7 +201,7 @@ export function runPurlinCalculation(input: PurlinInput): PurlinOutput {
   const slopeFactor = input.roofShape === "gable" ? 2 : 1;
   const L_slope_m = (input.span_m - 0.3) / slopeFactor;
 
-  const allCandidates = enumerateCandidates(input, loads.q_total_kPa, L_slope_m);
+  const allCandidates = enumerateCandidates(input, loads.q_total_kPa);
 
   const sections = bestPerGroup(allCandidates);
 

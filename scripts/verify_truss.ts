@@ -1,7 +1,6 @@
 // Verify truss engine against Excel default scenario.
 import {
   runTrussCalculation,
-  computeLoads,
   computeForces,
   getDefaultMinThickness,
 } from "../src/calc/truss/engine";

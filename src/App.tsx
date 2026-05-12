@@ -15,10 +15,12 @@ import type {
   CraneCapacity,
   SpanCount,
 } from "./calc/types";
+import type { SettlementClimateData } from "./types/climate";
 import {
-  searchSettlements,
-  getSettlementClimateById,
-} from "./types/climate";
+  getSettlementClimateByIdAsync,
+  searchSettlementsAsync,
+} from "./services/settlements";
+import { DEFAULT_COLUMN_INPUT } from "./defaults/columnInput";
 import structuresJson from "./data/structures/structures.json";
 import cranesJson from "./data/cranes/cranes.json";
 
@@ -73,55 +75,11 @@ function lookupStructure(id: string): StructureRow | undefined {
   return STRUCTURES.find((s) => s.id === id);
 }
 
-const DEFAULT_INPUT: CalculationInput = {
-  height_m: 11.5,
-  span_m: 40,
-  length_m: 80,
-  framePitch_m: 6,
-  fachverkPitch_m: 6,
-  roofSlope_deg: 6,
-  roofType: "gable",
-  spanCount: "single",
-  perimeterTies: false,
-  columnType: "fachwerk",
-  responsibilityCoeff: 1,
-  terrainType: "B",
-  w0_kPa: 0.6,
-  Sg_kPa: 1.7,
-  roofStructure: "профлист",
-  roofLoad_kPa: 0.105,
-  wallStructure: "профлист",
-  wallLoad_kPa: 0.105,
-  loadAddition_pct: 15,
-  overheadCrane: {
-    enabled: false,
-    capacity: "5",
-    span_m: 12,
-    count: "one",
-    singleSpan: true,
-    railLevel_m: 3.5,
-    wheelLoad_kN: 50,
-    base_m: 3.7,
-    gauge_m: 4.7,
-  },
-  suspendedCrane: {
-    enabled: false,
-    capacity_t: 2,
-    singleSpan: true,
-  },
-  prices: {
-    "С255Б": 148.8,
-    "С355Б": 155.88,
-    "С245": 130.2,
-    "С345": 141,
-  },
-};
-
 export function ColumnApp() {
   const { building, setBuilding } = useBuilding();
   const initialRoof = lookupStructure(building.roofStructure);
   const [input, setInput] = useState<CalculationInput>(() => ({
-    ...DEFAULT_INPUT,
+    ...DEFAULT_COLUMN_INPUT,
     span_m: building.span_m,
     length_m: building.length_m,
     height_m: building.height_m,
@@ -131,7 +89,7 @@ export function ColumnApp() {
     Sg_kPa: building.Sg_kPa,
     terrainType: building.terrainType,
     roofStructure: building.roofStructure,
-    roofLoad_kPa: initialRoof?.kPa ?? DEFAULT_INPUT.roofLoad_kPa,
+    roofLoad_kPa: initialRoof?.kPa ?? DEFAULT_COLUMN_INPUT.roofLoad_kPa,
     responsibilityCoeff: building.responsibilityCoeff,
     prices: {
       "С255Б": building.priceC255B_rubKg,
@@ -143,6 +101,8 @@ export function ColumnApp() {
   const [activeTab, setActiveTab] = useState<ColumnType>("edge");
   const [cityQuery, setCityQuery] = useState(building.city);
   const [showCityMatches, setShowCityMatches] = useState(false);
+  const [cityMatches, setCityMatches] = useState<SettlementClimateData[]>([]);
+  const [cityLoading, setCityLoading] = useState(false);
   const { setResult } = useBuildingResults();
   const validationErrors = useMemo(
     () => validateBuildingNumericInput({
@@ -250,14 +210,44 @@ export function ColumnApp() {
     setBuilding({ [key]: value } as Partial<Building>);
   };
 
-  const cityMatches = useMemo(() => {
-    if (!showCityMatches || cityQuery.length < 2) return [];
-    return searchSettlements(cityQuery).slice(0, 10);
+  useEffect(() => {
+    if (!showCityMatches || cityQuery.trim().length < 2) {
+      setCityMatches([]);
+      setCityLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setCityLoading(true);
+    const timer = window.setTimeout(() => {
+      searchSettlementsAsync(cityQuery)
+        .then((matches) => {
+          if (!cancelled) {
+            setCityMatches(matches.slice(0, 10));
+          }
+        })
+        .catch((error: unknown) => {
+          console.error("Failed to search settlements", error);
+          if (!cancelled) {
+            setCityMatches([]);
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setCityLoading(false);
+          }
+        });
+    }, 200);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [cityQuery, showCityMatches]);
 
   const handleCitySelect = useCallback(
-    (id: string) => {
-      const s = getSettlementClimateById(id);
+    async (id: string) => {
+      const s = await getSettlementClimateByIdAsync(id);
       if (!s) return;
       const label = `${s.settlement} (${s.region})`;
       setShowCityMatches(false);
@@ -399,6 +389,11 @@ export function ColumnApp() {
                     </span>
                   </div>
                 ))}
+              </div>
+            )}
+            {cityLoading && (
+              <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>
+                Поиск...
               </div>
             )}
           </div>

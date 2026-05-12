@@ -15,7 +15,11 @@ import {
   type TrussOutput,
   type TrussSection,
 } from "./calc/truss/types";
-import { searchSettlements, getSettlementClimateById } from "./types/climate";
+import type { SettlementClimateData } from "./types/climate";
+import {
+  getSettlementClimateByIdAsync,
+  searchSettlementsAsync,
+} from "./services/settlements";
 import structuresJson from "./data/structures/structures.json";
 
 interface StructureRow {
@@ -68,6 +72,8 @@ export function TrussApp() {
   const [activeSection, setActiveSection] = useState<TrussSection>("VP");
   const [cityQuery, setCityQuery] = useState(building.city);
   const [showCityMatches, setShowCityMatches] = useState(false);
+  const [cityMatches, setCityMatches] = useState<SettlementClimateData[]>([]);
+  const [cityLoading, setCityLoading] = useState(false);
   const { setResult } = useBuildingResults();
   const validationErrors = useMemo(
     () => validateBuildingNumericInput({
@@ -153,13 +159,43 @@ export function TrussApp() {
     setBuilding({ [key]: value } as Partial<Building>);
   };
 
-  const cityMatches = useMemo(() => {
-    if (!showCityMatches || cityQuery.length < 2) return [];
-    return searchSettlements(cityQuery).slice(0, 10);
+  useEffect(() => {
+    if (!showCityMatches || cityQuery.trim().length < 2) {
+      setCityMatches([]);
+      setCityLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setCityLoading(true);
+    const timer = window.setTimeout(() => {
+      searchSettlementsAsync(cityQuery)
+        .then((matches) => {
+          if (!cancelled) {
+            setCityMatches(matches.slice(0, 10));
+          }
+        })
+        .catch((error: unknown) => {
+          console.error("Failed to search settlements", error);
+          if (!cancelled) {
+            setCityMatches([]);
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setCityLoading(false);
+          }
+        });
+    }, 200);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [cityQuery, showCityMatches]);
 
-  const handleCitySelect = useCallback((id: string) => {
-    const s = getSettlementClimateById(id);
+  const handleCitySelect = useCallback(async (id: string) => {
+    const s = await getSettlementClimateByIdAsync(id);
     if (!s) return;
     const label = `${s.settlement} (${s.region})`;
     setShowCityMatches(false);
@@ -252,6 +288,11 @@ export function TrussApp() {
                     </span>
                   </div>
                 ))}
+              </div>
+            )}
+            {cityLoading && (
+              <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>
+                Поиск...
               </div>
             )}
           </div>
@@ -527,35 +568,6 @@ function Field({
         onChange={(e) => onChange(Number(e.target.value))}
         style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       />
-    </div>
-  );
-}
-
-function SelectField({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: [string, string][];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
-      >
-        {options.map(([v, l]) => (
-          <option key={v} value={v}>
-            {l}
-          </option>
-        ))}
-      </select>
     </div>
   );
 }

@@ -18,7 +18,11 @@ import type {
   LstkProfileType,
   SnowDriftMode,
 } from "./calc/purlin/types";
-import { searchSettlements, getSettlementClimateById } from "./types/climate";
+import type { SettlementClimateData } from "./types/climate";
+import {
+  getSettlementClimateByIdAsync,
+  searchSettlementsAsync,
+} from "./services/settlements";
 import structuresJson from "./data/structures/structures.json";
 
 interface StructureRow {
@@ -80,9 +84,11 @@ export function PurlinApp() {
   const { setResult } = useBuildingResults();
   const [cityQuery, setCityQuery] = useState(building.city);
   const [showCityMatches, setShowCityMatches] = useState(false);
+  const [cityMatches, setCityMatches] = useState<SettlementClimateData[]>([]);
+  const [cityLoading, setCityLoading] = useState(false);
   const [maxUtilFixed, setMaxUtilFixed] = useState<boolean>(false);
   const [maxUtilValue, setMaxUtilValue] = useState<number>(0.85);
-  const [rolledMaxK, setRolledMaxK] = useState<number>(0.8);
+  const [rolledMaxK] = useState<number>(0.8);
   // Prices for rolled-section selection are mapped from the synced building-level
   // prices block (С255Б / С355Б / С245 / С345). Channels reuse C245/C345 like tubes.
   const rolledPrices = useMemo<RolledPrices>(() => ({
@@ -135,13 +141,43 @@ export function PurlinApp() {
     setBuilding({ [key]: value } as Partial<Building>);
   };
 
-  const cityMatches = useMemo(() => {
-    if (!showCityMatches || cityQuery.length < 2) return [];
-    return searchSettlements(cityQuery).slice(0, 10);
+  useEffect(() => {
+    if (!showCityMatches || cityQuery.trim().length < 2) {
+      setCityMatches([]);
+      setCityLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setCityLoading(true);
+    const timer = window.setTimeout(() => {
+      searchSettlementsAsync(cityQuery)
+        .then((matches) => {
+          if (!cancelled) {
+            setCityMatches(matches.slice(0, 10));
+          }
+        })
+        .catch((error: unknown) => {
+          console.error("Failed to search settlements", error);
+          if (!cancelled) {
+            setCityMatches([]);
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setCityLoading(false);
+          }
+        });
+    }, 200);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [cityQuery, showCityMatches]);
 
-  const handleCitySelect = useCallback((id: string) => {
-    const s = getSettlementClimateById(id);
+  const handleCitySelect = useCallback(async (id: string) => {
+    const s = await getSettlementClimateByIdAsync(id);
     if (!s) return;
     const label = `${s.settlement} (${s.region})`;
     setShowCityMatches(false);
@@ -285,6 +321,11 @@ export function PurlinApp() {
                     </span>
                   </div>
                 ))}
+              </div>
+            )}
+            {cityLoading && (
+              <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>
+                Поиск...
               </div>
             )}
           </div>

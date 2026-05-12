@@ -68,7 +68,7 @@ export function WindowRiegelApp() {
   const result = useMemo(() => {
     try {
       return calculateWindowRiegel(inputs);
-    } catch (e) {
+    } catch {
       return null;
     }
   }, [inputs]);

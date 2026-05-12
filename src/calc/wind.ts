@@ -164,6 +164,8 @@ export function calcWind(
   span_m: number,
   length_m: number,
 ): WindResult {
+  void length_m;
+
   const h = Math.max(height_m, 5);
   const kze = getKze(terrain, h);
   const zeta = getZeta(terrain, h);

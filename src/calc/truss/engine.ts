@@ -1,4 +1,3 @@
-import type { TerrainType } from "../types";
 import { calcWind } from "../wind";
 import tubesJson from "../../data/truss/tubes.json";
 import unitDiagramsJson from "../../data/truss/unit_diagrams.json";
@@ -34,21 +33,6 @@ interface UnitDiagrams {
   wind_columns: UnitTable;
   wind_roof: UnitTable;
 }
-
-const SECTION_KEYS_PRIMARY: Record<TrussSection, string> = {
-  VP: "VP_N",
-  NP: "NP_Np",
-  ORb: "ORb_Np",
-  OR: "ORm_Np",
-  RR: "RR_Np",
-};
-const SECTION_KEYS_NEGATIVE: Record<TrussSection, string | null> = {
-  VP: null,
-  NP: null,
-  ORb: "ORb_Nm",
-  OR: "ORm_Nm",
-  RR: "RR_Nm",
-};
 
 /**
  * Линейная интерполяция unit-эпюры по пролёту.
@@ -367,7 +351,8 @@ function evaluateProfileForSection(
 ): ProfileEvaluation {
   const Ry = getRyForTube(prof.t_mm);
   const checks: Record<string, number> = {};
-  let lam_x = 0, lam_y = 0;
+  let lam_x: number;
+  let lam_y: number;
   let max_K = 0;
   let limiting = "";
 

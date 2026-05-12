@@ -1,4 +1,4 @@
-import { computeLoads, computeSnowDrift } from "../src/calc/purlin/engine";
+import { computeLoads } from "../src/calc/purlin/engine";
 import {
   selectRolledTop10,
   DEFAULT_ROLLED_PRICES,
