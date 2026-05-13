@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo, useState, useCallback, useEffect } from "react";
 import { runCalculation, computeMu } from "./calc/engine";
-import { useBuilding, type Building } from "./building/context";
-import { useBuildingResults, type ColumnResultByType, type ResultItem } from "./building/results";
+import { useBuilding, type Building } from "./building/useBuilding";
+import { useBuildingResults, type ColumnResultByType, type ResultItem } from "./building/useBuildingResults";
 import { useRoofTotalLoad_kPa } from "./building/loadPropagation";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";

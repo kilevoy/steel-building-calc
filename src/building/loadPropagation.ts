@@ -1,5 +1,5 @@
-import { useBuilding } from "./context";
-import { useBuildingResults } from "./results";
+import { useBuilding } from "./useBuilding";
+import { useBuildingResults } from "./useBuildingResults";
 import structuresJson from "../data/structures/structures.json";
 
 interface StructureRow {

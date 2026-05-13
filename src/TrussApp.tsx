@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { runTrussCalculation, getDefaultMinThickness } from "./calc/truss/engine";
-import { useBuilding, type Building } from "./building/context";
-import { useBuildingResults, type TrussResult } from "./building/results";
+import { useBuilding, type Building } from "./building/useBuilding";
+import { useBuildingResults, type TrussResult } from "./building/useBuildingResults";
 import { useRoofTotalLoad_kPa } from "./building/loadPropagation";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";

@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { useBuilding } from "./building/context";
+import { useBuilding } from "./building/useBuilding";
 import {
   useBuildingResults,
   type BuildingResults,
   type ResultItem,
-} from "./building/results";
-import { useCraneBeamRunner } from "./building/craneBeamRunner";
+} from "./building/useBuildingResults";
+import { useCraneBeamRunner } from "./building/useCraneBeamRunner";
 
 function fmtKg(v: number): string {
   if (!Number.isFinite(v)) return "—";

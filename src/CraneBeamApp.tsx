@@ -1,6 +1,6 @@
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
-import { useCraneBeamRunner } from "./building/craneBeamRunner";
+import { useCraneBeamRunner } from "./building/useCraneBeamRunner";
 import { craneOptions } from "./calc/craneBeam/engine";
 import type { CraneCheckValue } from "./calc/craneBeam/types";
 

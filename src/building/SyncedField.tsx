@@ -47,7 +47,7 @@ export function SyncedField({
   );
 }
 
-export const SYNCED_FIELD_STYLE: React.CSSProperties = {
+const SYNCED_FIELD_STYLE: React.CSSProperties = {
   background: SYNCED_BG,
   border: `1px dashed ${SYNCED_BORDER}`,
   borderRadius: 4,

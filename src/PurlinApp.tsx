@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { runPurlinCalculation, getCassetteHeightFilter } from "./calc/purlin/engine";
-import { useBuilding, type Building } from "./building/context";
-import { useBuildingResults, type ResultItem } from "./building/results";
+import { useBuilding, type Building } from "./building/useBuilding";
+import { useBuildingResults, type ResultItem } from "./building/useBuildingResults";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";

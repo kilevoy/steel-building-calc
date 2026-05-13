@@ -1,4 +1,4 @@
-import { useBuilding } from "./context";
+import { useBuilding } from "./useBuilding";
 import { SyncedNumField } from "./SyncedField";
 import { Collapsible } from "./Collapsible";
 
