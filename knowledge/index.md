@@ -8,6 +8,7 @@
 - Модули расчёта: `knowledge/wiki/modules/`.
 - Нагрузки и проверки: `knowledge/wiki/calculations/`.
 - Excel/VELICAN parity: `knowledge/wiki/parity/`.
+- Структурный ingest Excel-источников: `knowledge/wiki/parity/excel-005-window-riegel.md`.
 - UI-решения: `knowledge/wiki/ui/`.
 - Задачи и технический долг: `knowledge/wiki/tasks/`.
 - Реестр исходников: `knowledge/raw/source-register.md`.
