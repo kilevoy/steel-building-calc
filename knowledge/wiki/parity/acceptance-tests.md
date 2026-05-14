@@ -9,4 +9,5 @@ Acceptance и smoke tests проверяют, что расчётный движ
 - Есть smoke-тест для `runCalculation(DEFAULT_COLUMN_INPUT)`.
 - Есть helper-тесты для общих типов и validation.
 - Есть acceptance-тест `SCN-WINDOW-RIEGEL-001` для оконного ригеля: сверяются расчётные нагрузки, расчётные длины и первые наблюдаемые профили из Excel-oracle `EXCEL-005`.
+- Есть acceptance-тест `SCN-BEAM-CELL-001` для балочной клетки: сверяется главная балка ГБ и фиксируется известное отсутствие решения ВБ для сценария `балка покрытия`.
 - Требуется добавить ещё несколько smoke/acceptance-тестов для truss, purlins, beam-cell и crane-beam.
