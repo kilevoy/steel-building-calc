@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { calculate, defaultInputs } from "./calc/beamCell/engine";
 import { useBuilding, type Building } from "./building/useBuilding";
 import { useBuildingResults, type ResultItem } from "./building/useBuildingResults";
+import { deriveEndRoofBeamQuantity } from "./building/layout";
 import { SyncedNumField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
@@ -76,7 +77,7 @@ export function BeamCellApp() {
       setResult("beamCell", null);
       return;
     }
-    const n_beams = Math.max(2, Math.floor(building.length_m / building.framePitch_m) + 1);
+    const n_beams = deriveEndRoofBeamQuantity(building.spanCount);
     const steelLabel = sol.material === "C245" ? "С245" : "С345";
     const item: ResultItem = {
       profile: sol.profile,
@@ -87,7 +88,7 @@ export function BeamCellApp() {
       cost_rub: (sol.costRub ?? 0) * n_beams,
     };
     setResult("beamCell", item);
-  }, [result, inputs.acceptedMainSteel, building.length_m, building.framePitch_m, setResult]);
+  }, [result, inputs.acceptedMainSteel, building.spanCount, setResult]);
 
   return (
     <div>

@@ -3,6 +3,7 @@ import { runCalculation, computeMu } from "./calc/engine";
 import { useBuilding, type Building } from "./building/useBuilding";
 import { useBuildingResults, type ColumnResultByType, type ResultItem } from "./building/useBuildingResults";
 import { useRoofTotalLoad_kPa } from "./building/loadPropagation";
+import { deriveColumnLayout } from "./building/layout";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
@@ -85,6 +86,7 @@ export function ColumnApp() {
     height_m: building.height_m,
     roofSlope_deg: building.roofSlope_deg,
     framePitch_m: building.framePitch_m,
+    spanCount: building.spanCount,
     w0_kPa: building.w0_kPa,
     Sg_kPa: building.Sg_kPa,
     terrainType: building.terrainType,
@@ -123,8 +125,10 @@ export function ColumnApp() {
     }
     try {
       const out: Partial<Results> = {};
+      const layout = deriveColumnLayout(input);
       for (const ct of COLUMN_TYPES) {
-        out[ct] = runCalculation({ ...input, columnType: ct });
+        const height_m = layout[ct].maxHeight_m || input.height_m;
+        out[ct] = runCalculation({ ...input, columnType: ct, height_m });
       }
       return { results: out as Results, error: null };
     } catch (e) {
@@ -138,28 +142,24 @@ export function ColumnApp() {
       setResult("column", null);
       return;
     }
-    const n_frames = Math.max(2, Math.floor(input.length_m / input.framePitch_m) + 1);
-    const fachverkPerGable = Math.max(
-      0,
-      Math.round(input.span_m / input.fachverkPitch_m) - 1,
-    );
-    const counts: Record<ColumnType, number> = {
-      edge: 2 * n_frames,
-      middle: input.spanCount === "multi" ? n_frames : 0,
-      fachwerk: 2 * fachverkPerGable,
-    };
+    const layout = deriveColumnLayout(input);
     const buildItem = (ct: ColumnType): ResultItem | null => {
-      if (counts[ct] === 0) return null;
+      const group = layout[ct];
+      if (group.count === 0) return null;
       const r = results[ct].results[0];
       if (!r) return null;
+      const strutStep = ct === "fachwerk" ? input.fachverkPitch_m : input.framePitch_m;
+      const strutMassPerPiece_kg = r.strutCount * 12 * strutStep * 1.15;
+      const totalMass_kg =
+        r.mass_per_m * group.totalHeight_m + strutMassPerPiece_kg * group.count;
       return {
         profile: r.profileName,
         steel: r.steel,
-        massPerPiece_kg: r.totalMass_kg,
-        count: counts[ct],
-        totalMass_kg: r.totalMass_kg * counts[ct],
-        // engine's cost_rub is in тыс. руб per single column; convert to руб × count.
-        cost_rub: r.cost_rub * 1000 * counts[ct],
+        massPerPiece_kg: totalMass_kg / group.count,
+        count: group.count,
+        totalMass_kg,
+        // Group mass uses layout-specific column heights; price is rub/kg.
+        cost_rub: totalMass_kg * input.prices[r.steel],
       };
     };
     const payload: ColumnResultByType = {
@@ -170,11 +170,7 @@ export function ColumnApp() {
     setResult("column", payload);
   }, [
     results,
-    input.length_m,
-    input.span_m,
-    input.framePitch_m,
-    input.fachverkPitch_m,
-    input.spanCount,
+    input,
     setResult,
   ]);
 
@@ -189,6 +185,7 @@ export function ColumnApp() {
       height_m: building.height_m,
       roofSlope_deg: building.roofSlope_deg,
       framePitch_m: building.framePitch_m,
+      spanCount: building.spanCount,
       w0_kPa: building.w0_kPa,
       Sg_kPa: building.Sg_kPa,
       terrainType: building.terrainType,
@@ -333,7 +330,7 @@ export function ColumnApp() {
               ["single", "Один"],
               ["multi", "Более одного"],
             ]}
-            onChange={(v) => upd({ spanCount: v as SpanCount })}
+            onChange={(v) => updSynced("spanCount", v as SpanCount)}
           />
           <SyncedSelectField
             label="Кровля"

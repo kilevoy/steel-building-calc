@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import type { SpanCount } from "../calc/types";
 import type { TerrainType } from "../types/common";
 
 export type RoofShape = "gable" | "monoslope";
@@ -14,6 +15,7 @@ export interface Building {
   terrainType: TerrainType;
   roofStructure: string;
   roofShape: RoofShape;
+  spanCount: SpanCount;
   city: string;
   responsibilityCoeff: number;
   priceC255B_rubKg: number;
@@ -40,6 +42,7 @@ export const DEFAULT_BUILDING: Building = {
   terrainType: "B",
   roofStructure: "профлист",
   roofShape: "gable",
+  spanCount: "single",
   city: "",
   responsibilityCoeff: 1,
   priceC255B_rubKg: 148.8,
