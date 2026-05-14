@@ -1,0 +1,20 @@
+# Do not commit raw engineering sources by default
+
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+*.pdf
+*.dwg
+*.dxf
+*.rvt
+*.ifc
+*.zip
+*.rar
+*.7z
+
+# Keep documentation and folder structure
+!README.md
+!.gitkeep
+!source-register.md
+!.gitignore
