@@ -11,3 +11,5 @@
 Структурный ingest Excel-источника фермы описан в `excel-008-truss.md`.
 
 Структурный ingest Excel-источника прогонов описан в `excel-009-purlins.md`.
+
+Структурный ingest Excel-источника балочной клетки описан в `excel-007-beam-cell.md`.
