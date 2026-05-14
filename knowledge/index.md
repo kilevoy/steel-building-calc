@@ -10,6 +10,7 @@
 - Excel/VELICAN parity: `knowledge/wiki/parity/`.
 - Структурный ingest Excel-источников: `knowledge/wiki/parity/excel-005-window-riegel.md`, `knowledge/wiki/parity/excel-010-column.md`, `knowledge/wiki/parity/excel-008-truss.md`, `knowledge/wiki/parity/excel-009-purlins.md`, `knowledge/wiki/parity/excel-007-beam-cell.md`, `knowledge/wiki/parity/excel-006-crane-beam.md`.
 - Обезличенные КМ-примеры: `knowledge/wiki/parity/km-002-km1.md`, `knowledge/wiki/parity/km-003-km.md`.
+- Карта источников и сценарии: `knowledge/wiki/parity/source-map.md`, `knowledge/wiki/parity/scenarios/`.
 - UI-решения: `knowledge/wiki/ui/`.
 - Задачи и технический долг: `knowledge/wiki/tasks/`.
 - Реестр исходников: `knowledge/raw/source-register.md`.
