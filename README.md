@@ -1,5 +1,8 @@
 # Калькулятор стальных колонн промышленных зданий
 
+[![CI](https://github.com/kilevoy/steel-building-calc/actions/workflows/ci.yml/badge.svg)](https://github.com/kilevoy/steel-building-calc/actions/workflows/ci.yml)
+[![Deploy to GitHub Pages](https://github.com/kilevoy/steel-building-calc/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/kilevoy/steel-building-calc/actions/workflows/deploy-pages.yml)
+
 Веб-калькулятор для подбора оптимального стального профиля колонн каркаса промышленных зданий по СП 16.13330 и СП 20.13330.
 
 **Демо:** https://dist-ecuvkgbu.devinapps.com
