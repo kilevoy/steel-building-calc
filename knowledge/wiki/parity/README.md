@@ -9,3 +9,5 @@
 Структурный ingest Excel-источника колонн описан в `excel-010-column.md`.
 
 Структурный ingest Excel-источника фермы описан в `excel-008-truss.md`.
+
+Структурный ingest Excel-источника прогонов описан в `excel-009-purlins.md`.
