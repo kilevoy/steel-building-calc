@@ -1,5 +1,9 @@
 node_modules/
 dist/
+tmp/
+.env
+.env.*
 *.log
 .DS_Store
+desktop.ini
 scripts/__pycache__/
