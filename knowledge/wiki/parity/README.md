@@ -7,3 +7,5 @@
 Структурный ingest Excel-источника оконных ригелей описан в `excel-005-window-riegel.md`.
 
 Структурный ingest Excel-источника колонн описан в `excel-010-column.md`.
+
+Структурный ingest Excel-источника фермы описан в `excel-008-truss.md`.

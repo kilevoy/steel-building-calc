@@ -11,7 +11,7 @@
 | EXCEL-005 | Excel oracle | Подбор оконых ригелей v2.0.xlsx | knowledge/raw/excel/window-riegel/ | структура описана | сверка расчёта оконных ригелей | файл не коммитится, защищён knowledge/raw/.gitignore; см. knowledge/wiki/parity/excel-005-window-riegel.md |
 | EXCEL-006 | Excel oracle | подбор прокатной подкрановой балки v2.0.xlsx | knowledge/raw/excel/crane-beam/ | добавлен локально | сверка расчёта подкрановой балки | файл не коммитится, защищён knowledge/raw/.gitignore |
 | EXCEL-007 | Excel oracle | Подбор элементов балочной клетки v3.1.xlsx | knowledge/raw/excel/beam-cell/ | добавлен локально | сверка расчёта балки покрытия / балочной клетки | файл не коммитится, защищён knowledge/raw/.gitignore |
-| EXCEL-008 | Excel oracle | Калькулятор ферм типа Молодечно v1.0.xlsx | knowledge/raw/excel/truss/ | добавлен локально | сверка расчёта фермы | файл не коммитится, защищён knowledge/raw/.gitignore |
+| EXCEL-008 | Excel oracle | Калькулятор ферм типа Молодечно v1.0.xlsx | knowledge/raw/excel/truss/ | структура описана | сверка расчёта фермы | файл не коммитится, защищён knowledge/raw/.gitignore; см. knowledge/wiki/parity/excel-008-truss.md |
 | EXCEL-009 | Excel oracle | Общий калькулятор прогонов v2.0.xlsx | knowledge/raw/excel/purlins/ | добавлен локально | сверка расчёта прогонов | файл не коммитится, защищён knowledge/raw/.gitignore |
 | EXCEL-010 | Excel oracle | Калькулятор подбора колонн v6.1исх11111.xlsx | knowledge/raw/excel/column/ | структура описана | сверка расчёта колонн | файл не коммитится, защищён knowledge/raw/.gitignore; см. knowledge/wiki/parity/excel-010-column.md |
 | KM-001 | КМ project | Example steel building project | local only | ожидает добавления | проверка практических решений | использовать только обезличенно |
