@@ -5,3 +5,5 @@
 Внешние GitHub-репозитории, используемые как источники контекста, описаны в `external-repositories.md`.
 
 Структурный ingest Excel-источника оконных ригелей описан в `excel-005-window-riegel.md`.
+
+Структурный ingest Excel-источника колонн описан в `excel-010-column.md`.
