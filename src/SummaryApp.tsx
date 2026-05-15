@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { deriveUnifiedBuildingLayout } from "./building/unifiedLayout";
 import { useBuilding } from "./building/useBuilding";
 import {
   useBuildingResults,
@@ -148,6 +149,7 @@ export function SummaryApp() {
           и результат сразу появится здесь.
         </p>
         <BuildingBlock />
+        <BuildingCountDiagnostics />
         <CraneBeamTrigger />
       </div>
     );
@@ -162,6 +164,7 @@ export function SummaryApp() {
       </p>
 
       <BuildingBlock />
+      <BuildingCountDiagnostics />
       <CraneBeamTrigger />
 
       <h3 style={{ marginBottom: 6 }}>Подобранные элементы</h3>
@@ -309,6 +312,60 @@ function BuildingBlock() {
         <div>Местн.: <b>{building.terrainType}</b></div>
         <div>Покр.: <b>{building.roofStructure}</b></div>
         <div>γₙ: <b>{building.responsibilityCoeff}</b></div>
+      </div>
+    </fieldset>
+  );
+}
+
+function BuildingCountDiagnostics() {
+  const { building } = useBuilding();
+  const mainFrameAxisCount =
+    Number.isFinite(building.length_m) &&
+    Number.isFinite(building.framePitch_m) &&
+    building.framePitch_m > 0
+      ? Math.floor(building.length_m / building.framePitch_m) + 1
+      : 0;
+  const crossSpanCount = building.spanCount === "multi" ? 2 : 1;
+  const layout = deriveUnifiedBuildingLayout({
+    mainFrameAxisCount,
+    crossSpanCount,
+  });
+
+  return (
+    <fieldset
+      style={{
+        border: "1px solid #f59e0b",
+        padding: 12,
+        borderRadius: 6,
+        marginBottom: 24,
+        background: "#fffbeb",
+      }}
+    >
+      <legend style={{ fontWeight: 600 }}>Предварительный подсчёт здания</legend>
+      <div style={{ color: "#92400e", fontSize: 12, marginBottom: 10 }}>
+        Диагностика для обсуждения с ГИПом. Значения не используются в расчёте массы и
+        стоимости до подтверждения модели торцевых колонн.
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, minmax(130px, 1fr))",
+          gap: 8,
+          fontSize: 13,
+        }}
+      >
+        <div>Рам всего: <b>{layout.frames.totalFrameAxes}</b></div>
+        <div>Внутренних рам: <b>{layout.frames.interiorFrameAxes}</b></div>
+        <div>Торцевых рам: <b>{layout.frames.endFrameAxes}</b></div>
+        <div>Шагов вдоль: <b>{layout.frames.frameBays}</b></div>
+        <div>Пролётов поперёк: <b>{crossSpanCount}</b></div>
+        <div>Крайних колонн, внутренние: <b>{layout.columns.interiorEdge}</b></div>
+        <div>Средних колонн, внутренние: <b>{layout.columns.interiorMiddle}</b></div>
+        <div>Всего колонн, внутренние: <b>{layout.columns.interiorTotal}</b></div>
+        <div>Крайних колонн, все рамы: <b>{layout.columns.allEdge}</b></div>
+        <div>Средних колонн, все рамы: <b>{layout.columns.allMiddle}</b></div>
+        <div>Всего колонн, все рамы: <b>{layout.columns.allTotal}</b></div>
+        <div>Колонн на торцах: <b>{layout.columns.endTotal}</b></div>
       </div>
     </fieldset>
   );
