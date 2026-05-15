@@ -60,4 +60,74 @@ describe("building layout helpers", () => {
     expect(gableMiddle).toBeGreaterThan(12);
     expect(monoslopeFarEdge).toBeGreaterThan(gableMiddle);
   });
+
+  it("keeps gable roof column heights symmetric across the span", () => {
+    const leftQuarter = columnHeightAtX({
+      span_m: 24,
+      height_m: 12,
+      roofSlope_deg: 6,
+      roofType: "gable",
+      x_m: 6,
+    });
+    const rightQuarter = columnHeightAtX({
+      span_m: 24,
+      height_m: 12,
+      roofSlope_deg: 6,
+      roofType: "gable",
+      x_m: 18,
+    });
+    const ridge = columnHeightAtX({
+      span_m: 24,
+      height_m: 12,
+      roofSlope_deg: 6,
+      roofType: "gable",
+      x_m: 12,
+    });
+
+    expect(leftQuarter).toBeCloseTo(rightQuarter, 10);
+    expect(ridge).toBeCloseTo(12 + 12 * Math.tan((6 * Math.PI) / 180), 10);
+  });
+
+  it("keeps monoslope roof column height increasing from low to high edge", () => {
+    const lowEdge = columnHeightAtX({
+      span_m: 24,
+      height_m: 12,
+      roofSlope_deg: 6,
+      roofType: "single_slope",
+      x_m: 0,
+    });
+    const highEdge = columnHeightAtX({
+      span_m: 24,
+      height_m: 12,
+      roofSlope_deg: 6,
+      roofType: "single_slope",
+      x_m: 24,
+    });
+
+    expect(lowEdge).toBe(12);
+    expect(highEdge).toBeCloseTo(12 + 24 * Math.tan((6 * Math.PI) / 180), 10);
+  });
+
+  it("uses roof-dependent heights for edge, middle and fakhverk column groups", () => {
+    const layout = deriveColumnLayout({
+      span_m: 24,
+      length_m: 60,
+      height_m: 12,
+      framePitch_m: 6,
+      fachverkPitch_m: 6,
+      roofSlope_deg: 6,
+      roofType: "gable",
+      spanCount: "multi",
+    });
+    const ridgeHeight = 12 + 12 * Math.tan((6 * Math.PI) / 180);
+
+    expect(layout.edge.count).toBe(18);
+    expect(layout.edge.maxHeight_m).toBeCloseTo(12, 10);
+    expect(layout.edge.totalHeight_m).toBeCloseTo(18 * 12, 10);
+    expect(layout.middle.count).toBe(9);
+    expect(layout.middle.maxHeight_m).toBeCloseTo(ridgeHeight, 10);
+    expect(layout.middle.totalHeight_m).toBeCloseTo(9 * ridgeHeight, 10);
+    expect(layout.fachwerk.count).toBe(10);
+    expect(layout.fachwerk.maxHeight_m).toBeCloseTo(ridgeHeight, 10);
+  });
 });
