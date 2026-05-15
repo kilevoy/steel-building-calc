@@ -146,6 +146,14 @@ Commit: `0b65218d5b135821f38ca643e08bfa8a67f1148f`
 
 Helper не подключён к UI и не меняет расчётные формулы.
 
+## 2026-05-15 — building-count сценарии вынесены в typed fixtures
+
+Сценарии: `SCN-BUILDING-COUNT-001`, `SCN-BUILDING-COUNT-002`, `SCN-BUILDING-COUNT-003`.
+
+Добавлен файл `src/building/__fixtures__/building-count-scenarios.ts`. Тест `src/building/unifiedLayout.test.ts` теперь использует общий массив сценариев, чтобы входы и ожидаемые значения можно было переиспользовать в будущей диагностике Summary.
+
+UI и расчётные формулы не изменялись.
+
 ## 2026-05-14 — добавлены типовые PDF-схемы каркасов VELICAN
 
 Источники: `KM-004`...`KM-010`.

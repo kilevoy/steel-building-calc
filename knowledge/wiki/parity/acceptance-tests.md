@@ -10,5 +10,5 @@ Acceptance и smoke tests проверяют, что расчётный движ
 - Есть helper-тесты для общих типов и validation.
 - Есть acceptance-тест `SCN-WINDOW-RIEGEL-001` для оконного ригеля: сверяются расчётные нагрузки, расчётные длины и первые наблюдаемые профили из Excel-oracle `EXCEL-005`.
 - Есть acceptance-тест `SCN-BEAM-CELL-001` для балочной клетки: сверяется главная балка ГБ и фиксируется известное отсутствие решения ВБ для сценария `балка покрытия`.
-- Есть тесты `SCN-BUILDING-COUNT-001`...`003` для helper `deriveUnifiedBuildingLayout`: проверяется раздельный подсчёт внутренних, торцевых и всех рамных колонн.
+- Есть тесты `SCN-BUILDING-COUNT-001`...`003` для helper `deriveUnifiedBuildingLayout`: проверяется раздельный подсчёт внутренних, торцевых и всех рамных колонн. Сценарии вынесены в `src/building/__fixtures__/building-count-scenarios.ts`.
 - Требуется добавить ещё несколько smoke/acceptance-тестов для truss, purlins, beam-cell и crane-beam.
