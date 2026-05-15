@@ -16,6 +16,7 @@ export interface Building {
   roofStructure: string;
   roofShape: RoofShape;
   spanCount: SpanCount;
+  hasCrane: boolean;
   city: string;
   responsibilityCoeff: number;
   priceC255B_rubKg: number;
@@ -43,6 +44,7 @@ export const DEFAULT_BUILDING: Building = {
   roofStructure: "профлист",
   roofShape: "gable",
   spanCount: "single",
+  hasCrane: false,
   city: "",
   responsibilityCoeff: 1,
   priceC255B_rubKg: 148.8,

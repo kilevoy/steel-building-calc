@@ -149,6 +149,12 @@ export function ColumnApp() {
     setResult("column", payload);
   }, [results, input, setResult]);
 
+  useEffect(() => {
+    setBuilding({
+      hasCrane: input.overheadCrane.enabled || input.suspendedCrane.enabled,
+    });
+  }, [input.overheadCrane.enabled, input.suspendedCrane.enabled, setBuilding]);
+
   // Pull updates from BuildingContext when other tabs change shared fields.
   // Roof load includes self-weight of purlins / beam-cell (auto-propagation).
   const roofLoad = useRoofTotalLoad_kPa();

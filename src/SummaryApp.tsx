@@ -329,6 +329,7 @@ function BuildingCountDiagnostics() {
   const layout = deriveUnifiedBuildingLayout({
     mainFrameAxisCount,
     crossSpanCount,
+    hasCrane: building.hasCrane,
   });
 
   return (
@@ -345,6 +346,10 @@ function BuildingCountDiagnostics() {
       <div style={{ color: "#92400e", fontSize: 12, marginBottom: 10 }}>
         Диагностика для обсуждения с ГИПом. Значения не используются в расчёте массы и
         стоимости до подтверждения модели торцевых колонн.
+      </div>
+      <div style={{ color: "#92400e", fontSize: 12, marginBottom: 10 }}>
+        По решению ГИПа: без крана торцевые колонны считаются отдельной группой, с краном —
+        основными колоннами рам. Текущий режим: <b>{building.hasCrane ? "с краном" : "без крана"}</b>.
       </div>
       <div
         style={{
@@ -366,13 +371,37 @@ function BuildingCountDiagnostics() {
         <div>Средних колонн, все рамы: <b>{layout.columns.allMiddle}</b></div>
         <div>Всего колонн, все рамы: <b>{layout.columns.allTotal}</b></div>
         <div>Колонн на торцах: <b>{layout.columns.endTotal}</b></div>
+        <div>Основных крайних по ГИП: <b>{layout.columns.mainEdge}</b></div>
+        <div>Основных средних по ГИП: <b>{layout.columns.mainMiddle}</b></div>
+        <div>Основных колонн по ГИП: <b>{layout.columns.mainTotal}</b></div>
+        <div>Торцевых в фахверке: <b>{layout.columns.endFachwerkTotal}</b></div>
       </div>
     </fieldset>
   );
 }
 
 function CraneBeamTrigger() {
+  const { building } = useBuilding();
   const { result, calculating, error, handleCalc } = useCraneBeamRunner();
+  if (!building.hasCrane) {
+    return (
+      <fieldset
+        style={{
+          border: "1px solid #cbd5e1",
+          padding: 12,
+          borderRadius: 6,
+          marginBottom: 24,
+          background: "#f8fafc",
+        }}
+      >
+        <legend style={{ fontWeight: 600 }}>Подкрановая балка</legend>
+        <div style={{ fontSize: 13, color: "#475569" }}>
+          Кран не включён на вкладке «Колонна», поэтому подкрановая балка не рассчитывается.
+        </div>
+      </fieldset>
+    );
+  }
+
   return (
     <fieldset
       style={{

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import {
   BuildingContext,
@@ -31,8 +31,10 @@ export function BuildingProvider({ children }: { children: ReactNode }) {
     }
   }, [building]);
 
-  const setBuilding = (patch: Partial<Building>) =>
-    setBuildingState((cur) => ({ ...cur, ...patch }));
+  const setBuilding = useCallback(
+    (patch: Partial<Building>) => setBuildingState((cur) => ({ ...cur, ...patch })),
+    [],
+  );
 
   return (
     <BuildingContext.Provider value={{ building, setBuilding }}>
