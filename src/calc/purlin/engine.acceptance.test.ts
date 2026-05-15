@@ -83,6 +83,28 @@ describe("purlin engine — Excel acceptance SCN-PURLINS-001 (ЛСТК)", () => 
     Z350("MP390");
   });
 
+  it("fixes current gable-roof purlin line count and slope length model", () => {
+    const best = out.top10[0];
+
+    expect(out.L_slope_m).toBeCloseTo((24 - 0.3) / 2, 10);
+    expect(best.nPurlins).toBe(18);
+    expect(best.massPerFrameStep_kg).toBeCloseTo(1235.16, 4);
+    expect(best.massPerBuilding_kg).toBeCloseTo(12351.6, 4);
+  });
+
+  it("fixes current monoslope purlin line count model", () => {
+    const mono = runPurlinCalculation({
+      ...SCN_PURLINS_001,
+      roofShape: "monoslope",
+    });
+    const best = mono.top10[0];
+
+    expect(mono.L_slope_m).toBeCloseTo(24 - 0.3, 10);
+    expect(best.nPurlins).toBe(17);
+    expect(best.massPerFrameStep_kg).toBeCloseTo(1166.54, 4);
+    expect(best.massPerBuilding_kg).toBeCloseTo(11665.4, 4);
+  });
+
   it("returns the lightest candidate first in top10", () => {
     expect(out.top10.length).toBeGreaterThan(0);
     const first = out.top10[0];
