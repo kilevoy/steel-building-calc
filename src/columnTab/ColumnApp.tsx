@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { runCalculation, computeMu } from "../calc/engine";
+import { hasColumnCrane } from "../calc/cranes";
 import { useBuilding, type Building } from "../building/useBuilding";
 import { useBuildingResults, type ColumnResultByType, type ResultItem } from "../building/useBuildingResults";
 import { useRoofTotalLoad_kPa } from "../building/loadPropagation";
@@ -84,6 +85,7 @@ export function ColumnApp() {
   }));
   const [activeTab, setActiveTab] = useState<ColumnType>("edge");
   const { setResult } = useBuildingResults();
+  const inputHasCrane = hasColumnCrane(input);
 
   const validationErrors = useMemo(
     () => validateBuildingNumericInput({
@@ -151,9 +153,9 @@ export function ColumnApp() {
 
   useEffect(() => {
     setBuilding({
-      hasCrane: input.overheadCrane.enabled || input.suspendedCrane.enabled,
+      hasCrane: inputHasCrane,
     });
-  }, [input.overheadCrane.enabled, input.suspendedCrane.enabled, setBuilding]);
+  }, [inputHasCrane, setBuilding]);
 
   // Pull updates from BuildingContext when other tabs change shared fields.
   // Roof load includes self-weight of purlins / beam-cell (auto-propagation).

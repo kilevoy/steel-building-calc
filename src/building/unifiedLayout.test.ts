@@ -8,4 +8,26 @@ describe("unified building layout helpers", () => {
 
     expect(layout).toEqual(scenario.expected);
   });
+
+  it("keeps end columns in the end-fachwerk group when there is no crane", () => {
+    const layout = deriveUnifiedBuildingLayout({
+      mainFrameAxisCount: 20,
+      crossSpanCount: 2,
+      hasCrane: false,
+    });
+
+    expect(layout.columns.mainTotal).toBe(54);
+    expect(layout.columns.endFachwerkTotal).toBe(6);
+  });
+
+  it("counts end columns as main frame columns when there is a crane", () => {
+    const layout = deriveUnifiedBuildingLayout({
+      mainFrameAxisCount: 20,
+      crossSpanCount: 2,
+      hasCrane: true,
+    });
+
+    expect(layout.columns.mainTotal).toBe(60);
+    expect(layout.columns.endFachwerkTotal).toBe(0);
+  });
 });
