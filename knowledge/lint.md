@@ -52,3 +52,6 @@
 ## Что проверить перед следующим крупным refactor
 
 Сверить документацию с фактическим кодом, прогнать typecheck/lint/test/build, проверить стартовый bundle и GitHub Pages.
+# Актуальное pending-решение
+
+- Вопрос по классификации торцевых колонн вынесен в `knowledge/wiki/decisions/pending-gip-column-count-question.md`. До ответа ГИПа не менять рабочую модель `edge/middle`, фахверка и торцевых осей.
