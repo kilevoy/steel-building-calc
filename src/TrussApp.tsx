@@ -3,7 +3,7 @@ import { runTrussCalculation, getDefaultMinThickness } from "./calc/truss/engine
 import { useBuilding, type Building } from "./building/useBuilding";
 import { useBuildingResults, type TrussResult } from "./building/useBuildingResults";
 import { useRoofTotalLoad_kPa } from "./building/loadPropagation";
-import { deriveFrameLayout } from "./building/layout";
+import { deriveRoofElementLayout } from "./building/layout";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
@@ -106,7 +106,11 @@ export function TrussApp() {
       setResult("truss", null);
       return;
     }
-    const n_trusses = deriveFrameLayout(input.length_m, input.framePitch_m).interiorFrameCount;
+    const n_trusses = deriveRoofElementLayout({
+      length_m: input.length_m,
+      framePitch_m: input.framePitch_m,
+      spanCount: building.spanCount,
+    }).trussCount;
     const sections = TRUSS_SECTIONS.flatMap((sec) => {
       const r = out.sections[sec];
       const sel = r.selected;
@@ -134,7 +138,15 @@ export function TrussApp() {
       },
     };
     setResult("truss", payload);
-  }, [out, input.length_m, input.framePitch_m, input.span_m, building.priceC345_rubKg, setResult]);
+  }, [
+    out,
+    input.length_m,
+    input.framePitch_m,
+    input.span_m,
+    building.spanCount,
+    building.priceC345_rubKg,
+    setResult,
+  ]);
 
   const roofLoad = useRoofTotalLoad_kPa();
   useEffect(() => {

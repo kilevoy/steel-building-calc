@@ -17,12 +17,32 @@ export interface BuildingColumnLayout {
   fachwerk: ColumnLayoutGroup;
 }
 
+export interface RoofElementLayout {
+  frameCount: number;
+  interiorFrameCount: number;
+  trussCount: number;
+  endRoofBeamCount: number;
+}
+
 export function spanCountAsNumber(spanCount: SpanCount): number {
   return spanCount === "multi" ? 2 : 1;
 }
 
 export function deriveEndRoofBeamQuantity(spanCount: SpanCount): number {
   return 2 * spanCountAsNumber(spanCount);
+}
+
+export function deriveRoofElementLayout(params: {
+  length_m: number;
+  framePitch_m: number;
+  spanCount: SpanCount;
+}): RoofElementLayout {
+  const frameLayout = deriveFrameLayout(params.length_m, params.framePitch_m);
+  return {
+    ...frameLayout,
+    trussCount: frameLayout.interiorFrameCount,
+    endRoofBeamCount: deriveEndRoofBeamQuantity(params.spanCount),
+  };
 }
 
 export function deriveFrameLayout(length_m: number, framePitch_m: number): FrameLayout {

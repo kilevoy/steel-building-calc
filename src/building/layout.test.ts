@@ -4,6 +4,7 @@ import {
   deriveEndRoofBeamQuantity,
   deriveColumnLayout,
   deriveFrameLayout,
+  deriveRoofElementLayout,
   positionsAcrossSpan,
 } from "./layout";
 
@@ -18,6 +19,31 @@ describe("building layout helpers", () => {
   it("counts end roof beams by span count", () => {
     expect(deriveEndRoofBeamQuantity("single")).toBe(2);
     expect(deriveEndRoofBeamQuantity("multi")).toBe(4);
+  });
+
+  it("derives roof element counts from the same frame model", () => {
+    expect(
+      deriveRoofElementLayout({
+        length_m: 60,
+        framePitch_m: 6,
+        spanCount: "single",
+      }),
+    ).toEqual({
+      frameCount: 11,
+      interiorFrameCount: 9,
+      trussCount: 9,
+      endRoofBeamCount: 2,
+    });
+  });
+
+  it("counts multi-span end roof beams per span on both end frames", () => {
+    expect(
+      deriveRoofElementLayout({
+        length_m: 60,
+        framePitch_m: 6,
+        spanCount: "multi",
+      }).endRoofBeamCount,
+    ).toBe(4);
   });
 
   it("counts end fakhverk positions across the full span including edges", () => {
