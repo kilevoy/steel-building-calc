@@ -461,7 +461,7 @@ export function PurlinApp() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(5, 1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
               gap: 12,
               padding: 10,
               background: "#f8fafc",
@@ -473,6 +473,10 @@ export function PurlinApp() {
             <Stat label="q ветер (FGH+), кПа" value={out.q_windRoof_kPa.toFixed(4)} />
             <Stat label="q покрытие, кПа" value={out.q_roof_kPa.toFixed(4)} />
             <Stat label="q итог, кПа" value={out.q_total_kPa.toFixed(4)} />
+            <Stat
+              label="Макс. шаг авто, мм"
+              value={out.autoMaxStep_mm === null ? "—" : out.autoMaxStep_mm.toFixed(0)}
+            />
             <Stat label="μ₂" value={out.mu2.toFixed(3)} />
           </div>
 
