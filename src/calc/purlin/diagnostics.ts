@@ -97,7 +97,7 @@ export function buildPurlinSelectionDiagnostics(
       "Diagnostics report current native selection only; it does not change profile checks or numerical output.",
       "Tie installation and brace step are explicit inputs for workbook parity, but they are not applied to the native selection yet.",
       "COLONNA/VELICAN indicate additional oracle-only filters that are not fully represented in this module yet.",
-      "The current native LSTK branch applies maxUtilization when it is numeric; COLONNA documents workbook parity as using profile default_coef instead.",
+      "Default LSTK utilization mode uses profile default_coef; fixed numeric maxUtilization is an explicit override.",
     ],
   };
 }

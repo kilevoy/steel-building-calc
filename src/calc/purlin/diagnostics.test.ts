@@ -43,7 +43,7 @@ describe("purlin selection diagnostics", () => {
     ).toEqual(["2TPS", "2PS", "2TPS", "2PS"]);
     expect(diagnostics.oracleOnlyParameters).toContain("requiresPanelFilter");
     expect(diagnostics.warnings.join(" ")).toContain("Tie installation and brace step");
-    expect(diagnostics.warnings.join(" ")).toContain("default_coef");
+    expect(diagnostics.warnings.join(" ")).toContain("Default LSTK utilization mode uses profile default_coef");
   });
 
   it("mentions cassette height filter when no candidate is available in a family", () => {

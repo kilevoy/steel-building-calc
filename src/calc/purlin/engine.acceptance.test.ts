@@ -87,6 +87,16 @@ describe("purlin engine — Excel acceptance SCN-PURLINS-001 (ЛСТК)", () => 
     Z350("MP390");
   });
 
+  it("uses profile default_coef in default LSTK utilization mode", () => {
+    const sec = out.sections.find((s) => s.grade === "MP350" && s.type === "Z");
+    const best = sec!.best!;
+    const expectedMpred = (best.profile.M_pred_baseline_kNm / 0.85) * best.profile.default_coef;
+
+    expect(best.profile.default_coef).toBe(0.9);
+    expect(best.M_pred_eff_kNm).toBeCloseTo(expectedMpred, 10);
+    expect(best.M_pred_eff_kNm).toBeCloseTo(33.9352941176, 10);
+  });
+
   it("fixes current gable-roof purlin line count and slope length model", () => {
     const best = out.top10[0];
 

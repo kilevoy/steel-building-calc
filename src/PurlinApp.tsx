@@ -772,6 +772,9 @@ function warningRu(warning: string): string {
   if (warning.startsWith("The current native LSTK")) {
     return "Текущая ветка ЛСТК применяет числовой maxUtilization, а для полного Excel-parity нужно отдельно проверить default_coef профилей.";
   }
+  if (warning.startsWith("Default LSTK utilization")) {
+    return "В режиме ЛСТК «по умолчанию» используется профильный default_coef; числовой maxUtilization считается явным переопределением.";
+  }
   return warning;
 }
 
