@@ -1,5 +1,6 @@
 import { calcWind } from "../wind";
 import profilesData from "../../data/lstk/profiles.json";
+import { computePurlinAutoMaxStepMm } from "./autoStep";
 import type {
   LstkProfile,
   LstkProfileType,
@@ -197,6 +198,11 @@ function bestPerGroup(candidates: PurlinCandidate[]): PurlinSectionResult[] {
 export function runPurlinCalculation(input: PurlinInput): PurlinOutput {
   const loads = computeLoads(input);
   const { mu2, designSpan_m } = computeSnowDrift(input);
+  const autoMaxStep_mm = computePurlinAutoMaxStepMm({
+    input,
+    q_snow_kPa: loads.q_snow_kPa,
+    q_windRoof_kPa: loads.q_windRoof_kPa,
+  });
 
   const slopeFactor = input.roofShape === "gable" ? 2 : 1;
   const L_slope_m = (input.span_m - 0.3) / slopeFactor;
@@ -216,6 +222,7 @@ export function runPurlinCalculation(input: PurlinInput): PurlinOutput {
     q_roof_kPa: loads.q_roof_kPa,
     mu2,
     designSpan_m,
+    autoMaxStep_mm,
     L_slope_m,
     sections,
     top10,

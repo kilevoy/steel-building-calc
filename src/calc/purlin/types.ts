@@ -110,6 +110,9 @@ export interface PurlinOutput {
   /** Effective design span (m) — for snow drift it may shift */
   designSpan_m: number;
 
+  /** Workbook-style automatic maximum purlin step, mm. Diagnostic for Excel parity. */
+  autoMaxStep_mm: number | null;
+
   /** Slope length (m) */
   L_slope_m: number;
 

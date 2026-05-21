@@ -53,6 +53,7 @@ describe("purlin engine — Excel acceptance SCN-PURLINS-001 (ЛСТК)", () => 
     expect(out.q_roof_kPa).toBeCloseTo(0.32028, 5);
     expect(out.q_total_kPa).toBeCloseTo(4.774239, 4);
     expect(out.mu2).toBe(1);
+    expect(out.autoMaxStep_mm).toBe(1500);
   });
 
   it("rejects all 2ТПС and 2ПС profiles (no candidate fits)", () => {

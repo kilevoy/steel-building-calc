@@ -100,6 +100,30 @@ Workbook используется как Excel-oracle candidate для моду�
 
 Структурный ingest `EXCEL-009` не является достаточным подтверждением методики axial wind load. Для снятия предупреждения нужен отдельный разбор формул и acceptance-сценарий.
 
+## Проверка старых репозиториев по выбору 2ТПС / 2ПС / Z
+
+Проверены локальные reference-репозитории:
+
+- `GH-001 colonna`;
+- `GH-004 VELICAN`.
+
+Найдено, что выбор ЛСТК-прогонов в старой логике был богаче, чем текущая реализация `steel-building-calc`:
+
+- ЛСТК рассматривается отдельными семействами `MP350/2ТПС`, `MP350/2ПС`, `MP350/Z`, `MP390/2ТПС`, `MP390/2ПС`, `MP390/Z`;
+- для каждой группы выбирается семейный winner, а не только общий лёгкий top-10;
+- в VELICAN/insi-контексте присутствуют oracle-only параметры: `deck/profile sheet`, `tie installation`, `brace step`, `LSTK prices`, `requiresPanelFilter`, раздельные массы `black/galvanized/braced`;
+- для обычного сценария `SCN-PURLINS-001` workbook/oracle отдаёт `Z 350х2,5`, а `2ТПС` и `2ПС` дают `#N/A`;
+- `GH-001 colonna`, ���� `docs/purlin-lstk-diagnostics.md` фиксирует важное различие: для workbook-parity ЛСТК использует профильный `default_coef`, а не пользовательский `maxUtilization` как общий множитель несущей способности.
+
+В текущем `steel-building-calc` добавлен только безопасный diagnostic helper `src/calc/purlin/diagnostics.ts`. Он читает уже рассчитанный `PurlinOutput` и объясняет, какие семейства имеют кандидата, а какие нет. Helper не меняет подбор, нагрузки, формулы, коэффициенты и numerical output.
+
+Требует отдельного решения перед переносом в расчёт:
+
+- добавить ли в UI/engine параметры `deckProfile`, `tieInstallation`, `braceStep`;
+- как именно применять `requiresPanelFilter`;
+- должен ли `maxUtilization` влиять на ЛСТК или только на сортовой металл;
+- как показывать пользователю причины отказа `2ТПС` и `2ПС` без перегрузки интерфейса.
+
 ## Связь с текущим модулем
 
 Связанная страница модуля: `knowledge/wiki/modules/purlins.md`.
