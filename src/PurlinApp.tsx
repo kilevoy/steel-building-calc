@@ -11,6 +11,7 @@ import {
   type RolledCandidate,
   type RolledPrices,
 } from "./calc/purlin/rolled";
+import { buildPurlinSelectionDiagnostics } from "./calc/purlin/diagnostics";
 import type {
   PurlinInput,
   PurlinOutput,
@@ -226,6 +227,10 @@ export function PurlinApp() {
       return { out: null, rolledTop10: [], error: e instanceof Error ? e.message : String(e) };
     }
   }, [input, maxUtilFixed, maxUtilValue, rolledMaxK, rolledPrices, validationErrors]);
+  const diagnostics = useMemo(
+    () => (out ? buildPurlinSelectionDiagnostics(input, out) : null),
+    [input, out],
+  );
 
   // Publish ЛСТК top-1 selection to shared results bus for the Summary tab.
   useEffect(() => {
@@ -542,6 +547,77 @@ export function PurlinApp() {
             </table>
           </div>
 
+          {diagnostics && (
+            <div
+              style={{
+                border: "1px solid #cbd5e1",
+                borderRadius: 6,
+                padding: 10,
+                marginBottom: 16,
+                background: "#f8fafc",
+              }}
+            >
+              <h2 style={{ fontSize: 17, margin: "0 0 8px" }}>
+                Диагностика выбора ЛСТК-прогонов
+              </h2>
+              <div style={{ fontSize: 13, marginBottom: 8 }}>
+                Итоговый выбор:{" "}
+                <strong>
+                  {diagnostics.selectedOverallProfileName
+                    ? `${GRADE_LABELS[diagnostics.selectedOverallGrade ?? "MP350"]} / ${
+                        TYPE_LABELS[diagnostics.selectedOverallType ?? "Z"]
+                      } / ${diagnostics.selectedOverallProfileName}`
+                    : "нет подходящего профиля"}
+                </strong>
+              </div>
+              <div style={{ overflow: "auto", marginBottom: 8 }}>
+                <table style={{ borderCollapse: "collapse", fontSize: 12, minWidth: 760 }}>
+                  <thead style={{ background: "#e2e8f0" }}>
+                    <tr>
+                      <th style={th}>Сталь</th>
+                      <th style={th}>Тип</th>
+                      <th style={th}>Статус</th>
+                      <th style={th}>Профиль</th>
+                      <th style={th}>Шаг, мм</th>
+                      <th style={th}>K</th>
+                      <th style={th}>Масса, кг</th>
+                      <th style={th}>Пояснение</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {diagnostics.familyDiagnostics.map((item) => (
+                      <tr key={`${item.grade}-${item.type}`}>
+                        <td style={td}>{GRADE_LABELS[item.grade]}</td>
+                        <td style={td}>{TYPE_LABELS[item.type]}</td>
+                        <td style={td}>
+                          {item.status === "selected" ? "подходит" : "нет кандидата"}
+                        </td>
+                        <td style={td}>{item.profileName ?? "—"}</td>
+                        <td style={td}>{item.spacing_mm ?? "—"}</td>
+                        <td style={td}>{item.utilization === null ? "—" : item.utilization.toFixed(3)}</td>
+                        <td style={td}>
+                          {item.massPerBuilding_kg === null
+                            ? "—"
+                            : item.massPerBuilding_kg.toFixed(2)}
+                        </td>
+                        <td style={td}>{diagnosticNotesRu(item.notes).join(" ")}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ fontSize: 12, color: "#475569" }}>
+                Параметры Excel/VELICAN, которые ещё требуют полной сверки:{" "}
+                {diagnostics.oracleOnlyParameters.join(", ")}.
+              </div>
+              {diagnostics.warnings.map((warning) => (
+                <div key={warning} style={{ fontSize: 12, color: "#92400e", marginTop: 4 }}>
+                  {warningRu(warning)}
+                </div>
+              ))}
+            </div>
+          )}
+
           <div
             style={{
               display: "grid",
@@ -638,6 +714,37 @@ export function PurlinApp() {
 
 const th: React.CSSProperties = { padding: "6px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "left", whiteSpace: "nowrap" };
 const td: React.CSSProperties = { padding: "4px 8px", borderBottom: "1px solid #f1f5f9" };
+
+function diagnosticNotesRu(notes: string[]): string[] {
+  return notes.map((note) => {
+    if (note.startsWith("No accepted candidate")) {
+      return "Нет принятого кандидата в текущем расчёте ЛСТК.";
+    }
+    if (note.startsWith("Active cassette height filter")) {
+      return note.replace("Active cassette height filter:", "Активный фильтр высоты кассеты:");
+    }
+    if (note.startsWith("Possible causes")) {
+      return "Возможные причины: прочность, ограничения шага, фильтр высоты кассеты или отсутствующие Excel-фильтры.";
+    }
+    if (note.startsWith("Selected as the lightest")) {
+      return "Выбран самый лёгкий подходящий кандидат в этой группе.";
+    }
+    return note;
+  });
+}
+
+function warningRu(warning: string): string {
+  if (warning.startsWith("Diagnostics report")) {
+    return "Диагностика показывает текущий выбор приложения и не меняет расчётные проверки.";
+  }
+  if (warning.startsWith("COLONNA/VELICAN")) {
+    return "COLONNA/VELICAN указывают на дополнительные Excel-фильтры, которые ещё не полностью перенесены.";
+  }
+  if (warning.startsWith("The current native LSTK")) {
+    return "Текущая ветка ЛСТК применяет числовой maxUtilization, а для полного Excel-parity нужно отдельно проверить default_coef профилей.";
+  }
+  return warning;
+}
 
 function Field({
   label,
