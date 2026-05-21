@@ -396,6 +396,12 @@ export function PurlinApp() {
             onChange={(v) => upd({ maxStep_mm: v })}
             step={5}
           />
+          <ReadonlyField
+            label="Макс. шаг авто, мм"
+            value={out?.autoMaxStep_mm === null || out?.autoMaxStep_mm === undefined
+              ? "—"
+              : out.autoMaxStep_mm.toFixed(0)}
+          />
           <SelectField
             label="Прогон под снегозадержание"
             value={input.snowGuardPurlin ? "yes" : "no"}
@@ -653,6 +659,25 @@ function Field({
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
+      />
+    </div>
+  );
+}
+
+function ReadonlyField({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{ marginBottom: 6 }}>
+      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+      <input
+        readOnly
+        value={value}
+        style={{
+          width: "100%",
+          padding: 4,
+          boxSizing: "border-box",
+          background: "#f8fafc",
+          color: "#334155",
+        }}
       />
     </div>
   );
