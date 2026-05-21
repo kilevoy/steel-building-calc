@@ -25,7 +25,7 @@ const SCN_PURLINS_001: PurlinInput = {
   snowGuardPurlin: false,
   fencePurlin: false,
   tieInstallation: false,
-  braceStep_m: 0.4,
+  braceStep_m: 3,
   maxUtilization: "default",
   cassetteHeightFilter_mm: 0,
 };

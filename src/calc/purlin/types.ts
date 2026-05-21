@@ -94,6 +94,8 @@ export interface PurlinCandidate {
   massPerFrameStep_kg: number;
   /** Mass for full building, kg */
   massPerBuilding_kg: number;
+  /** Excel parity mass including brace rows, kg (Лист1!K63:K70). */
+  massWithBraces_kg: number;
 }
 
 export interface PurlinSectionResult {

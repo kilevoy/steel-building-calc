@@ -42,7 +42,7 @@ const SCN_PURLINS_001: PurlinInput = {
   snowGuardPurlin: false,
   fencePurlin: false,
   tieInstallation: false,
-  braceStep_m: 0.4,
+  braceStep_m: 3,
   maxUtilization: "default",
   cassetteHeightFilter_mm: 0,
 };
@@ -80,6 +80,8 @@ describe("purlin engine — Excel acceptance SCN-PURLINS-001 (ЛСТК)", () => 
       expect(best.spacing_mm).toBe(1500);
       // Mass per building from Excel SCN-PURLINS-001: 12351.6 kg.
       expect(best.massPerBuilding_kg).toBeCloseTo(12351.6, 4);
+      // Excel Лист1!K65/K70: H + Расчет!S87 * ROUNDUP(B8 / B47, 0) * B9.
+      expect(best.massWithBraces_kg).toBeCloseTo(16959.6, 4);
       // Utilization stays under the per-thickness default coefficient.
       expect(best.K).toBeLessThanOrEqual(1);
     };
@@ -104,6 +106,7 @@ describe("purlin engine — Excel acceptance SCN-PURLINS-001 (ЛСТК)", () => 
     expect(best.nPurlins).toBe(18);
     expect(best.massPerFrameStep_kg).toBeCloseTo(1235.16, 4);
     expect(best.massPerBuilding_kg).toBeCloseTo(12351.6, 4);
+    expect(best.massWithBraces_kg).toBeCloseTo(16959.6, 4);
   });
 
   it("fixes current monoslope purlin line count model", () => {

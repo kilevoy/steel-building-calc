@@ -88,6 +88,7 @@ def patch_and_recalc(out_dir: str, params: dict[str, Any], idx: int) -> dict[str
     ws["B38"] = params["max_step_mm"]
     ws["B39"] = params["min_step_mm"]
     ws["B41"] = params.get("ties", "нет")
+    ws["B47"] = params.get("brace_step_m", 3)
     ws["B44"] = params["snowguard"]
     ws["B45"] = params["fence"]
     ws["B63"] = params["max_util"]
@@ -115,6 +116,7 @@ def patch_and_recalc(out_dir: str, params: dict[str, Any], idx: int) -> dict[str
             "mass_per_m": ws2.cell(row, 6).value, # F
             "mass_per_frame": ws2.cell(row, 7).value, # G
             "mass_building": ws2.cell(row, 8).value,  # H
+            "mass_with_braces": ws2.cell(row, 11).value,  # K
         }
 
     return {

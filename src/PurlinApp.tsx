@@ -57,7 +57,7 @@ const DEFAULT_INPUT: PurlinInput = {
   snowGuardPurlin: false,
   fencePurlin: false,
   tieInstallation: false,
-  braceStep_m: 0.4,
+  braceStep_m: 3,
   maxUtilization: "default",
   cassetteHeightFilter_mm: getCassetteHeightFilter("С-П 150 мм"),
 };
@@ -533,6 +533,7 @@ export function PurlinApp() {
                   <th style={th}>Масса/м, кг</th>
                   <th style={th}>Масса на 1 шаг, кг</th>
                   <th style={th}>Масса на здание, кг</th>
+                  <th style={th}>Масса с распорками, кг</th>
                 </tr>
               </thead>
               <tbody>
@@ -544,7 +545,7 @@ export function PurlinApp() {
                       <tr key={key}>
                         <td style={td}>{GRADE_LABELS[s.grade]}</td>
                         <td style={td}>{TYPE_LABELS[s.type]}</td>
-                        <td style={td} colSpan={9}>
+                        <td style={td} colSpan={10}>
                           <span style={{ color: "#999" }}>нет подходящего профиля</span>
                         </td>
                       </tr>
@@ -566,6 +567,7 @@ export function PurlinApp() {
                       <td style={td}>{c.profile.mass_kg_per_m.toFixed(3)}</td>
                       <td style={td}>{c.massPerFrameStep_kg.toFixed(2)}</td>
                       <td style={td}>{c.massPerBuilding_kg.toFixed(2)}</td>
+                      <td style={td}>{c.massWithBraces_kg.toFixed(2)}</td>
                     </tr>
                   );
                 })}

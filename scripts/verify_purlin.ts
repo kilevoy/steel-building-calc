@@ -14,6 +14,7 @@ function runScenario(name: string, overrides: Partial<PurlinInput>) {
     w0_kPa: 0.6,
     Sg_kPa: 2.45,
     roofStructure: "С-П 150 мм",
+    deckProfile: "C44-1000-0.7",
     roofLoad_kPa: 0.32028,
     snowDrift: "none",
     drift_dropHeight_m: 4.5,
@@ -22,6 +23,8 @@ function runScenario(name: string, overrides: Partial<PurlinInput>) {
     minStep_mm: 1500,
     snowGuardPurlin: false,
     fencePurlin: false,
+    tieInstallation: false,
+    braceStep_m: 3,
     maxUtilization: "default",
     cassetteHeightFilter_mm: getCassetteHeightFilter("С-П 150 мм"),
   };
@@ -39,7 +42,7 @@ function runScenario(name: string, overrides: Partial<PurlinInput>) {
       console.log(`  ${s.grade} ${s.type}: -`);
     } else {
       console.log(
-        `  ${s.grade} ${s.type}: ${c.profile.name}  step=${c.spacing_mm}  K=${c.K.toFixed(3)}  m/m=${c.profile.mass_kg_per_m.toFixed(3)}  m_frame=${c.massPerFrameStep_kg.toFixed(2)}  m_bldg=${c.massPerBuilding_kg.toFixed(2)}`,
+        `  ${s.grade} ${s.type}: ${c.profile.name}  step=${c.spacing_mm}  K=${c.K.toFixed(3)}  m/m=${c.profile.mass_kg_per_m.toFixed(3)}  m_frame=${c.massPerFrameStep_kg.toFixed(2)}  m_bldg=${c.massPerBuilding_kg.toFixed(2)}  m_braced=${c.massWithBraces_kg.toFixed(2)}`,
       );
     }
   }
