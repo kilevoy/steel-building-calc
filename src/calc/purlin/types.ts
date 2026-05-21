@@ -49,6 +49,8 @@ export interface PurlinInput {
 
   /** Roof structure (kPa) — choose from dropdown of constructions */
   roofStructure: string;
+  /** Deck/profile sheet used by workbook auto-step tables */
+  deckProfile: string;
   roofLoad_kPa: number;
 
   /** Snow drift settings */

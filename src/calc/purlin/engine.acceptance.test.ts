@@ -32,6 +32,7 @@ const SCN_PURLINS_001: PurlinInput = {
   w0_kPa: 0.6,
   Sg_kPa: 2.45,
   roofStructure: "С-П 150 мм",
+  deckProfile: "С44-1000-0,7",
   roofLoad_kPa: 0.32028,
   snowDrift: "none",
   drift_dropHeight_m: 4.5,

@@ -11,6 +11,7 @@ import {
   type RolledCandidate,
   type RolledPrices,
 } from "./calc/purlin/rolled";
+import { getPurlinDeckProfileOptions } from "./calc/purlin/autoStep";
 import { buildPurlinSelectionDiagnostics } from "./calc/purlin/diagnostics";
 import type {
   PurlinInput,
@@ -32,6 +33,7 @@ interface StructureRow {
 }
 const STRUCTURES = structuresJson as StructureRow[];
 const lookupStructure = (id: string) => STRUCTURES.find((s) => s.id === id);
+const DECK_PROFILE_OPTIONS = getPurlinDeckProfileOptions();
 
 const DEFAULT_INPUT: PurlinInput = {
   gamma_n: 1,
@@ -45,6 +47,7 @@ const DEFAULT_INPUT: PurlinInput = {
   w0_kPa: 0.6,
   Sg_kPa: 2.45,
   roofStructure: "С-П 150 мм",
+  deckProfile: "С44-1000-0,7",
   roofLoad_kPa: 0.32028,
   snowDrift: "none",
   drift_dropHeight_m: 4.5,
@@ -351,6 +354,12 @@ export function PurlinApp() {
             value={input.roofStructure}
             options={STRUCTURES.map((s) => [s.id, `${s.id} (${s.kPa.toFixed(3)} кПа)`])}
             onChange={(v) => updSynced("roofStructure", v)}
+          />
+          <SelectField
+            label="Профлист"
+            value={input.deckProfile}
+            options={DECK_PROFILE_OPTIONS.map((profile) => [profile, profile])}
+            onChange={(v) => upd({ deckProfile: v })}
           />
           <Field
             label="Нагрузка от кровли, кПа"

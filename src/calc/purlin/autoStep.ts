@@ -21,6 +21,10 @@ const roofConstructions = autoStepData.roofConstructions as RoofConstructionAuto
 const deckProfiles = autoStepData.deckProfiles as DeckProfileAutoStep[];
 const capacityTable = autoStepData.capacityTable as AutoStepCapacityRow[];
 
+export function getPurlinDeckProfileOptions(): string[] {
+  return deckProfiles.map((item) => item.profileSheet);
+}
+
 function normalizeText(value: string): string {
   return value.trim().toLocaleLowerCase("ru-RU").replace(/ё/g, "е");
 }
@@ -58,7 +62,7 @@ export function computePurlinAutoMaxStepMm(params: {
 }): number | null {
   const autoStepIndex = resolvePurlinAutoStepIndex({
     roofStructure: params.input.roofStructure,
-    deckProfile: params.deckProfile ?? "С44-1000-0,7",
+    deckProfile: params.deckProfile ?? params.input.deckProfile,
   });
   if (autoStepIndex === null) return null;
 
