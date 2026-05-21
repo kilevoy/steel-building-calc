@@ -6,16 +6,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "node scripts/run-tsc.mjs --noEmit && node scripts/run-vite-build.mjs",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
-    "test": "vitest run",
+    "typecheck": "node scripts/run-tsc.mjs --noEmit",
+    "lint": "node scripts/run-eslint.mjs .",
+    "test": "node scripts/run-vitest.mjs",
     "prepare": "husky"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --fix"
+      "node scripts/run-eslint.mjs --fix"
     ]
   },
   "dependencies": {
