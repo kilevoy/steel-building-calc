@@ -56,6 +56,8 @@ const DEFAULT_INPUT: PurlinInput = {
   minStep_mm: 500,
   snowGuardPurlin: false,
   fencePurlin: false,
+  tieInstallation: false,
+  braceStep_m: 0.4,
   maxUtilization: "default",
   cassetteHeightFilter_mm: getCassetteHeightFilter("С-П 150 мм"),
 };
@@ -434,6 +436,21 @@ export function PurlinApp() {
             ]}
             onChange={(v) => upd({ fencePurlin: v === "yes" })}
           />
+          <SelectField
+            label="Установка тяжей"
+            value={input.tieInstallation ? "yes" : "no"}
+            options={[
+              ["no", "нет"],
+              ["yes", "да"],
+            ]}
+            onChange={(v) => upd({ tieInstallation: v === "yes" })}
+          />
+          <Field
+            label="Шаг распорок, м"
+            value={input.braceStep_m}
+            onChange={(v) => upd({ braceStep_m: v })}
+            step={0.1}
+          />
           <div style={{ marginBottom: 6 }}>
             <label style={{ fontSize: 13, display: "block" }}>
               <input
@@ -745,6 +762,9 @@ function diagnosticNotesRu(notes: string[]): string[] {
 function warningRu(warning: string): string {
   if (warning.startsWith("Diagnostics report")) {
     return "Диагностика показывает текущий выбор приложения и не меняет расчётные проверки.";
+  }
+  if (warning.startsWith("Tie installation")) {
+    return "Установка тяжей и шаг распорок уже вынесены в явные входные данные для сверки с Excel, но пока не применяются к подбору.";
   }
   if (warning.startsWith("COLONNA/VELICAN")) {
     return "COLONNA/VELICAN указывают на дополнительные Excel-фильтры, которые ещё не полностью перенесены.";

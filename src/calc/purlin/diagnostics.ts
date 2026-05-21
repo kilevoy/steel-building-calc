@@ -89,15 +89,13 @@ export function buildPurlinSelectionDiagnostics(
     selectedOverallGrade,
     selectedOverallType: selectedOverall?.profile.type ?? null,
     oracleOnlyParameters: [
-      "deck/profile sheet",
-      "tie installation",
-      "brace step",
       "LSTK prices",
       "requiresPanelFilter",
       "black/galvanized/braced mass split",
     ],
     warnings: [
       "Diagnostics report current native selection only; it does not change profile checks or numerical output.",
+      "Tie installation and brace step are explicit inputs for workbook parity, but they are not applied to the native selection yet.",
       "COLONNA/VELICAN indicate additional oracle-only filters that are not fully represented in this module yet.",
       "The current native LSTK branch applies maxUtilization when it is numeric; COLONNA documents workbook parity as using profile default_coef instead.",
     ],

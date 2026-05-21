@@ -67,6 +67,10 @@ export interface PurlinInput {
   /** Optional extra purlins */
   snowGuardPurlin: boolean;
   fencePurlin: boolean;
+  /** Workbook parity input: tie installation flag. Currently diagnostic-only. */
+  tieInstallation: boolean;
+  /** Workbook parity input: brace spacing, m. Currently diagnostic-only. */
+  braceStep_m: number;
 
   /** Maximum utilization: either "default" (per-thickness from Excel) or fixed fraction (e.g. 0.8) */
   maxUtilization: "default" | number;

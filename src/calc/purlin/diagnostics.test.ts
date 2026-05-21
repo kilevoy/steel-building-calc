@@ -24,6 +24,8 @@ const SCN_PURLINS_001: PurlinInput = {
   minStep_mm: 1500,
   snowGuardPurlin: false,
   fencePurlin: false,
+  tieInstallation: false,
+  braceStep_m: 0.4,
   maxUtilization: "default",
   cassetteHeightFilter_mm: 0,
 };
@@ -40,6 +42,7 @@ describe("purlin selection diagnostics", () => {
       diagnostics.familyDiagnostics.filter((item) => item.status === "no_candidate").map((item) => item.type),
     ).toEqual(["2TPS", "2PS", "2TPS", "2PS"]);
     expect(diagnostics.oracleOnlyParameters).toContain("requiresPanelFilter");
+    expect(diagnostics.warnings.join(" ")).toContain("Tie installation and brace step");
     expect(diagnostics.warnings.join(" ")).toContain("default_coef");
   });
 
