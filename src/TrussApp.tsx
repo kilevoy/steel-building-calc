@@ -134,7 +134,7 @@ export function TrussApp() {
         V_perm_kN: out.loads.roof_kN_per_m * input.span_m / 2,
         V_snow_kN: out.loads.snow_kN_per_m * input.span_m / 2,
         V_wind_kN: out.loads.wind_kN_per_m * input.span_m / 2,
-        H_kN: 0, // horizontal not computed here; placeholder
+        H_kN: null,
       },
     };
     setResult("truss", payload);
@@ -405,7 +405,7 @@ export function TrussApp() {
       {out && (
         <div>
           <div style={{ background: "#fef3c7", border: "1px solid #fde68a", padding: 8, marginBottom: 12, color: "#92400e", fontSize: 13 }}>
-            Внимание: горизонтальная реакция H пока не рассчитывается и временно принимается равной 0. Для расчёта колонн это допущение нужно проверить отдельно.
+            Внимание: горизонтальная реакция H в ферменном Excel-oracle не найдена и сейчас не передаётся в расчёт колонн как число. Для колонн это открытый инженерный вопрос, а не подтверждённое H = 0.
           </div>
 
           {/* Sticky summary */}

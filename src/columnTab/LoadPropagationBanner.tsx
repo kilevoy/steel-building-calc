@@ -39,7 +39,8 @@ export function LoadPropagationBanner() {
         <div>
           Ферма (реакции на опоры) → V<sub>пост</sub> = {rx.V_perm_kN.toFixed(1)} кН,
           V<sub>снег</sub> = {rx.V_snow_kN.toFixed(1)} кН,
-          V<sub>ветер</sub> = {rx.V_wind_kN.toFixed(1)} кН
+          V<sub>ветер</sub> = {rx.V_wind_kN.toFixed(1)} кН,
+          H = {rx.H_kN === null ? "не рассчитана" : `${rx.H_kN.toFixed(1)} кН`}
         </div>
       )}
       {hasCrane && (

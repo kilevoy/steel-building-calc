@@ -36,7 +36,7 @@ export interface TrussResult {
     V_perm_kN: number;
     V_snow_kN: number;
     V_wind_kN: number;
-    H_kN: number;
+    H_kN: number | null;
   };
 }
 
