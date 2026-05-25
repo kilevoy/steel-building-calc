@@ -96,6 +96,10 @@ export interface PurlinCandidate {
   massPerFrameStep_kg: number;
   /** Mass for full building, kg */
   massPerBuilding_kg: number;
+  /** Excel Лист1!I65/I70 black metal mass for Z purlins; null for 2ТПС/2ПС. */
+  blackMass_kg: number | null;
+  /** Excel Лист1!J65/J70 galvanized mass for Z purlins; null for 2ТПС/2ПС. */
+  galvanizedMass_kg: number | null;
   /** Excel parity mass including brace rows, kg (Лист1!K63:K70). */
   massWithBraces_kg: number;
 }

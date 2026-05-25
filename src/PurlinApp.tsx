@@ -537,6 +537,8 @@ export function PurlinApp() {
                   <th style={th}>Масса/м, кг</th>
                   <th style={th}>Масса на 1 шаг, кг</th>
                   <th style={th}>Масса на здание, кг</th>
+                  <th style={th}>Черняк, кг</th>
+                  <th style={th}>Оцинковка, кг</th>
                   <th style={th}>Масса с распорками, кг</th>
                 </tr>
               </thead>
@@ -549,7 +551,7 @@ export function PurlinApp() {
                       <tr key={key}>
                         <td style={td}>{GRADE_LABELS[s.grade]}</td>
                         <td style={td}>{TYPE_LABELS[s.type]}</td>
-                        <td style={td} colSpan={10}>
+                        <td style={td} colSpan={12}>
                           <span style={{ color: "#999" }}>нет подходящего профиля</span>
                         </td>
                       </tr>
@@ -571,6 +573,10 @@ export function PurlinApp() {
                       <td style={td}>{c.profile.mass_kg_per_m.toFixed(3)}</td>
                       <td style={td}>{c.massPerFrameStep_kg.toFixed(2)}</td>
                       <td style={td}>{c.massPerBuilding_kg.toFixed(2)}</td>
+                      <td style={td}>{c.blackMass_kg === null ? "—" : c.blackMass_kg.toFixed(2)}</td>
+                      <td style={td}>
+                        {c.galvanizedMass_kg === null ? "—" : c.galvanizedMass_kg.toFixed(2)}
+                      </td>
                       <td style={td}>{c.massWithBraces_kg.toFixed(2)}</td>
                     </tr>
                   );

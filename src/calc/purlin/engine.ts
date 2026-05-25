@@ -155,6 +155,10 @@ function evaluateProfile(
     : profile.mass_kg_per_m * input.framePitch_m;
   const massPerFrameStep_kg = countPerHalf * perPurlinUnit_kg * slopeFactor;
   const massPerBuilding_kg = (massPerFrameStep_kg * input.length_m) / input.framePitch_m;
+  const galvanizedMass_kg = isZ
+    ? countPerHalf * profile.mass_kg_per_m * input.framePitch_m * slopeFactor * input.length_m / input.framePitch_m
+    : null;
+  const blackMass_kg = galvanizedMass_kg === null ? null : massPerBuilding_kg - galvanizedMass_kg;
   const braceStep_m = input.braceStep_m > 0 ? input.braceStep_m : input.span_m;
   const braceRows = Math.ceil(input.span_m / braceStep_m);
   const massWithBraces_kg = massPerBuilding_kg + BRACE_MASS_PER_LINE_KG * braceRows * input.length_m;
@@ -168,6 +172,8 @@ function evaluateProfile(
     nPurlins,
     massPerFrameStep_kg,
     massPerBuilding_kg,
+    blackMass_kg,
+    galvanizedMass_kg,
     massWithBraces_kg,
   };
 }

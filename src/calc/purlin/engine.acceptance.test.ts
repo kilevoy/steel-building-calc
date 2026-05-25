@@ -80,6 +80,8 @@ describe("purlin engine — Excel acceptance SCN-PURLINS-001 (ЛСТК)", () => 
       expect(best.spacing_mm).toBe(1500);
       // Mass per building from Excel SCN-PURLINS-001: 12351.6 kg.
       expect(best.massPerBuilding_kg).toBeCloseTo(12351.6, 4);
+      expect(best.blackMass_kg).toBeCloseTo(309.6, 4);
+      expect(best.galvanizedMass_kg).toBeCloseTo(12042, 4);
       // Excel Лист1!K65/K70: H + Расчет!S87 * ROUNDUP(B8 / B47, 0) * B9.
       expect(best.massWithBraces_kg).toBeCloseTo(16959.6, 4);
       // Utilization stays under the per-thickness default coefficient.

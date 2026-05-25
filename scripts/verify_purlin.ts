@@ -42,7 +42,7 @@ function runScenario(name: string, overrides: Partial<PurlinInput>) {
       console.log(`  ${s.grade} ${s.type}: -`);
     } else {
       console.log(
-        `  ${s.grade} ${s.type}: ${c.profile.name}  step=${c.spacing_mm}  K=${c.K.toFixed(3)}  m/m=${c.profile.mass_kg_per_m.toFixed(3)}  m_frame=${c.massPerFrameStep_kg.toFixed(2)}  m_bldg=${c.massPerBuilding_kg.toFixed(2)}  m_braced=${c.massWithBraces_kg.toFixed(2)}`,
+        `  ${s.grade} ${s.type}: ${c.profile.name}  step=${c.spacing_mm}  K=${c.K.toFixed(3)}  m/m=${c.profile.mass_kg_per_m.toFixed(3)}  m_frame=${c.massPerFrameStep_kg.toFixed(2)}  m_bldg=${c.massPerBuilding_kg.toFixed(2)}  black=${c.blackMass_kg?.toFixed(2) ?? "-"}  zinc=${c.galvanizedMass_kg?.toFixed(2) ?? "-"}  m_braced=${c.massWithBraces_kg.toFixed(2)}`,
       );
     }
   }
