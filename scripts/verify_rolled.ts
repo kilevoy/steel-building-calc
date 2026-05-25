@@ -2,6 +2,7 @@ import { computeLoads } from "../src/calc/purlin/engine";
 import {
   selectRolledTop10,
   DEFAULT_ROLLED_PRICES,
+  computeRolledPurlinAxialWindLoad_kN,
   type RolledSelectionInput,
 } from "../src/calc/purlin/rolled";
 import type { PurlinInput } from "../src/calc/purlin/types";
@@ -19,6 +20,7 @@ const baseInput: PurlinInput = {
   w0_kPa: 0.6,
   Sg_kPa: 2.45,
   roofStructure: "С-П 150 мм",
+  deckProfile: "С44-1000-0,7",
   roofLoad_kPa: 0.32028,
   snowDrift: "none",
   drift_dropHeight_m: 0,
@@ -27,6 +29,8 @@ const baseInput: PurlinInput = {
   minStep_mm: 1500,
   snowGuardPurlin: false,
   fencePurlin: false,
+  tieInstallation: "none",
+  braceStep_m: 3,
   maxUtilization: "default",
   cassetteHeightFilter_mm: 150,
 };
@@ -46,15 +50,11 @@ const q_SLS_roof = (baseInput.roofLoad_kPa / 1.2) * baseInput.gamma_n;
 const q_SLS_kPa = q_SLS_snow + q_SLS_roof;
 console.log(`  q_SLS:  ${q_SLS_kPa.toFixed(4)} kPa  (Excel F14 = 1.6070)`);
 
-// Wind on facade (horizontal) — for axial force on purlin (Расчет!D17,D18)
-// Excel: D17 = ветровая горизонтальная (фасад) × γn
-//        D18 = D17 × height/2 × frame_pitch  (transferred to purlin)
-// Approximation: for default Excel case D18 = 29.65 kN (matches exact)
-const N_axial_kN = 29.65; // TODO: compute from facade wind formula
+const N_axial_kN = computeRolledPurlinAxialWindLoad_kN(baseInput);
+console.log(`  N_axial: ${N_axial_kN.toFixed(4)} kN  (Excel D18 = 29.6469)`);
 
 const rolledInput: RolledSelectionInput = {
   ...baseInput,
-  N_axial_kN_externalOverride: N_axial_kN,
   rolledMaxK: 0.8, // Лист1!D49
   rolledPrices: DEFAULT_ROLLED_PRICES,
 };

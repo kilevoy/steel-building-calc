@@ -11,6 +11,7 @@
 
 import type { ProfileData, SteelGrade } from "../types";
 import { getRy } from "../steel";
+import { getKze, getNu, getZeta } from "../wind";
 import type { PurlinInput } from "./types";
 import rolledCatalog from "../../data/purlin/rolled.json";
 import disabledList from "../../data/purlin/disabled.json";
@@ -96,6 +97,20 @@ function priceFor(profile: ProfileData, steel: SteelGrade, prices: RolledPrices)
 }
 
 const CATALOG = rolledCatalog as ProfileData[];
+
+export function computeRolledPurlinAxialWindLoad_kN(input: PurlinInput): number {
+  const h = Math.max(input.height_m, 5);
+  const kze = getKze(input.terrainType, h);
+  const zeta = getZeta(input.terrainType, h);
+  const nu = getNu(input.span_m, h);
+  const gamma_f = 1.4;
+  const cAerodynamic = 0.8;
+  const meanPressure_kPa = Math.abs(input.w0_kPa * kze * cAerodynamic * gamma_f);
+  const pulsePressure_kPa = meanPressure_kPa * zeta * nu;
+  const facadePressure_kPa = (meanPressure_kPa + pulsePressure_kPa) * input.gamma_n;
+
+  return facadePressure_kPa * (input.height_m / 2) * input.framePitch_m;
+}
 
 /**
  * Number of purlins per frame step length (used as Excel row 3 multiplier in Расчет).
@@ -223,7 +238,7 @@ export function selectRolledTop10(
   const ctx: RolledLoadContext = {
     q_total_kPa,
     q_SLS_kPa,
-    N_axial_kN: input.N_axial_kN_externalOverride ?? 0,
+    N_axial_kN: input.N_axial_kN_externalOverride ?? computeRolledPurlinAxialWindLoad_kN(input),
     q_horizontalWind_kPa: 0,
     L_inPlane_m: input.framePitch_m,
     L_outPlane_m: input.L_outPlane_m_override ?? input.framePitch_m,
