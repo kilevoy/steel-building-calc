@@ -105,7 +105,7 @@ describe("building summary contract", () => {
     expect(totals.totalMass_kg).toBeCloseTo(50_379.40317, 8);
     expect(totals.totalCost_rub).toBe(8_063_536);
     expect(calculateBuildingSummaryTotalsBySteel(results)).toEqual([
-      { steel: "С345", totalMass_kg: 35_262.00147, totalCost_rub: 4_000_000 },
+      { steel: "С345", totalMass_kg: 35_262.00147, totalCost_rub: 5_402_920 },
       { steel: "МП350", totalMass_kg: 12_126.4, totalCost_rub: 2_182_752 },
       { steel: "С245", totalMass_kg: 2_991.0017, totalCost_rub: 477_864 },
     ]);

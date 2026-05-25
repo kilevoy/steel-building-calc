@@ -69,6 +69,10 @@ export function calculateBuildingSummaryTotalsBySteel(
   addBySteel(results.craneBeam);
 
   if (results.truss) {
+    const trussMassForCostSplit = results.truss.sections.reduce(
+      (sum, section) => sum + section.totalMass_kg,
+      0,
+    );
     for (const section of results.truss.sections) {
       const current = totals.get(section.steel) ?? {
         steel: section.steel,
@@ -76,6 +80,10 @@ export function calculateBuildingSummaryTotalsBySteel(
         totalCost_rub: 0,
       };
       current.totalMass_kg += section.totalMass_kg;
+      if (trussMassForCostSplit > 0) {
+        current.totalCost_rub +=
+          (section.totalMass_kg / trussMassForCostSplit) * results.truss.totalCost_rub;
+      }
       totals.set(section.steel, current);
     }
   }

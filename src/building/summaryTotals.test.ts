@@ -89,9 +89,9 @@ describe("building summary totals", () => {
     };
 
     expect(calculateBuildingSummaryTotalsBySteel(results)).toEqual([
-      { steel: "C345", totalMass_kg: 300, totalCost_rub: 2_000 },
+      { steel: "C345", totalMass_kg: 300, totalCost_rub: 2_400 },
       { steel: "MP350", totalMass_kg: 300, totalCost_rub: 3_000 },
-      { steel: "C245", totalMass_kg: 155, totalCost_rub: 1_250 },
+      { steel: "C245", totalMass_kg: 155, totalCost_rub: 1_550 },
     ]);
   });
 });
