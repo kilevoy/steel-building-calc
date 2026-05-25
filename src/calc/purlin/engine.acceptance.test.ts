@@ -149,3 +149,32 @@ describe("purlin engine — Excel acceptance SCN-PURLINS-001 (ЛСТК)", () => 
     }
   });
 });
+
+describe("purlin engine — Excel acceptance SCN-PURLINS-002 (extra snow guard purlin)", () => {
+  const out = runPurlinCalculation({
+    ...SCN_PURLINS_001,
+    snowGuardPurlin: true,
+  });
+
+  it("keeps the base load model and adds one physical purlin line", () => {
+    expect(out.q_snow_kPa).toBeCloseTo(4.240134, 4);
+    expect(out.q_roof_kPa).toBeCloseTo(0.32028, 5);
+    expect(out.q_total_kPa).toBeCloseTo(4.774239, 4);
+    expect(out.mu2).toBe(1);
+    expect(out.autoMaxStep_mm).toBe(1500);
+    expect(out.L_slope_m).toBeCloseTo((24 - 0.3) / 2, 10);
+  });
+
+  it("selects the same Z profile but increases the line count and mass", () => {
+    const best = out.top10[0];
+
+    expect(best.profile.name).toBe("Z 350х2,5");
+    expect(best.spacing_mm).toBe(1500);
+    expect(best.nPurlins).toBe(20);
+    expect(best.massPerBuilding_kg).toBeCloseTo(13724, 4);
+    expect(best.blackMass_kg).toBeCloseTo(344, 4);
+    expect(best.galvanizedMass_kg).toBeCloseTo(13380, 4);
+    expect(best.massWithBraces_kg).toBeCloseTo(18332, 4);
+    expect(best.K).toBeCloseTo(0.9644195919, 10);
+  });
+});
