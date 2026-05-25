@@ -35,6 +35,13 @@ describe("crane beam engine — Excel acceptance (default scenario)", () => {
     expect(result.weightKg!).toBeCloseTo(expected.weightKg, 3);
   });
 
+  it("matches Excel deflection check within 1e-6", () => {
+    const deflectionCheck = result.deflections[result.deflections.length - 1]?.value;
+
+    expect(deflectionCheck).toBeDefined();
+    expect(deflectionCheck!).toBeCloseTo(expected.deflectionCheck, 6);
+  });
+
   it("populates downstream geometry, strength and stability blocks", () => {
     // These blocks come directly from the workbook ranges. Empty arrays
     // would mean the engine wired up the wrong cells — a regression we
