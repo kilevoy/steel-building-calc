@@ -1,106 +1,17 @@
 import { useMemo } from "react";
 import { deriveUnifiedBuildingLayout } from "./building/unifiedLayout";
 import { useBuilding } from "./building/useBuilding";
-import {
-  useBuildingResults,
-  type BuildingResults,
-  type ResultItem,
-} from "./building/useBuildingResults";
+import { useBuildingResults } from "./building/useBuildingResults";
 import { useCraneBeamRunner } from "./building/useCraneBeamRunner";
+import {
+  buildSummaryRows,
+  formatSummaryCost,
+  formatSummaryMass,
+} from "./building/summaryRows";
 import {
   calculateBuildingSummaryTotals,
   calculateBuildingSummaryTotalsBySteel,
 } from "./building/summaryTotals";
-
-function fmtKg(v: number): string {
-  if (!Number.isFinite(v)) return "—";
-  if (v >= 1000) return `${(v / 1000).toFixed(2)} т`;
-  return `${v.toFixed(1)} кг`;
-}
-function fmtRub(v: number): string {
-  if (!Number.isFinite(v) || v === 0) return "—";
-  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(2)} млн ₽`;
-  if (v >= 1_000) return `${(v / 1_000).toFixed(2)} тыс. ₽`;
-  return `${v.toFixed(0)} ₽`;
-}
-
-interface Row {
-  label: string;
-  profile: string;
-  steel: string;
-  count: string;
-  unitMass_kg: string;
-  totalMass_kg: number;
-  cost_rub: number;
-  note?: string;
-}
-
-function rowFromItem(label: string, item: ResultItem | null, note?: string): Row | null {
-  if (!item) return null;
-  const count = item.count ?? 1;
-  const unit = item.massPerPiece_kg ?? item.totalMass_kg / Math.max(1, count);
-  return {
-    label,
-    profile: item.profile,
-    steel: item.steel,
-    count: count > 1 ? `${count}` : "—",
-    unitMass_kg: count > 1 ? fmtKg(unit) : "—",
-    totalMass_kg: item.totalMass_kg,
-    cost_rub: item.cost_rub,
-    note,
-  };
-}
-
-function buildRows(r: BuildingResults): Row[] {
-  const rows: Row[] = [];
-
-  // Columns: edge/middle/fachwerk separate rows
-  if (r.column) {
-    const edge = rowFromItem("Колонна крайняя", r.column.edge);
-    if (edge) rows.push(edge);
-    const mid = rowFromItem("Колонна средняя", r.column.middle);
-    if (mid) rows.push(mid);
-    const fw = rowFromItem("Колонна фахверк", r.column.fachwerk);
-    if (fw) rows.push(fw);
-  }
-
-  // Truss: aggregated row with per-section breakdown footer
-  if (r.truss) {
-    rows.push({
-      label: "Ферма покрытия",
-      profile: r.truss.sections.map((s) => `${s.section}: ${s.profile}`).join(" / "),
-      steel: r.truss.sections[0]?.steel ?? "—",
-      count: `${r.truss.n_trusses}`,
-      unitMass_kg: fmtKg(r.truss.totalMass_kg / r.truss.n_trusses),
-      totalMass_kg: r.truss.totalMass_kg,
-      cost_rub: r.truss.totalCost_rub,
-      note: `${r.truss.unitMass_kg_per_m2.toFixed(1)} кг/м²`,
-    });
-  }
-
-  // Other elements
-  const purlin = rowFromItem("Прогоны (ЛСТК)", r.purlin);
-  if (purlin) rows.push(purlin);
-
-  const beamCell = rowFromItem("Балка покрытия", r.beamCell);
-  if (beamCell) rows.push(beamCell);
-
-  const windowRiegel = rowFromItem(
-    "Оконные ригели (★ top‑1)",
-    r.windowRiegel,
-    "Масса 1 ригеля; кол-во не учитывается",
-  );
-  if (windowRiegel) rows.push(windowRiegel);
-
-  const craneBeam = rowFromItem(
-    "Подкрановая балка",
-    r.craneBeam,
-    "Масса 1 балки; кол-во не учитывается",
-  );
-  if (craneBeam) rows.push(craneBeam);
-
-  return rows;
-}
 
 const th: React.CSSProperties = {
   padding: "8px 10px",
@@ -121,7 +32,7 @@ const tdR: React.CSSProperties = { ...td, textAlign: "right" };
 export function SummaryApp() {
   const { building } = useBuilding();
   const { results } = useBuildingResults();
-  const rows = useMemo(() => buildRows(results), [results]);
+  const rows = useMemo(() => buildSummaryRows(results), [results]);
   const bySteel = useMemo(() => calculateBuildingSummaryTotalsBySteel(results), [results]);
   const totals = useMemo(() => calculateBuildingSummaryTotals(results), [results]);
 
@@ -181,16 +92,16 @@ export function SummaryApp() {
                 <td style={td}>{r.steel}</td>
                 <td style={tdR}>{r.count}</td>
                 <td style={tdR}>{r.unitMass_kg}</td>
-                <td style={{ ...tdR, fontWeight: 600 }}>{fmtKg(r.totalMass_kg)}</td>
-                <td style={tdR}>{fmtRub(r.cost_rub)}</td>
+                <td style={{ ...tdR, fontWeight: 600 }}>{formatSummaryMass(r.totalMass_kg)}</td>
+                <td style={tdR}>{formatSummaryCost(r.cost_rub)}</td>
               </tr>
             ))}
           </tbody>
           <tfoot>
             <tr style={{ background: "#f8fafc" }}>
               <td style={{ ...td, fontWeight: 700 }} colSpan={5}>Итого по зданию</td>
-              <td style={{ ...tdR, fontWeight: 700 }}>{fmtKg(totals.totalMass_kg)}</td>
-              <td style={{ ...tdR, fontWeight: 700 }}>{fmtRub(totals.totalCost_rub)}</td>
+              <td style={{ ...tdR, fontWeight: 700 }}>{formatSummaryMass(totals.totalMass_kg)}</td>
+              <td style={{ ...tdR, fontWeight: 700 }}>{formatSummaryCost(totals.totalCost_rub)}</td>
             </tr>
           </tfoot>
         </table>
@@ -212,8 +123,8 @@ export function SummaryApp() {
                 {bySteel.map((s) => (
                   <tr key={s.steel}>
                     <td style={{ ...td, fontWeight: 600 }}>{s.steel}</td>
-                    <td style={tdR}>{fmtKg(s.totalMass_kg)}</td>
-                    <td style={tdR}>{fmtRub(s.totalCost_rub)}</td>
+                    <td style={tdR}>{formatSummaryMass(s.totalMass_kg)}</td>
+                    <td style={tdR}>{formatSummaryCost(s.totalCost_rub)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -242,7 +153,7 @@ export function SummaryApp() {
                     <td style={{ ...td, fontWeight: 600 }}>{s.section}</td>
                     <td style={td}>{s.profile}</td>
                     <td style={td}>{s.steel}</td>
-                    <td style={tdR}>{fmtKg(s.totalMass_kg)}</td>
+                    <td style={tdR}>{formatSummaryMass(s.totalMass_kg)}</td>
                   </tr>
                 ))}
               </tbody>
