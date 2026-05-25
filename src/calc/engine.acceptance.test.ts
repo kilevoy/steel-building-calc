@@ -170,6 +170,8 @@ describe("column engine — Excel acceptance (10 scenarios)", () => {
     expect(first.steel).toBe("С355Б");
     expect(first.strutCount).toBe(3);
     expect(first.mass_per_m).toBeCloseTo(41.4, 6);
+    expect(first.columnMass_kg).toBeCloseTo(547.515, 6);
+    expect(first.totalMass_kg).toBeCloseTo(746.235, 6);
     expect(first.maxUtilization).toBeCloseTo(0.9742299766, 10);
     expect(first.limitingCheck).toBe("по σ уст X");
   });

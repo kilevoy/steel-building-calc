@@ -188,8 +188,8 @@ function checkProfile(
 
   const strutStep =
     input.columnType === "fachwerk" ? input.fachverkPitch_m : input.framePitch_m;
-  const strutMass = struts * 12 * strutStep * 1.15;
-  const columnMass = profile.mass_kg_per_m * H;
+  const strutMass = struts * 9.6 * strutStep * 1.15;
+  const columnMass = profile.mass_kg_per_m * H * 1.15;
   const totalMass = columnMass + strutMass;
   const cost = (totalMass * pricePerKg(steel, input.prices)) / 1000;
 
