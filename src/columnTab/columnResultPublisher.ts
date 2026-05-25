@@ -1,5 +1,5 @@
 import { deriveColumnLayout } from "../building/layout";
-import type { ColumnResultByType, ResultItem } from "../building/useBuildingResults";
+import type { ColumnResultByType, ResultItem } from "../building/resultsContext";
 import type { CalculationInput, CalculationOutput, ColumnType } from "../calc/types";
 
 const STRUT_MASS_KG_PER_M = 9.6;

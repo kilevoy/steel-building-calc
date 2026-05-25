@@ -1,5 +1,5 @@
 import { deriveRoofElementLayout } from "./building/layout";
-import type { ResultItem } from "./building/useBuildingResults";
+import type { ResultItem } from "./building/resultsContext";
 import type { MemberSolution, Steel } from "./calc/beamCell/types";
 import type { SpanCount } from "./calc/types";
 

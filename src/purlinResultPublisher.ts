@@ -1,4 +1,4 @@
-import type { ResultItem } from "./building/useBuildingResults";
+import type { ResultItem } from "./building/resultsContext";
 import type { PurlinOutput } from "./calc/purlin/types";
 
 export interface PurlinResultPrices {

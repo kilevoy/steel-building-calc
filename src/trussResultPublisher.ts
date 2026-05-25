@@ -1,5 +1,5 @@
 import { deriveRoofElementLayout } from "./building/layout";
-import type { TrussResult } from "./building/useBuildingResults";
+import type { TrussResult } from "./building/resultsContext";
 import {
   TRUSS_SECTIONS,
   TRUSS_SECTION_SHORT,

@@ -1,4 +1,4 @@
-import type { ResultItem } from "./building/useBuildingResults";
+import type { ResultItem } from "./building/resultsContext";
 import type { WindowRiegelResult } from "./calc/windowRiegel/types";
 
 export function buildWindowRiegelResultItem(
