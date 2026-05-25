@@ -1,9 +1,8 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { runTrussCalculation, getDefaultMinThickness } from "./calc/truss/engine";
 import { useBuilding, type Building } from "./building/useBuilding";
-import { useBuildingResults, type TrussResult } from "./building/useBuildingResults";
+import { useBuildingResults } from "./building/useBuildingResults";
 import { useRoofTotalLoad_kPa } from "./building/loadPropagation";
-import { deriveRoofElementLayout } from "./building/layout";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
@@ -21,6 +20,7 @@ import {
   getSettlementClimateByIdAsync,
   searchSettlementsAsync,
 } from "./services/settlements";
+import { buildTrussResultPayload } from "./trussResultPublisher";
 import structuresJson from "./data/structures/structures.json";
 
 interface StructureRow {
@@ -106,38 +106,16 @@ export function TrussApp() {
       setResult("truss", null);
       return;
     }
-    const n_trusses = deriveRoofElementLayout({
-      length_m: input.length_m,
-      framePitch_m: input.framePitch_m,
-      spanCount: building.spanCount,
-    }).trussCount;
-    const sections = TRUSS_SECTIONS.flatMap((sec) => {
-      const r = out.sections[sec];
-      const sel = r.selected;
-      if (!sel) return [];
-      return [{
-        section: TRUSS_SECTION_SHORT[sec],
-        profile: sel.profile.name,
-        steel: "С345", // truss tubes are typically С345
-        totalMass_kg: sel.totalMass_kg * n_trusses,
-      }];
-    });
-    const totalMass = out.totalMass_kg * n_trusses;
-    const totalCost = totalMass * building.priceC345_rubKg;
-    const payload: TrussResult = {
-      sections,
-      totalMass_kg: totalMass,
-      totalCost_rub: totalCost,
-      unitMass_kg_per_m2: out.unitMass_kg_per_m2,
-      n_trusses,
-      reactions: {
-        V_perm_kN: out.loads.roof_kN_per_m * input.span_m / 2,
-        V_snow_kN: out.loads.snow_kN_per_m * input.span_m / 2,
-        V_wind_kN: out.loads.wind_kN_per_m * input.span_m / 2,
-        H_kN: null,
+    setResult("truss", buildTrussResultPayload({
+      input: {
+        length_m: input.length_m,
+        framePitch_m: input.framePitch_m,
+        span_m: input.span_m,
       },
-    };
-    setResult("truss", payload);
+      output: out,
+      spanCount: building.spanCount,
+      priceC345_rubKg: building.priceC345_rubKg,
+    }));
   }, [
     out,
     input.length_m,
