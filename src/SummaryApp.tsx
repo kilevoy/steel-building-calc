@@ -1,5 +1,8 @@
 import { useMemo } from "react";
-import { deriveUnifiedBuildingLayout } from "./building/unifiedLayout";
+import {
+  deriveUnifiedBuildingLayoutFromBuilding,
+  deriveUnifiedBuildingLayoutInput,
+} from "./building/unifiedBuildingInput";
 import { useBuilding } from "./building/useBuilding";
 import { useBuildingResults } from "./building/useBuildingResults";
 import { useCraneBeamRunner } from "./building/useCraneBeamRunner";
@@ -215,18 +218,8 @@ function BuildingBlock() {
 
 function BuildingCountDiagnostics() {
   const { building } = useBuilding();
-  const mainFrameAxisCount =
-    Number.isFinite(building.length_m) &&
-    Number.isFinite(building.framePitch_m) &&
-    building.framePitch_m > 0
-      ? Math.floor(building.length_m / building.framePitch_m) + 1
-      : 0;
-  const crossSpanCount = building.spanCount === "multi" ? 2 : 1;
-  const layout = deriveUnifiedBuildingLayout({
-    mainFrameAxisCount,
-    crossSpanCount,
-    hasCrane: building.hasCrane,
-  });
+  const layoutInput = deriveUnifiedBuildingLayoutInput(building);
+  const layout = deriveUnifiedBuildingLayoutFromBuilding(building);
 
   return (
     <fieldset
@@ -259,7 +252,7 @@ function BuildingCountDiagnostics() {
         <div>Внутренних рам: <b>{layout.frames.interiorFrameAxes}</b></div>
         <div>Торцевых рам: <b>{layout.frames.endFrameAxes}</b></div>
         <div>Шагов вдоль: <b>{layout.frames.frameBays}</b></div>
-        <div>Пролётов поперёк: <b>{crossSpanCount}</b></div>
+        <div>Пролётов поперёк: <b>{layoutInput.crossSpanCount}</b></div>
         <div>Крайних колонн, внутренние: <b>{layout.columns.interiorEdge}</b></div>
         <div>Средних колонн, внутренние: <b>{layout.columns.interiorMiddle}</b></div>
         <div>Всего колонн, внутренние: <b>{layout.columns.interiorTotal}</b></div>
