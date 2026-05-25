@@ -48,6 +48,12 @@
 
 Добавлен сценарий с прогоном под снегозадержание. Автотест находится в `src/calc/purlin/engine.acceptance.test.ts`, описание сценария — в `knowledge/wiki/parity/scenarios/SCN-PURLINS-002.md`. Снеговой мешок и прогон под ограждение остаются отдельными сценариями.
 
+### `SCN-PURLINS-003`
+
+Статус: выполнено 2026-05-25.
+
+Добавлен сценарий с ручным ограничением максимального шага `1200 мм`. Автотест находится в `src/calc/purlin/engine.acceptance.test.ts`, описание сценария — в `knowledge/wiki/parity/scenarios/SCN-PURLINS-003.md`.
+
 ### `SCN-COLUMN-002`
 
 Статус: выполнено 2026-05-25.

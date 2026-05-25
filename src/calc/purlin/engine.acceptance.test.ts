@@ -178,3 +178,30 @@ describe("purlin engine — Excel acceptance SCN-PURLINS-002 (extra snow guard p
     expect(best.K).toBeCloseTo(0.9644195919, 10);
   });
 });
+
+describe("purlin engine — Excel acceptance SCN-PURLINS-003 (manual max step 1200)", () => {
+  const out = runPurlinCalculation({
+    ...SCN_PURLINS_001,
+    minStep_mm: 500,
+    maxStep_mm: 1200,
+  });
+
+  it("uses the manual maximum step constraint", () => {
+    expect(out.autoMaxStep_mm).toBe(1200);
+    expect(out.q_total_kPa).toBeCloseTo(4.774239, 4);
+    expect(out.top10.length).toBeGreaterThan(0);
+  });
+
+  it("selects Z 350x2 at the constrained step", () => {
+    const best = out.top10[0];
+
+    expect(best.profile.name).toBe("Z 350х2");
+    expect(best.spacing_mm).toBe(1185);
+    expect(best.nPurlins).toBe(22);
+    expect(best.massPerBuilding_kg).toBeCloseTo(12126.4, 4);
+    expect(best.blackMass_kg).toBeCloseTo(378.4, 4);
+    expect(best.galvanizedMass_kg).toBeCloseTo(11748, 4);
+    expect(best.massWithBraces_kg).toBeCloseTo(16734.4, 4);
+    expect(best.K).toBeCloseTo(0.9842098225, 10);
+  });
+});
