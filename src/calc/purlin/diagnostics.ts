@@ -54,10 +54,10 @@ export function buildPurlinSelectionDiagnostics(
         const notes = ["No accepted candidate in the current native LSTK calculation."];
         const inspection = inspectPurlinFamilyRejection(input, output.q_total_kPa, grade, type);
         if (input.cassetteHeightFilter_mm > 0) {
-          notes.push(`Active cassette height filter: ${input.cassetteHeightFilter_mm} mm.`);
+          notes.push(`Active panel assembly height filter: ${input.cassetteHeightFilter_mm} mm.`);
         }
-        if (inspection.rejectionReason === "cassette_height_filter") {
-          notes.push("All profiles in this family are rejected by the active cassette height filter.");
+        if (inspection.rejectionReason === "panel_assembly_height_filter") {
+          notes.push("All profiles in this family are rejected by the active panel assembly height filter.");
         } else if (inspection.bestRejectedUtilization !== null) {
           notes.push(
             `Best rejected variant: ${inspection.bestRejectedProfileName}, step ${inspection.bestRejectedSpacing_mm} mm, K=${inspection.bestRejectedUtilization.toFixed(3)} > 1.`,
@@ -65,7 +65,7 @@ export function buildPurlinSelectionDiagnostics(
         } else {
           notes.push("No profile in this family could be evaluated for the current step limits.");
         }
-        notes.push("Possible causes: strength utilization, step limits, cassette height filter, or missing oracle-only filters.");
+        notes.push("Possible causes: strength utilization, step limits, panel assembly height filter, or missing oracle-only filters.");
         return {
           grade,
           type,

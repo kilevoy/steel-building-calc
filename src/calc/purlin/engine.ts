@@ -20,7 +20,7 @@ const ALL_PROFILES: Record<SteelGrade, LstkProfile[]> = {
 // Excel purlin workbook: Расчет!S87, used by Лист1!K63:K70 mass with braces.
 const BRACE_MASS_PER_LINE_KG = 9.6;
 
-/** Cassette filter map: roof structure name -> required purlin h (mm). 0 = no filter. */
+/** Layer-by-layer panel assembly filter map: roof structure name -> required purlin h (mm). 0 = no filter. */
 const CASSETTE_HEIGHT_MAP: Record<string, number> = {
   "наше 150 мм": 150,
   "наше 200 мм": 200,
@@ -117,7 +117,7 @@ function evaluateProfile(
   input: PurlinInput,
   allowOverUtilization = false,
 ): PurlinCandidate | null {
-  // Cassette height filter (Лист1!C97)
+  // Layer-by-layer panel assembly height filter (Лист1!C97)
   if (input.cassetteHeightFilter_mm > 0 && profile.h_mm !== input.cassetteHeightFilter_mm) {
     return null;
   }
@@ -208,7 +208,7 @@ export function inspectPurlinFamilyRejection(
     profiles.length === 0
       ? "no_profiles"
       : heightAcceptedProfiles.length === 0
-        ? "cassette_height_filter"
+        ? "panel_assembly_height_filter"
         : "strength_utilization";
 
   return {

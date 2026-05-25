@@ -77,7 +77,7 @@ export interface PurlinInput {
   /** Maximum utilization: either "default" (per-thickness from Excel) or fixed fraction (e.g. 0.8) */
   maxUtilization: "default" | number;
 
-  /** Sandwich panel cassette height filter (mm), 0 = no filter */
+  /** Layer-by-layer panel assembly height filter (mm), 0 = no filter. */
   cassetteHeightFilter_mm: number;
 }
 
@@ -119,7 +119,7 @@ export interface PurlinFamilyInspection {
   bestRejectedProfileName: string | null;
   bestRejectedSpacing_mm: number | null;
   bestRejectedUtilization: number | null;
-  rejectionReason: "cassette_height_filter" | "strength_utilization" | "no_profiles";
+  rejectionReason: "panel_assembly_height_filter" | "strength_utilization" | "no_profiles";
 }
 
 export interface PurlinOutput {

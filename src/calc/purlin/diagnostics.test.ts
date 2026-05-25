@@ -51,7 +51,7 @@ describe("purlin selection diagnostics", () => {
     expect(diagnostics.warnings.join(" ")).toContain("Default LSTK utilization mode uses profile default_coef");
   });
 
-  it("mentions cassette height filter when no candidate is available in a family", () => {
+  it("mentions panel assembly height filter when no candidate is available in a family", () => {
     const input: PurlinInput = {
       ...SCN_PURLINS_001,
       cassetteHeightFilter_mm: 999,

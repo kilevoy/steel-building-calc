@@ -758,11 +758,11 @@ function diagnosticNotesRu(notes: string[]): string[] {
     if (note.startsWith("No accepted candidate")) {
       return "Нет принятого кандидата в текущем расчёте ЛСТК.";
     }
-    if (note.startsWith("Active cassette height filter")) {
-      return note.replace("Active cassette height filter:", "Активный фильтр высоты кассеты:");
+    if (note.startsWith("Active panel assembly height filter")) {
+      return note.replace("Active panel assembly height filter:", "Активный фильтр высоты панели послойной сборки:");
     }
     if (note.startsWith("Possible causes")) {
-      return "Возможные причины: прочность, ограничения шага, фильтр высоты кассеты или отсутствующие Excel-фильтры.";
+      return "Возможные причины: прочность, ограничения шага, фильтр высоты панели послойной сборки или отсутствующие Excel-фильтры.";
     }
     if (note.startsWith("Selected as the lightest")) {
       return "Выбран самый лёгкий подходящий кандидат в этой группе.";
