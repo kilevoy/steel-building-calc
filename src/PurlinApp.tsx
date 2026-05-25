@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { runPurlinCalculation, getCassetteHeightFilter } from "./calc/purlin/engine";
 import { useBuilding, type Building } from "./building/useBuilding";
-import { useBuildingResults, type ResultItem } from "./building/useBuildingResults";
+import { useBuildingResults } from "./building/useBuildingResults";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
@@ -25,6 +25,7 @@ import {
   getSettlementClimateByIdAsync,
   searchSettlementsAsync,
 } from "./services/settlements";
+import { buildPurlinResultItem } from "./purlinResultPublisher";
 import structuresJson from "./data/structures/structures.json";
 
 interface StructureRow {
@@ -236,20 +237,14 @@ export function PurlinApp() {
 
   // Publish ЛСТК top-1 selection to shared results bus for the Summary tab.
   useEffect(() => {
-    if (!out || out.top10.length === 0) {
+    const item = buildPurlinResultItem(out, {
+      priceMP350_rubKg: building.priceMP350_rubKg,
+      priceMP390_rubKg: building.priceMP390_rubKg,
+    });
+    if (!item) {
       setResult("purlin", null);
       return;
     }
-    const top = out.top10[0];
-    const isMP390 = top.profile.Ry_MPa >= 380;
-    const steelLabel = isMP390 ? "МП390" : "МП350";
-    const pricePerKg = isMP390 ? building.priceMP390_rubKg : building.priceMP350_rubKg;
-    const item: ResultItem = {
-      profile: top.profile.name,
-      steel: steelLabel,
-      totalMass_kg: top.massPerBuilding_kg,
-      cost_rub: top.massPerBuilding_kg * pricePerKg,
-    };
     setResult("purlin", item);
   }, [out, building.priceMP350_rubKg, building.priceMP390_rubKg, setResult]);
 
