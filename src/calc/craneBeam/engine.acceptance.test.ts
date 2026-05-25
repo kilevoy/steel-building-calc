@@ -63,3 +63,34 @@ describe("crane beam engine — Excel acceptance (default scenario)", () => {
     expect(result.craneGaugeMm).toBeCloseTo(4700, 6);
   });
 });
+
+describe("crane beam engine — Excel acceptance SCN-CRANE-BEAM-002", () => {
+  const result = calculateCraneBeam({
+    ...defaultCraneInputs,
+    capacity: 10,
+  });
+
+  it("matches the 10 t crane scenario headline results", () => {
+    expect(result.profile).not.toBeNull();
+    expect(result.profile?.trim()).toBe("35Ш2");
+    expect(result.utilizationPercent).toBeCloseTo(62.58962347, 6);
+    expect(result.weightKg).toBeCloseTo(478.20072, 3);
+  });
+
+  it("matches the 10 t crane catalogue lookup and deflection check", () => {
+    expect(result.wheelLoadKn).toBeCloseTo(95, 6);
+    expect(result.craneBaseMm).toBeCloseTo(4400, 6);
+    expect(result.craneGaugeMm).toBeCloseTo(5400, 6);
+    expect(result.deflections[result.deflections.length - 1]?.value).toBeCloseTo(0.43298646313, 6);
+  });
+
+  it("keeps all downstream workbook blocks populated", () => {
+    expect(result.dimensions.length).toBe(7);
+    expect(result.geometry.length).toBe(15);
+    expect(result.strength.length).toBe(8);
+    expect(result.crane78.length).toBe(13);
+    expect(result.globalStability.length).toBe(5);
+    expect(result.localStability.length).toBe(15);
+    expect(result.deflections.length).toBe(5);
+  });
+});
