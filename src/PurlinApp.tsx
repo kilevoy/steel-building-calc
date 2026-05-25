@@ -646,7 +646,7 @@ export function PurlinApp() {
               </div>
               <div style={{ fontSize: 12, color: "#475569" }}>
                 Параметры Excel/VELICAN, которые ещё требуют полной сверки:{" "}
-                {diagnostics.oracleOnlyParameters.join(", ")}.
+                {diagnostics.oracleOnlyParameters.map(oracleParameterRu).join(", ")}.
               </div>
               {diagnostics.warnings.map((warning) => (
                 <div key={warning} style={{ fontSize: 12, color: "#92400e", marginTop: 4 }}>
@@ -761,6 +761,19 @@ function diagnosticNotesRu(notes: string[]): string[] {
     if (note.startsWith("Active panel assembly height filter")) {
       return note.replace("Active panel assembly height filter:", "Активный фильтр высоты панели послойной сборки:");
     }
+    if (note.startsWith("All profiles in this family")) {
+      return "Все профили этой группы отсеяны активным фильтром высоты панели послойной сборки.";
+    }
+    if (note.startsWith("Best rejected variant")) {
+      const match = note.match(/^Best rejected variant: (.*), step (.*) mm, K=(.*) > 1\.$/);
+      if (match) {
+        return `Лучший отклонённый вариант: ${match[1]}, шаг ${match[2]} мм, K=${match[3]} > 1.`;
+      }
+      return "Лучший отклонённый вариант не проходит по K > 1.";
+    }
+    if (note.startsWith("No profile in this family")) {
+      return "Для текущих ограничений шага не удалось оценить ни один профиль этой группы.";
+    }
     if (note.startsWith("Possible causes")) {
       return "Возможные причины: прочность, ограничения шага, фильтр высоты панели послойной сборки или отсутствующие Excel-фильтры.";
     }
@@ -769,6 +782,15 @@ function diagnosticNotesRu(notes: string[]): string[] {
     }
     return note;
   });
+}
+
+function oracleParameterRu(parameter: string): string {
+  if (parameter === "LSTK prices") return "цены ЛСТК";
+  if (parameter === "requiresPanelFilter") return "фильтр необходимости панели";
+  if (parameter === "black/galvanized/braced mass split") {
+    return "разделение массы на черняк/оцинковку/распорки";
+  }
+  return parameter;
 }
 
 function warningRu(warning: string): string {
