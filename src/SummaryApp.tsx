@@ -7,6 +7,10 @@ import {
   type ResultItem,
 } from "./building/useBuildingResults";
 import { useCraneBeamRunner } from "./building/useCraneBeamRunner";
+import {
+  calculateBuildingSummaryTotals,
+  calculateBuildingSummaryTotalsBySteel,
+} from "./building/summaryTotals";
 
 function fmtKg(v: number): string {
   if (!Number.isFinite(v)) return "—";
@@ -98,24 +102,6 @@ function buildRows(r: BuildingResults): Row[] {
   return rows;
 }
 
-interface SteelTotal {
-  steel: string;
-  mass_kg: number;
-  cost_rub: number;
-}
-
-function aggregateBySteel(rows: Row[]): SteelTotal[] {
-  const map = new Map<string, SteelTotal>();
-  for (const r of rows) {
-    if (!r.steel || r.steel === "—") continue;
-    const cur = map.get(r.steel) ?? { steel: r.steel, mass_kg: 0, cost_rub: 0 };
-    cur.mass_kg += r.totalMass_kg;
-    cur.cost_rub += r.cost_rub;
-    map.set(r.steel, cur);
-  }
-  return Array.from(map.values()).sort((a, b) => b.mass_kg - a.mass_kg);
-}
-
 const th: React.CSSProperties = {
   padding: "8px 10px",
   borderBottom: "2px solid #cbd5e1",
@@ -136,9 +122,8 @@ export function SummaryApp() {
   const { building } = useBuilding();
   const { results } = useBuildingResults();
   const rows = useMemo(() => buildRows(results), [results]);
-  const bySteel = useMemo(() => aggregateBySteel(rows), [rows]);
-  const totalMass = rows.reduce((s, r) => s + r.totalMass_kg, 0);
-  const totalCost = rows.reduce((s, r) => s + r.cost_rub, 0);
+  const bySteel = useMemo(() => calculateBuildingSummaryTotalsBySteel(results), [results]);
+  const totals = useMemo(() => calculateBuildingSummaryTotals(results), [results]);
 
   if (rows.length === 0) {
     return (
@@ -204,8 +189,8 @@ export function SummaryApp() {
           <tfoot>
             <tr style={{ background: "#f8fafc" }}>
               <td style={{ ...td, fontWeight: 700 }} colSpan={5}>Итого по зданию</td>
-              <td style={{ ...tdR, fontWeight: 700 }}>{fmtKg(totalMass)}</td>
-              <td style={{ ...tdR, fontWeight: 700 }}>{fmtRub(totalCost)}</td>
+              <td style={{ ...tdR, fontWeight: 700 }}>{fmtKg(totals.totalMass_kg)}</td>
+              <td style={{ ...tdR, fontWeight: 700 }}>{fmtRub(totals.totalCost_rub)}</td>
             </tr>
           </tfoot>
         </table>
@@ -227,8 +212,8 @@ export function SummaryApp() {
                 {bySteel.map((s) => (
                   <tr key={s.steel}>
                     <td style={{ ...td, fontWeight: 600 }}>{s.steel}</td>
-                    <td style={tdR}>{fmtKg(s.mass_kg)}</td>
-                    <td style={tdR}>{fmtRub(s.cost_rub)}</td>
+                    <td style={tdR}>{fmtKg(s.totalMass_kg)}</td>
+                    <td style={tdR}>{fmtRub(s.totalCost_rub)}</td>
                   </tr>
                 ))}
               </tbody>
