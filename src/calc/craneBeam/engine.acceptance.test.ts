@@ -94,3 +94,26 @@ describe("crane beam engine — Excel acceptance SCN-CRANE-BEAM-002", () => {
     expect(result.deflections.length).toBe(5);
   });
 });
+
+describe("crane beam engine — Excel acceptance SCN-CRANE-BEAM-003", () => {
+  const result = calculateCraneBeam({
+    ...defaultCraneInputs,
+    capacity: 10,
+    craneCount: "два",
+  });
+
+  it("matches the two-crane 10 t scenario headline results", () => {
+    expect(result.profile).not.toBeNull();
+    expect(result.profile?.trim()).toBe("30К1");
+    expect(result.utilizationPercent).toBeCloseTo(79.580983572, 6);
+    expect(result.weightKg).toBeCloseTo(522.00147, 3);
+  });
+
+  it("matches the two-crane catalogue lookup and deflection check", () => {
+    expect(result.wheelLoadKn).toBeCloseTo(95, 6);
+    expect(result.craneBaseMm).toBeCloseTo(4400, 6);
+    expect(result.craneGaugeMm).toBeCloseTo(5400, 6);
+    expect(result.ribStepSelectedM).toBeCloseTo(6, 6);
+    expect(result.deflections[result.deflections.length - 1]?.value).toBeCloseTo(0.49794686031, 6);
+  });
+});

@@ -34,7 +34,13 @@
 
 Статус: выполнено 2026-05-25.
 
-Добавлен сценарий с краном 10 т. Автотест находится в `src/calc/craneBeam/engine.acceptance.test.ts`, описание сценария — в `knowledge/wiki/parity/scenarios/SCN-CRANE-BEAM-002.md`. Ветка `два крана` остается отдельной задачей.
+Добавлен сценарий с краном 10 т. Автотест находится в `src/calc/craneBeam/engine.acceptance.test.ts`, описание сценария — в `knowledge/wiki/parity/scenarios/SCN-CRANE-BEAM-002.md`.
+
+### `SCN-CRANE-BEAM-003`
+
+Статус: выполнено 2026-05-25.
+
+Добавлен сценарий с двумя кранами 10 т. Автотест находится в `src/calc/craneBeam/engine.acceptance.test.ts`, описание сценария — в `knowledge/wiki/parity/scenarios/SCN-CRANE-BEAM-003.md`. Связь с крановыми нагрузками колонн остается отдельной задачей.
 
 ### `SCN-PURLINS-002`
 
