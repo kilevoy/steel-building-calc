@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import type { ReactNode } from "react";
-import { useBuildingResults, type ResultItem } from "./useBuildingResults";
+import { useBuildingResults } from "./useBuildingResults";
 import { useBuilding } from "./useBuilding";
 import {
   CraneBeamRunnerContext,
   defaultCraneInputs,
 } from "./craneBeamRunnerContext";
+import { buildCraneBeamResultItem } from "./craneBeamResultPublisher";
 import type { CraneCalculationResult } from "../calc/craneBeam/types";
 
 /**
@@ -30,18 +31,11 @@ export function CraneBeamRunnerProvider({ children }: { children: ReactNode }) {
   }, [building.hasCrane, publishResult]);
 
   useEffect(() => {
-    if (!result || !result.profile || result.weightKg == null) {
+    const item = buildCraneBeamResultItem(result);
+    if (!item) {
       publishResult("craneBeam", null);
       return;
     }
-    const item: ResultItem = {
-      profile: result.profile,
-      steel: "С345",
-      massPerPiece_kg: result.weightKg,
-      count: 1,
-      totalMass_kg: result.weightKg,
-      cost_rub: 0,
-    };
     publishResult("craneBeam", item);
   }, [result, publishResult]);
 
