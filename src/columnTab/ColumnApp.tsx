@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { runCalculation, computeMu } from "../calc/engine";
 import { hasColumnCrane } from "../calc/cranes";
 import { useBuilding, type Building } from "../building/useBuilding";
-import { useBuildingResults, type ColumnResultByType, type ResultItem } from "../building/useBuildingResults";
+import { useBuildingResults } from "../building/useBuildingResults";
 import { useRoofTotalLoad_kPa } from "../building/loadPropagation";
 import { deriveColumnLayout } from "../building/layout";
 import { PricesBlock } from "../building/PricesBlock";
@@ -16,6 +16,7 @@ import { CranesSection } from "./CranesSection";
 import { ResultsView } from "./ResultsView";
 import type { CalculationInput, CalculationOutput, ColumnType } from "../calc/types";
 import { DEFAULT_COLUMN_INPUT } from "../defaults/columnInput";
+import { buildColumnResultPayload } from "./columnResultPublisher";
 import structuresJson from "../data/structures/structures.json";
 import cranesJson from "../data/cranes/cranes.json";
 
@@ -123,32 +124,7 @@ export function ColumnApp() {
       setResult("column", null);
       return;
     }
-    const layout = deriveColumnLayout(input);
-    const buildItem = (ct: ColumnType): ResultItem | null => {
-      const group = layout[ct];
-      if (group.count === 0) return null;
-      const r = results[ct].results[0];
-      if (!r) return null;
-      const strutStep = ct === "fachwerk" ? input.fachverkPitch_m : input.framePitch_m;
-      const strutMassPerPiece_kg = r.strutCount * 12 * strutStep * 1.15;
-      const totalMass_kg =
-        r.mass_per_m * group.totalHeight_m + strutMassPerPiece_kg * group.count;
-      return {
-        profile: r.profileName,
-        steel: r.steel,
-        massPerPiece_kg: totalMass_kg / group.count,
-        count: group.count,
-        totalMass_kg,
-        // Group mass uses layout-specific column heights; price is rub/kg.
-        cost_rub: totalMass_kg * input.prices[r.steel],
-      };
-    };
-    const payload: ColumnResultByType = {
-      edge: buildItem("edge"),
-      middle: buildItem("middle"),
-      fachwerk: buildItem("fachwerk"),
-    };
-    setResult("column", payload);
+    setResult("column", buildColumnResultPayload(input, results));
   }, [results, input, setResult]);
 
   useEffect(() => {
