@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useBuilding, type Building } from "./building/useBuilding";
-import { useBuildingResults, type ResultItem } from "./building/useBuildingResults";
+import { useBuildingResults } from "./building/useBuildingResults";
 import { SyncedNumField, SyncedSelectField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
@@ -15,6 +15,7 @@ import type {
   WindowRiegelInputs,
   WindowRiegelOption,
 } from "./calc/windowRiegel/types";
+import { buildWindowRiegelResultItem } from "./windowRiegelResultPublisher";
 
 function fmt(n: number | null | undefined, digits = 3): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return "—";
@@ -76,21 +77,11 @@ export function WindowRiegelApp() {
   // Publish window-riegel top-1 selection (per-piece) to shared results bus.
   const { setResult } = useBuildingResults();
   useEffect(() => {
-    const top = result?.lowerAndUpperProfiles?.[0];
-    if (!top || top.profile == null || top.weightKg == null) {
+    const item = buildWindowRiegelResultItem(result);
+    if (!item) {
       setResult("windowRiegel", null);
       return;
     }
-    // Crude estimate: 2 gables × (height/3) rows × (span/fachverkPitch) bays.
-    // Without precise count from Excel, treat as 1 piece — summary will show per-piece.
-    const item: ResultItem = {
-      profile: String(top.profile),
-      steel: top.steel ? String(top.steel) : "—",
-      massPerPiece_kg: top.weightKg,
-      count: 1,
-      totalMass_kg: top.weightKg,
-      cost_rub: 0, // riegel prices not in current PricesBlock; leave for the user
-    };
     setResult("windowRiegel", item);
   }, [result, setResult]);
 
