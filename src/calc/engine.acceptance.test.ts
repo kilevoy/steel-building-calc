@@ -156,4 +156,21 @@ describe("column engine — Excel acceptance (10 scenarios)", () => {
       expect(out.results.length, `${sc.id}: empty result set`).toBeGreaterThan(0);
     }
   });
+
+  it("SCN-COL-DEFAULT matches the Excel first selected profile anchors", () => {
+    const sc = fx.scenarios.find((s) => s.id === "SCN-COL-DEFAULT");
+    if (!sc) {
+      throw new Error("SCN-COL-DEFAULT must exist");
+    }
+
+    const out = runCalculation(buildInput(sc.input));
+    const first = out.results[0];
+
+    expect(first.profileName).toBe("35 Б1");
+    expect(first.steel).toBe("С355Б");
+    expect(first.strutCount).toBe(3);
+    expect(first.mass_per_m).toBeCloseTo(41.4, 6);
+    expect(first.maxUtilization).toBeCloseTo(0.9742299766, 10);
+    expect(first.limitingCheck).toBe("по σ уст X");
+  });
 });
