@@ -41,7 +41,7 @@ const SCN_PURLINS_001: PurlinInput = {
   minStep_mm: 1500,
   snowGuardPurlin: false,
   fencePurlin: false,
-  tieInstallation: false,
+  tieInstallation: "none",
   braceStep_m: 3,
   maxUtilization: "default",
   cassetteHeightFilter_mm: 0,
@@ -107,6 +107,18 @@ describe("purlin engine — Excel acceptance SCN-PURLINS-001 (ЛСТК)", () => 
     expect(best.massPerFrameStep_kg).toBeCloseTo(1235.16, 4);
     expect(best.massPerBuilding_kg).toBeCloseTo(12351.6, 4);
     expect(best.massWithBraces_kg).toBeCloseTo(16959.6, 4);
+  });
+
+  it("applies tie installation to the effective design span like Excel Расчет!D21", () => {
+    const withOneTie = runPurlinCalculation({
+      ...SCN_PURLINS_001,
+      tieInstallation: 1,
+    });
+    const best = withOneTie.sections.find((s) => s.grade === "MP350" && s.type === "Z")?.best;
+
+    expect(best?.profile.name).toBe("Z 220х1,5");
+    expect(best?.M_design_kNm).toBeCloseTo(8.1058031258, 10);
+    expect(best?.K).toBeCloseTo(0.9921423655, 10);
   });
 
   it("fixes current monoslope purlin line count model", () => {

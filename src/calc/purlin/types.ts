@@ -26,6 +26,8 @@ export type SnowDriftMode = "none" | "along" | "across";
 
 export type RoofShape = "gable" | "monoslope";
 
+export type TieInstallation = "none" | 1 | 2 | 3;
+
 export interface PurlinInput {
   /** γn — coefficient of responsibility */
   gamma_n: number;
@@ -67,9 +69,9 @@ export interface PurlinInput {
   /** Optional extra purlins */
   snowGuardPurlin: boolean;
   fencePurlin: boolean;
-  /** Workbook parity input: tie installation flag. Currently diagnostic-only. */
-  tieInstallation: boolean;
-  /** Workbook parity input: brace spacing, m. Currently diagnostic-only. */
+  /** Workbook parity input: number of tie rows; "none" matches Excel value "нет". */
+  tieInstallation: TieInstallation;
+  /** Workbook parity input: brace spacing, m. Used for Excel braced mass. */
   braceStep_m: number;
 
   /** Maximum utilization: either "default" (per-thickness from Excel) or fixed fraction (e.g. 0.8) */

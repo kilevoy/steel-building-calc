@@ -56,7 +56,7 @@ const DEFAULT_INPUT: PurlinInput = {
   minStep_mm: 500,
   snowGuardPurlin: false,
   fencePurlin: false,
-  tieInstallation: false,
+  tieInstallation: "none",
   braceStep_m: 3,
   maxUtilization: "default",
   cassetteHeightFilter_mm: getCassetteHeightFilter("С-П 150 мм"),
@@ -438,12 +438,16 @@ export function PurlinApp() {
           />
           <SelectField
             label="Установка тяжей"
-            value={input.tieInstallation ? "yes" : "no"}
+            value={String(input.tieInstallation)}
             options={[
-              ["no", "нет"],
-              ["yes", "да"],
+              ["none", "нет"],
+              ["1", "1"],
+              ["2", "2"],
+              ["3", "3"],
             ]}
-            onChange={(v) => upd({ tieInstallation: v === "yes" })}
+            onChange={(v) =>
+              upd({ tieInstallation: v === "none" ? "none" : (Number(v) as 1 | 2 | 3) })
+            }
           />
           <Field
             label="Шаг распорок, м"
@@ -766,7 +770,7 @@ function warningRu(warning: string): string {
     return "Диагностика показывает текущий выбор приложения и не меняет расчётные проверки.";
   }
   if (warning.startsWith("Tie installation")) {
-    return "Установка тяжей и шаг распорок уже вынесены в явные входные данные для сверки с Excel, но пока не применяются к подбору.";
+    return "Установка тяжей применяется к расчетному пролету прогона по Excel-логике; шаг распорок применяется к массе с распорками.";
   }
   if (warning.startsWith("COLONNA/VELICAN")) {
     return "COLONNA/VELICAN указывают на дополнительные Excel-фильтры, которые ещё не полностью перенесены.";

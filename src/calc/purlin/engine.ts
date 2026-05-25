@@ -96,6 +96,15 @@ export function computeLoads(input: PurlinInput): {
   };
 }
 
+function computeEffectivePurlinSpan_m(input: PurlinInput): number {
+  if (input.roofStructure === "профлист") {
+    return 0.4;
+  }
+  return input.tieInstallation === "none"
+    ? input.framePitch_m
+    : input.framePitch_m / (input.tieInstallation + 1);
+}
+
 /**
  * Evaluate a single (profile, spacing) combination.
  * Returns null if the profile fails the K ≤ 1 check or the height filter.
@@ -121,7 +130,7 @@ function evaluateProfile(
   const w_purlin_kN_per_m = q_total_kPa * s_m + (profile.mass_kg_per_m / 100) * input.gamma_n;
 
   // Design moment: simply-supported beam M = w·L²/8
-  const L = input.framePitch_m;
+  const L = computeEffectivePurlinSpan_m(input);
   const M_design = (w_purlin_kN_per_m * L * L) / 8;
 
   const K = M_design / M_pred_eff;
