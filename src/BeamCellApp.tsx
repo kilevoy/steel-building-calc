@@ -1,11 +1,11 @@
 import { useMemo, useState, useEffect } from "react";
 import { calculate, defaultInputs } from "./calc/beamCell/engine";
 import { useBuilding, type Building } from "./building/useBuilding";
-import { useBuildingResults, type ResultItem } from "./building/useBuildingResults";
-import { deriveRoofElementLayout } from "./building/layout";
+import { useBuildingResults } from "./building/useBuildingResults";
 import { SyncedNumField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
+import { buildBeamCellResultItem } from "./beamCellResultPublisher";
 import type {
   CalculatorInputs,
   MemberSolution,
@@ -72,25 +72,16 @@ export function BeamCellApp() {
   // Publish accepted main beam selection to shared results bus for the Summary tab.
   const { setResult } = useBuildingResults();
   useEffect(() => {
-    const sol = result.main[inputs.acceptedMainSteel];
-    if (!sol || sol.status !== "OK" || !sol.profile || sol.weightKg === undefined) {
-      setResult("beamCell", null);
-      return;
-    }
-    const n_beams = deriveRoofElementLayout({
+    const item = buildBeamCellResultItem({
+      solution: result.main[inputs.acceptedMainSteel],
       length_m: building.length_m,
       framePitch_m: building.framePitch_m,
       spanCount: building.spanCount,
-    }).endRoofBeamCount;
-    const steelLabel = sol.material === "C245" ? "С245" : "С345";
-    const item: ResultItem = {
-      profile: sol.profile,
-      steel: steelLabel,
-      massPerPiece_kg: sol.weightKg,
-      count: n_beams,
-      totalMass_kg: sol.weightKg * n_beams,
-      cost_rub: (sol.costRub ?? 0) * n_beams,
-    };
+    });
+    if (!item) {
+      setResult("beamCell", null);
+      return;
+    }
     setResult("beamCell", item);
   }, [
     result,
