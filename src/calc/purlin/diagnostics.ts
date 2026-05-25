@@ -5,6 +5,7 @@ import type {
   PurlinSectionResult,
   SteelGrade,
 } from "./types";
+import { inspectPurlinFamilyRejection } from "./engine";
 
 export interface PurlinFamilyDiagnostic {
   grade: SteelGrade;
@@ -51,8 +52,18 @@ export function buildPurlinSelectionDiagnostics(
 
       if (!best) {
         const notes = ["No accepted candidate in the current native LSTK calculation."];
+        const inspection = inspectPurlinFamilyRejection(input, output.q_total_kPa, grade, type);
         if (input.cassetteHeightFilter_mm > 0) {
           notes.push(`Active cassette height filter: ${input.cassetteHeightFilter_mm} mm.`);
+        }
+        if (inspection.rejectionReason === "cassette_height_filter") {
+          notes.push("All profiles in this family are rejected by the active cassette height filter.");
+        } else if (inspection.bestRejectedUtilization !== null) {
+          notes.push(
+            `Best rejected variant: ${inspection.bestRejectedProfileName}, step ${inspection.bestRejectedSpacing_mm} mm, K=${inspection.bestRejectedUtilization.toFixed(3)} > 1.`,
+          );
+        } else {
+          notes.push("No profile in this family could be evaluated for the current step limits.");
         }
         notes.push("Possible causes: strength utilization, step limits, cassette height filter, or missing oracle-only filters.");
         return {

@@ -41,6 +41,11 @@ describe("purlin selection diagnostics", () => {
     expect(
       diagnostics.familyDiagnostics.filter((item) => item.status === "no_candidate").map((item) => item.type),
     ).toEqual(["2TPS", "2PS", "2TPS", "2PS"]);
+    const rejected2Tps = diagnostics.familyDiagnostics.find(
+      (item) => item.grade === "MP350" && item.type === "2TPS",
+    );
+    expect(rejected2Tps?.notes.join(" ")).toContain("Best rejected variant");
+    expect(rejected2Tps?.notes.join(" ")).toContain("K=");
     expect(diagnostics.oracleOnlyParameters).toContain("requiresPanelFilter");
     expect(diagnostics.warnings.join(" ")).toContain("Tie installation is applied");
     expect(diagnostics.warnings.join(" ")).toContain("Default LSTK utilization mode uses profile default_coef");

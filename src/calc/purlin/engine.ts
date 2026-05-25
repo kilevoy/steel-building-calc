@@ -5,6 +5,7 @@ import type {
   LstkProfile,
   LstkProfileType,
   PurlinCandidate,
+  PurlinFamilyInspection,
   PurlinInput,
   PurlinOutput,
   PurlinSectionResult,
@@ -114,6 +115,7 @@ function evaluateProfile(
   spacing_mm: number,
   q_total_kPa: number,
   input: PurlinInput,
+  allowOverUtilization = false,
 ): PurlinCandidate | null {
   // Cassette height filter (Лист1!C97)
   if (input.cassetteHeightFilter_mm > 0 && profile.h_mm !== input.cassetteHeightFilter_mm) {
@@ -134,7 +136,7 @@ function evaluateProfile(
   const M_design = (w_purlin_kN_per_m * L * L) / 8;
 
   const K = M_design / M_pred_eff;
-  if (K > 1) return null;
+  if (K > 1 && !allowOverUtilization) return null;
 
   // Number of purlins and mass per frame, matching Excel candidate formulas:
   //   - 2ТПС/2ПС:  countPerHalf = ceil(...) + (1 or 1.5 if sg) + (0 or 0.5 if fence)
@@ -175,6 +177,49 @@ function evaluateProfile(
     blackMass_kg,
     galvanizedMass_kg,
     massWithBraces_kg,
+  };
+}
+
+export function inspectPurlinFamilyRejection(
+  input: PurlinInput,
+  q_total_kPa: number,
+  grade: SteelGrade,
+  type: LstkProfileType,
+): PurlinFamilyInspection {
+  const profiles = ALL_PROFILES[grade].filter((profile) => profile.type === type);
+  const heightAcceptedProfiles = profiles.filter(
+    (profile) => input.cassetteHeightFilter_mm <= 0 || profile.h_mm === input.cassetteHeightFilter_mm,
+  );
+  const minS = Math.min(input.minStep_mm, input.maxStep_mm);
+  const maxS = Math.max(input.minStep_mm, input.maxStep_mm);
+  let bestRejected: PurlinCandidate | null = null;
+
+  for (let s = minS; s <= maxS; s += 5) {
+    for (const profile of heightAcceptedProfiles) {
+      const candidate = evaluateProfile(profile, s, q_total_kPa, input, true);
+      if (!candidate || candidate.K <= 1) continue;
+      if (!bestRejected || candidate.K < bestRejected.K) {
+        bestRejected = candidate;
+      }
+    }
+  }
+
+  const rejectionReason =
+    profiles.length === 0
+      ? "no_profiles"
+      : heightAcceptedProfiles.length === 0
+        ? "cassette_height_filter"
+        : "strength_utilization";
+
+  return {
+    grade,
+    type,
+    profileCount: profiles.length,
+    heightAcceptedProfileCount: heightAcceptedProfiles.length,
+    bestRejectedProfileName: bestRejected?.profile.name ?? null,
+    bestRejectedSpacing_mm: bestRejected?.spacing_mm ?? null,
+    bestRejectedUtilization: bestRejected?.K ?? null,
+    rejectionReason,
   };
 }
 

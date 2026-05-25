@@ -111,6 +111,17 @@ export interface PurlinSectionResult {
   type: LstkProfileType;
 }
 
+export interface PurlinFamilyInspection {
+  grade: SteelGrade;
+  type: LstkProfileType;
+  profileCount: number;
+  heightAcceptedProfileCount: number;
+  bestRejectedProfileName: string | null;
+  bestRejectedSpacing_mm: number | null;
+  bestRejectedUtilization: number | null;
+  rejectionReason: "cassette_height_filter" | "strength_utilization" | "no_profiles";
+}
+
 export interface PurlinOutput {
   /** Combined load q [kPa] = q_snow + q_wind_roof + q_roof_struct */
   q_total_kPa: number;
