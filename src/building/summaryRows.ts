@@ -6,6 +6,7 @@ export interface SummaryRow {
   steel: string;
   count: string;
   lengthPerPiece_m: string;
+  totalLength_m: string;
   unitMass_kg: string;
   totalMass_kg: number;
   cost_rub: number;
@@ -35,6 +36,7 @@ function rowFromItem(label: string, item: ResultItem | null, note?: string): Sum
     steel: item.steel,
     count: count > 1 ? `${count}` : "—",
     lengthPerPiece_m: item.lengthPerPiece_m ? `${item.lengthPerPiece_m.toFixed(2)} м` : "—",
+    totalLength_m: item.totalLength_m ? `${item.totalLength_m.toFixed(2)} м` : "—",
     unitMass_kg: count > 1 ? formatSummaryMass(unit) : "—",
     totalMass_kg: item.totalMass_kg,
     cost_rub: item.cost_rub,
@@ -61,6 +63,7 @@ export function buildSummaryRows(results: BuildingResults): SummaryRow[] {
       steel: results.truss.sections[0]?.steel ?? "—",
       count: `${results.truss.n_trusses}`,
       lengthPerPiece_m: "—",
+      totalLength_m: "—",
       unitMass_kg: formatSummaryMass(results.truss.totalMass_kg / results.truss.n_trusses),
       totalMass_kg: results.truss.totalMass_kg,
       cost_rub: results.truss.totalCost_rub,

@@ -94,6 +94,7 @@ export function SummaryApp() {
               <th style={th}>Сталь</th>
               <th style={{ ...th, textAlign: "right" }}>Шт.</th>
               <th style={{ ...th, textAlign: "right" }}>Длина 1 шт.</th>
+              <th style={{ ...th, textAlign: "right" }}>Σ длина</th>
               <th style={{ ...th, textAlign: "right" }}>Масса 1 шт.</th>
               <th style={{ ...th, textAlign: "right" }}>Σ масса</th>
               <th style={{ ...th, textAlign: "right" }}>Σ стоимость</th>
@@ -114,6 +115,7 @@ export function SummaryApp() {
                 <td style={td}>{r.steel}</td>
                 <td style={tdR}>{r.count}</td>
                 <td style={tdR}>{r.lengthPerPiece_m}</td>
+                <td style={tdR}>{r.totalLength_m}</td>
                 <td style={tdR}>{r.unitMass_kg}</td>
                 <td style={{ ...tdR, fontWeight: 600 }}>{formatSummaryMass(r.totalMass_kg)}</td>
                 <td style={tdR}>{formatSummaryCost(r.cost_rub)}</td>
@@ -122,7 +124,7 @@ export function SummaryApp() {
           </tbody>
           <tfoot>
             <tr style={{ background: "#f8fafc" }}>
-              <td style={{ ...td, fontWeight: 700 }} colSpan={6}>Итого по зданию</td>
+              <td style={{ ...td, fontWeight: 700 }} colSpan={7}>Итого по зданию</td>
               <td style={{ ...tdR, fontWeight: 700 }}>{formatSummaryMass(totals.totalMass_kg)}</td>
               <td style={{ ...tdR, fontWeight: 700 }}>{formatSummaryCost(totals.totalCost_rub)}</td>
             </tr>

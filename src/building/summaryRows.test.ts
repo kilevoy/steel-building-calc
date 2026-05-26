@@ -93,4 +93,25 @@ describe("summary rows", () => {
       { label: "Подкрановая балка", steel: "C345", totalMass_kg: 60 },
     ]);
   });
+
+  it("shows piece length and total length when a module publishes them", () => {
+    const results: BuildingResults = {
+      ...emptyResults,
+      purlin: {
+        profile: "Z 140х1,5",
+        steel: "МП350",
+        count: 156,
+        lengthPerPiece_m: 6,
+        totalLength_m: 936,
+        totalMass_kg: 300,
+        cost_rub: 3_000,
+      },
+    };
+
+    expect(buildSummaryRows(results)[0]).toMatchObject({
+      count: "156",
+      lengthPerPiece_m: "6.00 м",
+      totalLength_m: "936.00 м",
+    });
+  });
 });
