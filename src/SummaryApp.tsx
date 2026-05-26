@@ -365,7 +365,7 @@ function BuildingCountDiagnostics() {
         <div>Основных крайних по ГИП: <b>{layout.columns.mainEdge}</b></div>
         <div>Основных средних по ГИП: <b>{layout.columns.mainMiddle}</b></div>
         <div>Основных колонн по ГИП: <b>{layout.columns.mainTotal}</b></div>
-        <div>Крайних колонн торцевых рам, отнесённых к фахверку: <b>{layout.columns.endFachwerkEdge}</b></div>
+        <div>В том числе угловых стоек фахверка: <b>{layout.columns.endFachwerkEdge}</b></div>
         <div>Фахверковых стоек по торцам всего: <b>{fachwerkColumnCount ?? "—"}</b></div>
         <div>Всего колонн здания: <b>{totalAcceptedColumnCount ?? "—"}</b></div>
       </div>
