@@ -753,6 +753,9 @@ function diagnosticNotesRu(notes: string[]): string[] {
     if (note.startsWith("Active panel assembly height filter")) {
       return note.replace("Active panel assembly height filter:", "Активный фильтр высоты панели послойной сборки:");
     }
+    if (note.startsWith("2TPS thermal profiles")) {
+      return "2ТПС допустим только для кровли из послойной сборки «наше ...».";
+    }
     if (note.startsWith("All profiles in this family")) {
       return "Все профили этой группы отсеяны активным фильтром высоты панели послойной сборки.";
     }

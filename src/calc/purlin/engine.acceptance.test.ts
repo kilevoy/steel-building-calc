@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { runPurlinCalculation } from "./engine";
+import { isLayeredAssemblyRoof, runPurlinCalculation } from "./engine";
 import type { PurlinInput } from "./types";
 
 /**
@@ -147,6 +147,28 @@ describe("purlin engine — Excel acceptance SCN-PURLINS-001 (ЛСТК)", () => 
         out.top10[i - 1].massPerBuilding_kg - 1e-9,
       );
     }
+  });
+});
+
+describe("purlin engine — purlin family availability by roof assembly", () => {
+  it("allows 2TPS only for layer-by-layer Наше roof assemblies", () => {
+    expect(isLayeredAssemblyRoof("профлист")).toBe(false);
+    expect(isLayeredAssemblyRoof("С-П 150 мм")).toBe(false);
+    expect(isLayeredAssemblyRoof("наше 100 мм")).toBe(true);
+    expect(isLayeredAssemblyRoof("наше 150 мм")).toBe(true);
+    expect(isLayeredAssemblyRoof("наше 250 мм 2 слоя ГВЛ")).toBe(true);
+  });
+
+  it("does not expose 2TPS candidates for non-layered roof structures", () => {
+    const out = runPurlinCalculation({
+      ...SCN_PURLINS_001,
+      roofStructure: "профлист",
+      roofLoad_kPa: 0.105,
+      cassetteHeightFilter_mm: 0,
+    });
+
+    expect(out.sections.find((section) => section.type === "2TPS")?.best).toBeNull();
+    expect(out.top10.every((candidate) => candidate.profile.type !== "2TPS")).toBe(true);
   });
 });
 

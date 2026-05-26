@@ -119,7 +119,11 @@ export interface PurlinFamilyInspection {
   bestRejectedProfileName: string | null;
   bestRejectedSpacing_mm: number | null;
   bestRejectedUtilization: number | null;
-  rejectionReason: "panel_assembly_height_filter" | "strength_utilization" | "no_profiles";
+  rejectionReason:
+    | "roof_family_filter"
+    | "panel_assembly_height_filter"
+    | "strength_utilization"
+    | "no_profiles";
 }
 
 export interface PurlinOutput {

@@ -22,6 +22,7 @@ const BRACE_MASS_PER_LINE_KG = 9.6;
 
 /** Layer-by-layer panel assembly filter map: roof structure name -> required purlin h (mm). 0 = no filter. */
 const CASSETTE_HEIGHT_MAP: Record<string, number> = {
+  "наше 100 мм": 100,
   "наше 150 мм": 150,
   "наше 200 мм": 200,
   "наше 250 мм": 250,
@@ -35,6 +36,14 @@ const CASSETTE_HEIGHT_MAP: Record<string, number> = {
 
 export function getCassetteHeightFilter(roofStructure: string): number {
   return CASSETTE_HEIGHT_MAP[roofStructure] ?? 0;
+}
+
+export function isLayeredAssemblyRoof(roofStructure: string): boolean {
+  return getCassetteHeightFilter(roofStructure) > 0;
+}
+
+function isProfileFamilyAllowed(profile: LstkProfile, input: PurlinInput): boolean {
+  return profile.type !== "2TPS" || isLayeredAssemblyRoof(input.roofStructure);
 }
 
 /**
@@ -117,6 +126,10 @@ function evaluateProfile(
   input: PurlinInput,
   allowOverUtilization = false,
 ): PurlinCandidate | null {
+  if (!isProfileFamilyAllowed(profile, input)) {
+    return null;
+  }
+
   // Layer-by-layer panel assembly height filter (Лист1!C97)
   if (input.cassetteHeightFilter_mm > 0 && profile.h_mm !== input.cassetteHeightFilter_mm) {
     return null;
@@ -187,8 +200,11 @@ export function inspectPurlinFamilyRejection(
   type: LstkProfileType,
 ): PurlinFamilyInspection {
   const profiles = ALL_PROFILES[grade].filter((profile) => profile.type === type);
+  const familyAllowedProfiles = profiles.filter((profile) => isProfileFamilyAllowed(profile, input));
   const heightAcceptedProfiles = profiles.filter(
-    (profile) => input.cassetteHeightFilter_mm <= 0 || profile.h_mm === input.cassetteHeightFilter_mm,
+    (profile) =>
+      isProfileFamilyAllowed(profile, input) &&
+      (input.cassetteHeightFilter_mm <= 0 || profile.h_mm === input.cassetteHeightFilter_mm),
   );
   const minS = Math.min(input.minStep_mm, input.maxStep_mm);
   const maxS = Math.max(input.minStep_mm, input.maxStep_mm);
@@ -207,6 +223,8 @@ export function inspectPurlinFamilyRejection(
   const rejectionReason =
     profiles.length === 0
       ? "no_profiles"
+      : familyAllowedProfiles.length === 0
+        ? "roof_family_filter"
       : heightAcceptedProfiles.length === 0
         ? "panel_assembly_height_filter"
         : "strength_utilization";

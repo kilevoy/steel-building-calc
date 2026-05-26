@@ -15,6 +15,7 @@ import {
   calculateBuildingSummaryTotals,
   calculateBuildingSummaryTotalsBySteel,
 } from "./building/summaryTotals";
+import { applyAutoPurlinResult } from "./building/autoPurlinResult";
 
 const th: React.CSSProperties = {
   padding: "8px 10px",
@@ -35,9 +36,13 @@ const tdR: React.CSSProperties = { ...td, textAlign: "right" };
 export function SummaryApp() {
   const { building } = useBuilding();
   const { results } = useBuildingResults();
-  const rows = useMemo(() => buildSummaryRows(results), [results]);
-  const bySteel = useMemo(() => calculateBuildingSummaryTotalsBySteel(results), [results]);
-  const totals = useMemo(() => calculateBuildingSummaryTotals(results), [results]);
+  const summaryResults = useMemo(
+    () => applyAutoPurlinResult(results, building),
+    [results, building],
+  );
+  const rows = useMemo(() => buildSummaryRows(summaryResults), [summaryResults]);
+  const bySteel = useMemo(() => calculateBuildingSummaryTotalsBySteel(summaryResults), [summaryResults]);
+  const totals = useMemo(() => calculateBuildingSummaryTotals(summaryResults), [summaryResults]);
 
   if (rows.length === 0) {
     return (
@@ -137,7 +142,7 @@ export function SummaryApp() {
       )}
 
       {/* Truss section breakdown — separate small table if truss is present */}
-      {results.truss && results.truss.sections.length > 0 && (
+      {summaryResults.truss && summaryResults.truss.sections.length > 0 && (
         <>
           <h3 style={{ marginBottom: 6 }}>Ферма — разбивка по элементам</h3>
           <div style={{ overflow: "auto", marginBottom: 24 }}>
@@ -151,7 +156,7 @@ export function SummaryApp() {
                 </tr>
               </thead>
               <tbody>
-                {results.truss.sections.map((s, i) => (
+                {summaryResults.truss.sections.map((s, i) => (
                   <tr key={i}>
                     <td style={{ ...td, fontWeight: 600 }}>{s.section}</td>
                     <td style={td}>{s.profile}</td>

@@ -53,6 +53,9 @@ export function buildPurlinSelectionDiagnostics(
       if (!best) {
         const notes = ["No accepted candidate in the current native LSTK calculation."];
         const inspection = inspectPurlinFamilyRejection(input, output.q_total_kPa, grade, type);
+        if (inspection.rejectionReason === "roof_family_filter") {
+          notes.push("2TPS thermal profiles are available only for layer-by-layer roof assemblies.");
+        }
         if (input.cassetteHeightFilter_mm > 0) {
           notes.push(`Active panel assembly height filter: ${input.cassetteHeightFilter_mm} mm.`);
         }

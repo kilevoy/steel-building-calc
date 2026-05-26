@@ -44,8 +44,12 @@ describe("purlin selection diagnostics", () => {
     const rejected2Tps = diagnostics.familyDiagnostics.find(
       (item) => item.grade === "MP350" && item.type === "2TPS",
     );
-    expect(rejected2Tps?.notes.join(" ")).toContain("Best rejected variant");
-    expect(rejected2Tps?.notes.join(" ")).toContain("K=");
+    expect(rejected2Tps?.notes.join(" ")).toContain("2TPS thermal profiles");
+    const rejected2Ps = diagnostics.familyDiagnostics.find(
+      (item) => item.grade === "MP350" && item.type === "2PS",
+    );
+    expect(rejected2Ps?.notes.join(" ")).toContain("Best rejected variant");
+    expect(rejected2Ps?.notes.join(" ")).toContain("K=");
     expect(diagnostics.oracleOnlyParameters).toContain("requiresPanelFilter");
     expect(diagnostics.warnings.join(" ")).toContain("Tie installation is applied");
     expect(diagnostics.warnings.join(" ")).toContain("Default LSTK utilization mode uses profile default_coef");
