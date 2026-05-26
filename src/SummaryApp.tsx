@@ -220,24 +220,29 @@ function BuildingBlock() {
         <div>Местн.: <b>{building.terrainType}</b></div>
         <div>Покр.: <b>{building.roofStructure}</b></div>
         <div>γₙ: <b>{building.responsibilityCoeff}</b></div>
-        <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          Прогоны:
-          <select
-            value={building.purlinSelectionMode}
-            onChange={(event) =>
-              setBuilding({
-                purlinSelectionMode: event.target.value as typeof building.purlinSelectionMode,
-              })
-            }
-            style={{ minWidth: 150 }}
-          >
-            {getAvailablePurlinSelectionModes(building).map((mode) => (
-              <option key={mode} value={mode}>
-                {purlinSelectionModeLabel(mode)}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div>
+          <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            Прогоны:
+            <select
+              value={building.purlinSelectionMode}
+              onChange={(event) =>
+                setBuilding({
+                  purlinSelectionMode: event.target.value as typeof building.purlinSelectionMode,
+                })
+              }
+              style={{ minWidth: 150 }}
+            >
+              {getAvailablePurlinSelectionModes(building).map((mode) => (
+                <option key={mode} value={mode}>
+                  {purlinSelectionModeLabel(mode)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>
+            Принятый расчетчиком вариант для итоговой сводки.
+          </div>
+        </div>
       </div>
     </fieldset>
   );

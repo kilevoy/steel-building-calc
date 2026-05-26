@@ -12,6 +12,22 @@ describe("auto purlin result for building summary", () => {
     expect(result?.totalMass_kg).toBeGreaterThan(0);
   });
 
+  it("uses the accepted purlin branch selected in the shared building state", () => {
+    const zResult = calculateAutoPurlinResult({
+      ...DEFAULT_BUILDING,
+      purlinSelectionMode: "Z",
+    });
+    const rolledResult = calculateAutoPurlinResult({
+      ...DEFAULT_BUILDING,
+      purlinSelectionMode: "rolled",
+    });
+
+    expect(zResult?.profile).toContain("Z");
+    expect(zResult?.steel).toMatch(/^МП/);
+    expect(rolledResult?.steel).toMatch(/^С/);
+    expect(rolledResult?.profile).not.toContain("Z");
+  });
+
   it("keeps an explicit purlin tab result when it already exists", () => {
     const explicit: ResultItem = {
       profile: "manual purlin",

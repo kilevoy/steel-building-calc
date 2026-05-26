@@ -390,6 +390,9 @@ export function PurlinApp() {
             ])}
             onChange={(v) => updSynced("purlinSelectionMode", v as Building["purlinSelectionMode"])}
           />
+          <div style={{ color: "#64748b", fontSize: 11, margin: "-2px 0 8px" }}>
+            Этот выбор синхронизирован со сводкой. 2ТПС доступен только для послойной сборки «наше ...».
+          </div>
           <SelectField
             label="Снеговой мешок"
             value={input.snowDrift}
