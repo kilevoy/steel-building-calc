@@ -301,8 +301,10 @@ function PurlinSelectionWarning({ warning }: { warning: string | null }) {
 
 function BuildingCountDiagnostics() {
   const { building } = useBuilding();
+  const { results } = useBuildingResults();
   const layoutInput = deriveUnifiedBuildingLayoutInput(building);
   const layout = deriveUnifiedBuildingLayoutFromBuilding(building);
+  const fachwerkColumnCount = results.column?.fachwerk?.count;
 
   return (
     <fieldset
@@ -346,7 +348,8 @@ function BuildingCountDiagnostics() {
         <div>Основных крайних по ГИП: <b>{layout.columns.mainEdge}</b></div>
         <div>Основных средних по ГИП: <b>{layout.columns.mainMiddle}</b></div>
         <div>Основных колонн по ГИП: <b>{layout.columns.mainTotal}</b></div>
-        <div>Торцевых в фахверке: <b>{layout.columns.endFachwerkTotal}</b></div>
+        <div>Торцевых крайних, отнесённых к фахверку: <b>{layout.columns.endFachwerkEdge}</b></div>
+        <div>Фахверковых стоек по торцам всего: <b>{fachwerkColumnCount ?? "—"}</b></div>
       </div>
     </fieldset>
   );
