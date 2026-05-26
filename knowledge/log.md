@@ -316,3 +316,29 @@ PDF-файлы защищены `knowledge/raw/.gitignore` и не коммит�
 - масса на здание считается через массу на один шаг рам и `length / framePitch`.
 
 Формулы не менялись. Временное допущение по axial wind load для прокатных прогонов остаётся открытым вопросом.
+
+## 2026-05-26 — укреплён слой сводки и публикации результатов
+
+Добавлен проверяемый слой result publishers для связки расчётных вкладок со сводкой здания:
+
+- колонны: `src/columnTab/columnResultPublisher.ts`;
+- ферма: `src/trussResultPublisher.ts`;
+- прогоны: `src/purlinResultPublisher.ts`;
+- балка покрытия: `src/beamCellResultPublisher.ts`;
+- оконные ригели: `src/windowRiegelResultPublisher.ts`;
+- подкрановая балка: `src/building/craneBeamResultPublisher.ts`.
+
+`SummaryApp` больше не содержит скрытой логики суммирования масс и стоимости. Состав строк, общие итоги и разбивка по маркам стали вынесены в pure helpers:
+
+- `src/building/summaryRows.ts`;
+- `src/building/summaryTotals.ts`;
+- `src/building/summaryContract.test.ts`.
+
+Тестами закреплено, что все модули попадают в итоговую сводку здания. Стоимость фермы в разбивке по маркам стали распределяется пропорционально массе секций фермы. Это не меняет расчёт фермы и не меняет подбор профилей, а только делает итоговую бухгалтерскую сводку полной.
+
+Также вынесен чистый расчёт автопередачи нагрузок покрытия:
+
+- `src/building/loadPropagation.ts`;
+- `src/building/loadPropagation.test.ts`.
+
+Расчётные формулы, generated-файлы, справочники профилей и lazy loading тяжёлых модулей не менялись.

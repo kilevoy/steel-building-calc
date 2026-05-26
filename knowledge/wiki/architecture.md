@@ -7,3 +7,30 @@
 Ошибки расчётных вкладок должны быть видимыми через ErrorBoundary, чтобы одна вкладка не роняла всё приложение. Вкладки должны открываться независимо.
 
 Тесты должны проверять жизнеспособность движка и helpers. Smoke-тесты не заменяют инженерную приёмку, но защищают от грубой поломки расчётного пути.
+
+## Слой публикации результатов
+
+Каждая расчётная вкладка публикует выбранный результат в общий `BuildingResults` для вкладки `Summary`. Эта публикация не должна содержать скрытой бизнес-логики внутри React-компонента.
+
+Правило:
+
+- React-вкладка рассчитывает модуль, хранит UI-state и вызывает `setResult`;
+- преобразование результата модуля в `ResultItem` или `TrussResult` выполняется в отдельном pure helper;
+- helper должен иметь unit-test;
+- если меняется количество элементов, масса, стоимость или марка стали в сводке, нужно менять соответствующий publisher и его тест, а не править JSX вручную.
+
+Текущие publishers:
+
+- `src/columnTab/columnResultPublisher.ts`;
+- `src/trussResultPublisher.ts`;
+- `src/purlinResultPublisher.ts`;
+- `src/beamCellResultPublisher.ts`;
+- `src/windowRiegelResultPublisher.ts`;
+- `src/building/craneBeamResultPublisher.ts`.
+
+Сводка здания строится через:
+
+- `src/building/summaryRows.ts`;
+- `src/building/summaryTotals.ts`.
+
+Сквозной контракт сводки закреплён в `src/building/summaryContract.test.ts`.
