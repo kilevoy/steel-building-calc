@@ -305,6 +305,8 @@ function BuildingCountDiagnostics() {
   const layoutInput = deriveUnifiedBuildingLayoutInput(building);
   const layout = deriveUnifiedBuildingLayoutFromBuilding(building);
   const fachwerkColumnCount = results.column?.fachwerk?.count;
+  const totalAcceptedColumnCount =
+    fachwerkColumnCount === undefined ? null : layout.columns.mainTotal + fachwerkColumnCount;
 
   return (
     <fieldset
@@ -350,6 +352,7 @@ function BuildingCountDiagnostics() {
         <div>Основных колонн по ГИП: <b>{layout.columns.mainTotal}</b></div>
         <div>Крайних колонн торцевых рам, отнесённых к фахверку: <b>{layout.columns.endFachwerkEdge}</b></div>
         <div>Фахверковых стоек по торцам всего: <b>{fachwerkColumnCount ?? "—"}</b></div>
+        <div>Всего колонн здания: <b>{totalAcceptedColumnCount ?? "—"}</b></div>
       </div>
     </fieldset>
   );
