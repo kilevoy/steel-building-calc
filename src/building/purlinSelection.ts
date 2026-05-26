@@ -24,8 +24,13 @@ export function purlinSelectionModeLabel(mode: PurlinSelectionMode): string {
 
 export function getPurlinSelectionWarning(
   mode: PurlinSelectionMode,
+  building: Building,
   result: ResultItem | null,
 ): string | null {
+  if (!getAvailablePurlinSelectionModes(building).includes(mode)) {
+    return `Выбранный тип прогонов «${purlinSelectionModeLabel(mode)}» недоступен для текущей конструкции покрытия. Проверьте вкладку «Прогоны» или выберите другой тип.`;
+  }
+
   if (result) return null;
 
   return `Выбранный тип прогонов «${purlinSelectionModeLabel(mode)}» не дал подходящего кандидата. Проверьте вкладку «Прогоны» и причины отсева.`;

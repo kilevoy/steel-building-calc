@@ -50,6 +50,7 @@ export function SummaryApp() {
   const totals = useMemo(() => calculateBuildingSummaryTotals(summaryResults), [summaryResults]);
   const purlinWarning = getPurlinSelectionWarning(
     building.purlinSelectionMode,
+    building,
     summaryResults.purlin,
   );
 

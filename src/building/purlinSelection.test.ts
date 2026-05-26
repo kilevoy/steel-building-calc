@@ -67,13 +67,20 @@ describe("purlin selection mode", () => {
   });
 
   it("explains when an accepted purlin branch has no candidate", () => {
-    expect(getPurlinSelectionWarning("Z", {
+    expect(getPurlinSelectionWarning("Z", DEFAULT_BUILDING, {
       profile: "Z 140х1,5",
       steel: "МП350",
       totalMass_kg: 100,
       cost_rub: 10,
     })).toBeNull();
-    expect(getPurlinSelectionWarning("2PS", null)).toContain("2ПС");
-    expect(getPurlinSelectionWarning("2PS", null)).toContain("вкладку «Прогоны»");
+    expect(getPurlinSelectionWarning("2PS", DEFAULT_BUILDING, null)).toContain("2ПС");
+    expect(getPurlinSelectionWarning("2PS", DEFAULT_BUILDING, null)).toContain("вкладку «Прогоны»");
+  });
+
+  it("warns when the accepted purlin branch is unavailable for the current roof", () => {
+    const warning = getPurlinSelectionWarning("2TPS", DEFAULT_BUILDING, null);
+
+    expect(warning).toContain("2ТПС");
+    expect(warning).toContain("недоступен");
   });
 });
