@@ -80,6 +80,7 @@ function purlinQuantityFields(
     count,
     lengthPerPiece_m,
     totalLength_m: count * lengthPerPiece_m,
+    note: `${purlinContinuitySchemeLabel(building.purlinContinuityScheme)}, шаг ${candidate.spacing_mm} мм`,
   };
 }
 

@@ -40,7 +40,7 @@ function rowFromItem(label: string, item: ResultItem | null, note?: string): Sum
     unitMass_kg: count > 1 ? formatSummaryMass(unit) : "—",
     totalMass_kg: item.totalMass_kg,
     cost_rub: item.cost_rub,
-    note,
+    note: note ?? item.note,
   };
 }
 

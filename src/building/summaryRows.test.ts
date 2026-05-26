@@ -103,6 +103,7 @@ describe("summary rows", () => {
         count: 156,
         lengthPerPiece_m: 6,
         totalLength_m: 936,
+        note: "Разрезной, шаг 1500 мм",
         totalMass_kg: 300,
         cost_rub: 3_000,
       },
@@ -112,6 +113,7 @@ describe("summary rows", () => {
       count: "156",
       lengthPerPiece_m: "6.00 м",
       totalLength_m: "936.00 м",
+      note: "Разрезной, шаг 1500 мм",
     });
   });
 });

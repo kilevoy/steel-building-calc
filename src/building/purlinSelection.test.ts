@@ -81,6 +81,9 @@ describe("purlin selection mode", () => {
     expect(split?.count).toBeGreaterThan(continuous?.count ?? 0);
     expect(split?.lengthPerPiece_m).toBe(DEFAULT_BUILDING.framePitch_m);
     expect(continuous?.lengthPerPiece_m).toBe(DEFAULT_BUILDING.length_m);
+    expect(split?.note).toContain("Разрезной");
+    expect(continuous?.note).toContain("Неразрезной");
+    expect(split?.note).toContain("шаг");
     expect(split?.totalMass_kg).toBeCloseTo(continuous?.totalMass_kg ?? 0, 8);
   });
 

@@ -14,6 +14,8 @@ export interface ResultItem {
   lengthPerPiece_m?: number;
   /** Total length of all pieces, m. */
   totalLength_m?: number;
+  /** Short UI note for summary rows. */
+  note?: string;
   /** Total mass in the whole building (kg). */
   totalMass_kg: number;
   /** Total cost in the whole building (руб). */
