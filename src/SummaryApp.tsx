@@ -329,6 +329,21 @@ function BuildingCountDiagnostics() {
       </div>
       <div
         style={{
+          border: "1px solid #fbbf24",
+          background: "#fff7ed",
+          borderRadius: 6,
+          padding: "8px 10px",
+          marginBottom: 10,
+          fontSize: 13,
+          fontWeight: 600,
+        }}
+      >
+        {totalAcceptedColumnCount === null
+          ? "Итого колонн здания появится после расчёта вкладки «Колонна»."
+          : `Итого колонн здания: ${totalAcceptedColumnCount} = основных по ГИП ${layout.columns.mainTotal} + фахверковых стоек ${fachwerkColumnCount}`}
+      </div>
+      <div
+        style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, minmax(130px, 1fr))",
           gap: 8,
