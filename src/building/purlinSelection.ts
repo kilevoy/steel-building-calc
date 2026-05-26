@@ -22,6 +22,15 @@ export function purlinSelectionModeLabel(mode: PurlinSelectionMode): string {
   return LSTK_MODE_LABELS[mode];
 }
 
+export function getPurlinSelectionWarning(
+  mode: PurlinSelectionMode,
+  result: ResultItem | null,
+): string | null {
+  if (result) return null;
+
+  return `Выбранный тип прогонов «${purlinSelectionModeLabel(mode)}» не дал подходящего кандидата. Проверьте вкладку «Прогоны» и причины отсева.`;
+}
+
 export function getAvailablePurlinSelectionModes(building: Building): PurlinSelectionMode[] {
   const modes: PurlinSelectionMode[] = ["auto"];
   if (building.roofStructure.startsWith("наше ")) {

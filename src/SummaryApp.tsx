@@ -18,6 +18,7 @@ import {
 import { applyAutoPurlinResult } from "./building/autoPurlinResult";
 import {
   getAvailablePurlinSelectionModes,
+  getPurlinSelectionWarning,
   purlinSelectionModeLabel,
 } from "./building/purlinSelection";
 
@@ -47,6 +48,10 @@ export function SummaryApp() {
   const rows = useMemo(() => buildSummaryRows(summaryResults), [summaryResults]);
   const bySteel = useMemo(() => calculateBuildingSummaryTotalsBySteel(summaryResults), [summaryResults]);
   const totals = useMemo(() => calculateBuildingSummaryTotals(summaryResults), [summaryResults]);
+  const purlinWarning = getPurlinSelectionWarning(
+    building.purlinSelectionMode,
+    summaryResults.purlin,
+  );
 
   if (rows.length === 0) {
     return (
@@ -57,6 +62,7 @@ export function SummaryApp() {
           и результат сразу появится здесь.
         </p>
         <BuildingBlock />
+        <PurlinSelectionWarning warning={purlinWarning} />
         <BuildingCountDiagnostics />
         <CraneBeamTrigger />
       </div>
@@ -72,6 +78,7 @@ export function SummaryApp() {
       </p>
 
       <BuildingBlock />
+      <PurlinSelectionWarning warning={purlinWarning} />
       <BuildingCountDiagnostics />
       <CraneBeamTrigger />
 
@@ -245,6 +252,26 @@ function BuildingBlock() {
         </div>
       </div>
     </fieldset>
+  );
+}
+
+function PurlinSelectionWarning({ warning }: { warning: string | null }) {
+  if (!warning) return null;
+
+  return (
+    <div
+      style={{
+        border: "1px solid #f59e0b",
+        background: "#fffbeb",
+        color: "#92400e",
+        borderRadius: 6,
+        padding: "8px 10px",
+        marginBottom: 16,
+        fontSize: 13,
+      }}
+    >
+      {warning}
+    </div>
   );
 }
 

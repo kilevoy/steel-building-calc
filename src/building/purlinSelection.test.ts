@@ -6,6 +6,7 @@ import { buildPurlinInputFromBuilding } from "./purlinInputFromBuilding";
 import {
   buildSelectedPurlinResultItem,
   getAvailablePurlinSelectionModes,
+  getPurlinSelectionWarning,
 } from "./purlinSelection";
 
 const prices = {
@@ -63,5 +64,16 @@ describe("purlin selection mode", () => {
     expect(z?.steel).toMatch(/^МП/);
     expect(rolled?.steel).toMatch(/^С/);
     expect(rolled?.totalMass_kg).toBeGreaterThan(0);
+  });
+
+  it("explains when an accepted purlin branch has no candidate", () => {
+    expect(getPurlinSelectionWarning("Z", {
+      profile: "Z 140х1,5",
+      steel: "МП350",
+      totalMass_kg: 100,
+      cost_rub: 10,
+    })).toBeNull();
+    expect(getPurlinSelectionWarning("2PS", null)).toContain("2ПС");
+    expect(getPurlinSelectionWarning("2PS", null)).toContain("вкладку «Прогоны»");
   });
 });
