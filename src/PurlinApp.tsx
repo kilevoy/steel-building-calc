@@ -28,6 +28,7 @@ import {
 import {
   buildSelectedPurlinResultItem,
   getAvailablePurlinSelectionModes,
+  purlinContinuitySchemeLabel,
   purlinSelectionModeLabel,
 } from "./building/purlinSelection";
 import structuresJson from "./data/structures/structures.json";
@@ -241,7 +242,7 @@ export function PurlinApp() {
 
   // Publish the accepted purlin branch to the shared results bus for the Summary tab.
   useEffect(() => {
-    const item = buildSelectedPurlinResultItem(out, rolledTop10, building.purlinSelectionMode, {
+    const item = buildSelectedPurlinResultItem(out, rolledTop10, building, building.purlinSelectionMode, {
       priceMP350_rubKg: building.priceMP350_rubKg,
       priceMP390_rubKg: building.priceMP390_rubKg,
       priceC245_rubKg: building.priceC245_rubKg,
@@ -255,6 +256,7 @@ export function PurlinApp() {
   }, [
     out,
     rolledTop10,
+    building,
     building.purlinSelectionMode,
     building.priceMP350_rubKg,
     building.priceMP390_rubKg,
@@ -393,6 +395,15 @@ export function PurlinApp() {
           <div style={{ color: "#64748b", fontSize: 11, margin: "-2px 0 8px" }}>
             Этот выбор синхронизирован со сводкой. 2ТПС доступен только для послойной сборки «наше ...».
           </div>
+          <SyncedSelectField
+            label="Схема работы прогонов"
+            value={building.purlinContinuityScheme}
+            options={[
+              ["split", purlinContinuitySchemeLabel("split")],
+              ["continuous", purlinContinuitySchemeLabel("continuous")],
+            ]}
+            onChange={(v) => updSynced("purlinContinuityScheme", v as Building["purlinContinuityScheme"])}
+          />
           <SelectField
             label="Снеговой мешок"
             value={input.snowDrift}

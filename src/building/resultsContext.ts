@@ -10,6 +10,10 @@ export interface ResultItem {
   massPerPiece_kg?: number;
   /** Count of identical pieces in the building. */
   count?: number;
+  /** Length of one physical/accounting piece, m. */
+  lengthPerPiece_m?: number;
+  /** Total length of all pieces, m. */
+  totalLength_m?: number;
   /** Total mass in the whole building (kg). */
   totalMass_kg: number;
   /** Total cost in the whole building (руб). */

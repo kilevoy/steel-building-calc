@@ -19,6 +19,7 @@ import { applyAutoPurlinResult } from "./building/autoPurlinResult";
 import {
   getAvailablePurlinSelectionModes,
   getPurlinSelectionWarning,
+  purlinContinuitySchemeLabel,
   purlinSelectionModeLabel,
 } from "./building/purlinSelection";
 
@@ -92,6 +93,7 @@ export function SummaryApp() {
               <th style={th}>Профиль</th>
               <th style={th}>Сталь</th>
               <th style={{ ...th, textAlign: "right" }}>Шт.</th>
+              <th style={{ ...th, textAlign: "right" }}>Длина 1 шт.</th>
               <th style={{ ...th, textAlign: "right" }}>Масса 1 шт.</th>
               <th style={{ ...th, textAlign: "right" }}>Σ масса</th>
               <th style={{ ...th, textAlign: "right" }}>Σ стоимость</th>
@@ -111,6 +113,7 @@ export function SummaryApp() {
                 </td>
                 <td style={td}>{r.steel}</td>
                 <td style={tdR}>{r.count}</td>
+                <td style={tdR}>{r.lengthPerPiece_m}</td>
                 <td style={tdR}>{r.unitMass_kg}</td>
                 <td style={{ ...tdR, fontWeight: 600 }}>{formatSummaryMass(r.totalMass_kg)}</td>
                 <td style={tdR}>{formatSummaryCost(r.cost_rub)}</td>
@@ -119,7 +122,7 @@ export function SummaryApp() {
           </tbody>
           <tfoot>
             <tr style={{ background: "#f8fafc" }}>
-              <td style={{ ...td, fontWeight: 700 }} colSpan={5}>Итого по зданию</td>
+              <td style={{ ...td, fontWeight: 700 }} colSpan={6}>Итого по зданию</td>
               <td style={{ ...tdR, fontWeight: 700 }}>{formatSummaryMass(totals.totalMass_kg)}</td>
               <td style={{ ...tdR, fontWeight: 700 }}>{formatSummaryCost(totals.totalCost_rub)}</td>
             </tr>
@@ -249,6 +252,26 @@ function BuildingBlock() {
           </label>
           <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>
             Принятый расчетчиком вариант для итоговой сводки.
+          </div>
+        </div>
+        <div>
+          <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            Схема:
+            <select
+              value={building.purlinContinuityScheme}
+              onChange={(event) =>
+                setBuilding({
+                  purlinContinuityScheme: event.target.value as typeof building.purlinContinuityScheme,
+                })
+              }
+              style={{ minWidth: 130 }}
+            >
+              <option value="split">{purlinContinuitySchemeLabel("split")}</option>
+              <option value="continuous">{purlinContinuitySchemeLabel("continuous")}</option>
+            </select>
+          </label>
+          <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>
+            Влияет на штучность и длину в сводке.
           </div>
         </div>
       </div>

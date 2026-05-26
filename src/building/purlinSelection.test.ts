@@ -57,13 +57,31 @@ describe("purlin selection mode", () => {
       qSls,
     );
 
-    const z = buildSelectedPurlinResultItem(output, rolledTop10, "Z", prices);
-    const rolled = buildSelectedPurlinResultItem(output, rolledTop10, "rolled", prices);
+    const z = buildSelectedPurlinResultItem(output, rolledTop10, DEFAULT_BUILDING, "Z", prices);
+    const rolled = buildSelectedPurlinResultItem(output, rolledTop10, DEFAULT_BUILDING, "rolled", prices);
 
     expect(z?.profile).toContain("Z");
     expect(z?.steel).toMatch(/^МП/);
     expect(rolled?.steel).toMatch(/^С/);
     expect(rolled?.totalMass_kg).toBeGreaterThan(0);
+  });
+
+  it("changes purlin piece count and length by continuity scheme", () => {
+    const input = buildPurlinInputFromBuilding(DEFAULT_BUILDING);
+    const output = runPurlinCalculation(input);
+    const split = buildSelectedPurlinResultItem(output, [], DEFAULT_BUILDING, "Z", prices);
+    const continuous = buildSelectedPurlinResultItem(
+      output,
+      [],
+      { ...DEFAULT_BUILDING, purlinContinuityScheme: "continuous" },
+      "Z",
+      prices,
+    );
+
+    expect(split?.count).toBeGreaterThan(continuous?.count ?? 0);
+    expect(split?.lengthPerPiece_m).toBe(DEFAULT_BUILDING.framePitch_m);
+    expect(continuous?.lengthPerPiece_m).toBe(DEFAULT_BUILDING.length_m);
+    expect(split?.totalMass_kg).toBeCloseTo(continuous?.totalMass_kg ?? 0, 8);
   });
 
   it("explains when an accepted purlin branch has no candidate", () => {

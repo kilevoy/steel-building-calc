@@ -22,6 +22,10 @@ export function purlinSelectionModeLabel(mode: PurlinSelectionMode): string {
   return LSTK_MODE_LABELS[mode];
 }
 
+export function purlinContinuitySchemeLabel(scheme: Building["purlinContinuityScheme"]): string {
+  return scheme === "split" ? "Разрезной" : "Неразрезной";
+}
+
 export function getPurlinSelectionWarning(
   mode: PurlinSelectionMode,
   building: Building,
@@ -52,24 +56,61 @@ function priceForRolled(candidate: RolledCandidate, prices: PurlinSelectionPrice
   return candidate.steel === "С345" ? prices.priceC345_rubKg : prices.priceC245_rubKg;
 }
 
-function resultFromLstkCandidate(candidate: PurlinCandidate, prices: PurlinSelectionPrices): ResultItem {
+function estimatePurlinLineCount(building: Building, spacing_mm: number): number {
+  const slopeFactor = building.roofShape === "gable" ? 2 : 1;
+  const slopeLength_m = (building.span_m - 0.3) / slopeFactor;
+  const baseCountPerSlope = Math.ceil(slopeLength_m / (spacing_mm / 1000)) + 1;
+  return baseCountPerSlope * slopeFactor;
+}
+
+function purlinQuantityFields(
+  candidate: { nPurlins?: number; spacing_mm: number },
+  building: Building,
+) {
+  const lineCount = Math.max(
+    1,
+    Math.round(candidate.nPurlins ?? estimatePurlinLineCount(building, candidate.spacing_mm)),
+  );
+  const bayCount = Math.max(1, Math.ceil(building.length_m / building.framePitch_m));
+  const count = building.purlinContinuityScheme === "split" ? lineCount * bayCount : lineCount;
+  const lengthPerPiece_m =
+    building.purlinContinuityScheme === "split" ? building.framePitch_m : building.length_m;
+
+  return {
+    count,
+    lengthPerPiece_m,
+    totalLength_m: count * lengthPerPiece_m,
+  };
+}
+
+function resultFromLstkCandidate(
+  candidate: PurlinCandidate,
+  building: Building,
+  prices: PurlinSelectionPrices,
+): ResultItem {
   const steel = candidate.profile.Ry_MPa >= 380 ? "МП390" : "МП350";
   const pricePerKg = priceForLstk(candidate, prices);
 
   return {
     profile: candidate.profile.name,
     steel,
+    ...purlinQuantityFields(candidate, building),
     totalMass_kg: candidate.massPerBuilding_kg,
     cost_rub: candidate.massPerBuilding_kg * pricePerKg,
   };
 }
 
-function resultFromRolledCandidate(candidate: RolledCandidate, prices: PurlinSelectionPrices): ResultItem {
+function resultFromRolledCandidate(
+  candidate: RolledCandidate,
+  building: Building,
+  prices: PurlinSelectionPrices,
+): ResultItem {
   const pricePerKg = priceForRolled(candidate, prices);
 
   return {
     profile: candidate.profile.name,
     steel: candidate.steel,
+    ...purlinQuantityFields({ spacing_mm: candidate.spacing_mm }, building),
     totalMass_kg: candidate.massPerBuilding_kg,
     cost_rub: candidate.massPerBuilding_kg * pricePerKg,
   };
@@ -96,14 +137,15 @@ function selectLstkCandidate(output: PurlinOutput | null, mode: PurlinSelectionM
 export function buildSelectedPurlinResultItem(
   output: PurlinOutput | null,
   rolledTop10: RolledCandidate[],
+  building: Building,
   selectionMode: PurlinSelectionMode,
   prices: PurlinSelectionPrices,
 ): ResultItem | null {
   if (selectionMode === "rolled") {
     const candidate = rolledTop10[0];
-    return candidate ? resultFromRolledCandidate(candidate, prices) : null;
+    return candidate ? resultFromRolledCandidate(candidate, building, prices) : null;
   }
 
   const candidate = selectLstkCandidate(output, selectionMode);
-  return candidate ? resultFromLstkCandidate(candidate, prices) : null;
+  return candidate ? resultFromLstkCandidate(candidate, building, prices) : null;
 }

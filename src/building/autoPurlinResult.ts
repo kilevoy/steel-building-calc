@@ -30,7 +30,7 @@ export function calculateAutoPurlinResult(building: Building): ResultItem | null
     q_SLS_kPa,
   );
 
-  return buildSelectedPurlinResultItem(output, rolledTop10, building.purlinSelectionMode, {
+  return buildSelectedPurlinResultItem(output, rolledTop10, building, building.purlinSelectionMode, {
     priceMP350_rubKg: building.priceMP350_rubKg,
     priceMP390_rubKg: building.priceMP390_rubKg,
     priceC245_rubKg: building.priceC245_rubKg,

@@ -4,6 +4,7 @@ import type { TerrainType } from "../types/common";
 
 export type RoofShape = "gable" | "monoslope";
 export type PurlinSelectionMode = "auto" | "2TPS" | "2PS" | "Z" | "rolled";
+export type PurlinContinuityScheme = "split" | "continuous";
 
 export interface Building {
   span_m: number;
@@ -27,6 +28,7 @@ export interface Building {
   priceMP350_rubKg: number;
   priceMP390_rubKg: number;
   purlinSelectionMode: PurlinSelectionMode;
+  purlinContinuityScheme: PurlinContinuityScheme;
 }
 
 export interface BuildingContextValue {
@@ -56,6 +58,7 @@ export const DEFAULT_BUILDING: Building = {
   priceMP350_rubKg: 180,
   priceMP390_rubKg: 180,
   purlinSelectionMode: "auto",
+  purlinContinuityScheme: "split",
 };
 
 export const BuildingContext = createContext<BuildingContextValue | null>(null);
