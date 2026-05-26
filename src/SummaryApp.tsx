@@ -233,47 +233,45 @@ function BuildingBlock() {
         <div>Местн.: <b>{building.terrainType}</b></div>
         <div>Покр.: <b>{building.roofStructure}</b></div>
         <div>γₙ: <b>{building.responsibilityCoeff}</b></div>
-        <div>
-          <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            Прогоны:
-            <select
-              value={building.purlinSelectionMode}
-              onChange={(event) =>
-                setBuilding({
-                  purlinSelectionMode: event.target.value as typeof building.purlinSelectionMode,
-                })
-              }
-              style={{ minWidth: 150 }}
-            >
-              {getAvailablePurlinSelectionModes(building).map((mode) => (
-                <option key={mode} value={mode}>
-                  {purlinSelectionModeLabel(mode)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>
-            Принятый расчетчиком вариант для итоговой сводки.
+        <div style={{ gridColumn: "span 2" }}>
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>Прогоны</div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              Тип:
+              <select
+                value={building.purlinSelectionMode}
+                onChange={(event) =>
+                  setBuilding({
+                    purlinSelectionMode: event.target.value as typeof building.purlinSelectionMode,
+                  })
+                }
+                style={{ minWidth: 150 }}
+              >
+                {getAvailablePurlinSelectionModes(building).map((mode) => (
+                  <option key={mode} value={mode}>
+                    {purlinSelectionModeLabel(mode)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              Схема:
+              <select
+                value={building.purlinContinuityScheme}
+                onChange={(event) =>
+                  setBuilding({
+                    purlinContinuityScheme: event.target.value as typeof building.purlinContinuityScheme,
+                  })
+                }
+                style={{ minWidth: 130 }}
+              >
+                <option value="split">{purlinContinuitySchemeLabel("split")}</option>
+                <option value="continuous">{purlinContinuitySchemeLabel("continuous")}</option>
+              </select>
+            </label>
           </div>
-        </div>
-        <div>
-          <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            Схема:
-            <select
-              value={building.purlinContinuityScheme}
-              onChange={(event) =>
-                setBuilding({
-                  purlinContinuityScheme: event.target.value as typeof building.purlinContinuityScheme,
-                })
-              }
-              style={{ minWidth: 130 }}
-            >
-              <option value="split">{purlinContinuitySchemeLabel("split")}</option>
-              <option value="continuous">{purlinContinuitySchemeLabel("continuous")}</option>
-            </select>
-          </label>
           <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>
-            Влияет на штучность и длину в сводке.
+            Принятый расчетчиком вариант прогонов для итоговой сводки.
           </div>
         </div>
       </div>
