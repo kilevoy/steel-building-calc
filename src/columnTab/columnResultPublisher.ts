@@ -30,6 +30,8 @@ export function buildColumnResultPayload(
       steel: result.steel,
       massPerPiece_kg: totalMass_kg / group.count,
       count: group.count,
+      lengthPerPiece_m: group.totalHeight_m / group.count,
+      totalLength_m: group.totalHeight_m,
       totalMass_kg,
       cost_rub: totalMass_kg * input.prices[result.steel],
     };

@@ -64,10 +64,14 @@ describe("column result publisher", () => {
     const payload = buildColumnResultPayload(input, results);
 
     expect(payload.edge?.count).toBe(4);
+    expect(payload.edge?.lengthPerPiece_m).toBeCloseTo(10, 10);
+    expect(payload.edge?.totalLength_m).toBeCloseTo(40, 10);
     expect(payload.edge?.totalMass_kg).toBeCloseTo(40 * 40 + 2 * 9.6 * 6 * 1.15 * 4, 10);
     expect(payload.edge?.cost_rub).toBeCloseTo(payload.edge!.totalMass_kg * 100, 10);
 
     expect(payload.fachwerk?.count).toBe(10);
+    expect(payload.fachwerk?.lengthPerPiece_m).toBeCloseTo(10, 10);
+    expect(payload.fachwerk?.totalLength_m).toBeCloseTo(100, 10);
     expect(payload.fachwerk?.totalMass_kg).toBeCloseTo(
       20 * 100 + 1 * 9.6 * 6 * 1.15 * 10,
       10,
