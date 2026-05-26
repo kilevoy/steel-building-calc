@@ -25,7 +25,11 @@ import {
   getSettlementClimateByIdAsync,
   searchSettlementsAsync,
 } from "./services/settlements";
-import { buildPurlinResultItem } from "./purlinResultPublisher";
+import {
+  buildSelectedPurlinResultItem,
+  getAvailablePurlinSelectionModes,
+  purlinSelectionModeLabel,
+} from "./building/purlinSelection";
 import structuresJson from "./data/structures/structures.json";
 
 interface StructureRow {
@@ -235,18 +239,29 @@ export function PurlinApp() {
     [input, out],
   );
 
-  // Publish ЛСТК top-1 selection to shared results bus for the Summary tab.
+  // Publish the accepted purlin branch to the shared results bus for the Summary tab.
   useEffect(() => {
-    const item = buildPurlinResultItem(out, {
+    const item = buildSelectedPurlinResultItem(out, rolledTop10, building.purlinSelectionMode, {
       priceMP350_rubKg: building.priceMP350_rubKg,
       priceMP390_rubKg: building.priceMP390_rubKg,
+      priceC245_rubKg: building.priceC245_rubKg,
+      priceC345_rubKg: building.priceC345_rubKg,
     });
     if (!item) {
       setResult("purlin", null);
       return;
     }
     setResult("purlin", item);
-  }, [out, building.priceMP350_rubKg, building.priceMP390_rubKg, setResult]);
+  }, [
+    out,
+    rolledTop10,
+    building.purlinSelectionMode,
+    building.priceMP350_rubKg,
+    building.priceMP390_rubKg,
+    building.priceC245_rubKg,
+    building.priceC345_rubKg,
+    setResult,
+  ]);
 
   const upd = (patch: Partial<PurlinInput>) => setInput((p) => ({ ...p, ...patch }));
 
@@ -366,6 +381,15 @@ export function PurlinApp() {
         {/* Column 3: snow drift + step constraints */}
         <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
           <legend style={{ fontWeight: 600 }}>Снеговой мешок и параметры подбора</legend>
+          <SyncedSelectField
+            label="Принятый тип прогонов"
+            value={building.purlinSelectionMode}
+            options={getAvailablePurlinSelectionModes(building).map((mode) => [
+              mode,
+              purlinSelectionModeLabel(mode),
+            ])}
+            onChange={(v) => updSynced("purlinSelectionMode", v as Building["purlinSelectionMode"])}
+          />
           <SelectField
             label="Снеговой мешок"
             value={input.snowDrift}

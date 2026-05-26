@@ -65,7 +65,11 @@ export function buildSummaryRows(results: BuildingResults): SummaryRow[] {
     });
   }
 
-  const purlin = rowFromItem("Прогоны (ЛСТК)", results.purlin);
+  const purlinSteel = results.purlin?.steel ?? "";
+  const purlinLabel = purlinSteel.startsWith("МП") || purlinSteel.startsWith("MP")
+    ? "Прогоны (ЛСТК)"
+    : "Прогоны (прокат)";
+  const purlin = rowFromItem(purlinLabel, results.purlin);
   if (purlin) rows.push(purlin);
 
   const beamCell = rowFromItem("Балка покрытия", results.beamCell);
