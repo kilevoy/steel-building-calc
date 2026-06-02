@@ -52,8 +52,16 @@ export function buildSummaryRows(results: BuildingResults): SummaryRow[] {
     if (edge) rows.push(edge);
     const middle = rowFromItem("Колонна средняя", results.column.middle);
     if (middle) rows.push(middle);
-    const fachwerk = rowFromItem("Колонна фахверк", results.column.fachwerk);
-    if (fachwerk) rows.push(fachwerk);
+    const fachwerkBreakdown = results.column.fachwerk?.breakdown ?? [];
+    if (fachwerkBreakdown.length > 0) {
+      for (const item of fachwerkBreakdown) {
+        const fachwerk = rowFromItem("Колонна фахверк", item);
+        if (fachwerk) rows.push(fachwerk);
+      }
+    } else {
+      const fachwerk = rowFromItem("Колонна фахверк", results.column.fachwerk);
+      if (fachwerk) rows.push(fachwerk);
+    }
   }
 
   if (results.truss) {

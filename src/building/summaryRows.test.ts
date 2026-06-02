@@ -116,4 +116,58 @@ describe("summary rows", () => {
       note: "Разрезной, шаг 1500 мм",
     });
   });
+
+  it("expands fachwerk column breakdown by length in the summary table", () => {
+    const results: BuildingResults = {
+      ...emptyResults,
+      column: {
+        edge: null,
+        middle: null,
+        fachwerk: {
+          profile: "35 Б1",
+          steel: "С355Б",
+          count: 10,
+          lengthPerPiece_m: 12.5,
+          totalLength_m: 125,
+          totalMass_kg: 1_000,
+          cost_rub: 100_000,
+          breakdown: [
+            {
+              profile: "35 Б1",
+              steel: "С355Б",
+              count: 4,
+              lengthPerPiece_m: 12,
+              totalLength_m: 48,
+              totalMass_kg: 400,
+              cost_rub: 40_000,
+            },
+            {
+              profile: "35 Б1",
+              steel: "С355Б",
+              count: 6,
+              lengthPerPiece_m: 12.83,
+              totalLength_m: 76.98,
+              totalMass_kg: 600,
+              cost_rub: 60_000,
+            },
+          ],
+        },
+      },
+    };
+
+    expect(buildSummaryRows(results)).toMatchObject([
+      {
+        label: "Колонна фахверк",
+        count: "4",
+        lengthPerPiece_m: "12.00 м",
+        totalLength_m: "48.00 м",
+      },
+      {
+        label: "Колонна фахверк",
+        count: "6",
+        lengthPerPiece_m: "12.83 м",
+        totalLength_m: "76.98 м",
+      },
+    ]);
+  });
 });

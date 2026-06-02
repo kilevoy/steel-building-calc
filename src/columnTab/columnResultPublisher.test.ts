@@ -72,9 +72,56 @@ describe("column result publisher", () => {
     expect(payload.fachwerk?.count).toBe(10);
     expect(payload.fachwerk?.lengthPerPiece_m).toBeCloseTo(10, 10);
     expect(payload.fachwerk?.totalLength_m).toBeCloseTo(100, 10);
+    expect(payload.fachwerk?.breakdown).toHaveLength(1);
+    expect(payload.fachwerk?.breakdown?.[0]).toMatchObject({
+      count: 10,
+      lengthPerPiece_m: 10,
+      totalLength_m: 100,
+    });
     expect(payload.fachwerk?.totalMass_kg).toBeCloseTo(
       20 * 100 + 1 * 9.6 * 6 * 1.15 * 10,
       10,
     );
+  });
+
+  it("groups fachwerk columns by roof-dependent lengths", () => {
+    const input: CalculationInput = {
+      ...DEFAULT_COLUMN_INPUT,
+      span_m: 24,
+      length_m: 72,
+      height_m: 12,
+      framePitch_m: 6,
+      fachverkPitch_m: 6,
+      roofSlope_deg: 5,
+      roofType: "gable",
+      spanCount: "single",
+      prices: {
+        ...DEFAULT_COLUMN_INPUT.prices,
+        С345: 100,
+      },
+    };
+    const results: Record<ColumnType, CalculationOutput> = {
+      edge: resultFor("edge-test", 40, 0),
+      fachwerk: resultFor("fachwerk-test", 20, 0),
+      middle: resultFor("middle-test", 30, 0),
+    };
+
+    const payload = buildColumnResultPayload(input, results);
+
+    expect(payload.fachwerk?.count).toBe(10);
+    expect(payload.fachwerk?.breakdown).toHaveLength(3);
+    expect(payload.fachwerk?.breakdown?.map((item) => item.count)).toEqual([4, 4, 2]);
+    expect(payload.fachwerk?.breakdown?.[0].lengthPerPiece_m).toBeCloseTo(12, 10);
+    expect(payload.fachwerk?.breakdown?.[2].lengthPerPiece_m).toBeGreaterThan(13);
+    const breakdownLength = payload.fachwerk!.breakdown!.reduce(
+      (sum, item) => sum + (item.totalLength_m ?? 0),
+      0,
+    );
+    const breakdownMass = payload.fachwerk!.breakdown!.reduce(
+      (sum, item) => sum + item.totalMass_kg,
+      0,
+    );
+    expect(breakdownLength).toBeCloseTo(payload.fachwerk!.totalLength_m!, 10);
+    expect(breakdownMass).toBeCloseTo(payload.fachwerk!.totalMass_kg, 10);
   });
 });

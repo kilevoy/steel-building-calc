@@ -11,6 +11,12 @@ export interface ColumnLayoutGroup {
   totalHeight_m: number;
 }
 
+export interface ColumnLengthGroup {
+  length_m: number;
+  count: number;
+  totalLength_m: number;
+}
+
 export interface BuildingColumnLayout {
   edge: ColumnLayoutGroup;
   middle: ColumnLayoutGroup;
@@ -101,6 +107,35 @@ function groupFromPositions(
     maxHeight_m: Math.max(...heights),
     totalHeight_m: heights.reduce((sum, height) => sum + height * quantityPerPosition, 0),
   };
+}
+
+export function groupColumnLengths(
+  positions: number[],
+  quantityPerPosition: number,
+  heightAt: (x_m: number) => number,
+): ColumnLengthGroup[] {
+  if (positions.length === 0 || quantityPerPosition <= 0) {
+    return [];
+  }
+
+  const groups = new Map<string, ColumnLengthGroup>();
+  for (const position of positions) {
+    const height = heightAt(position);
+    const key = height.toFixed(6);
+    const existing = groups.get(key);
+    if (existing) {
+      existing.count += quantityPerPosition;
+      existing.totalLength_m += height * quantityPerPosition;
+    } else {
+      groups.set(key, {
+        length_m: height,
+        count: quantityPerPosition,
+        totalLength_m: height * quantityPerPosition,
+      });
+    }
+  }
+
+  return Array.from(groups.values()).sort((a, b) => a.length_m - b.length_m);
 }
 
 export function deriveColumnLayout(params: {

@@ -16,6 +16,8 @@ export interface ResultItem {
   totalLength_m?: number;
   /** Short UI note for summary rows. */
   note?: string;
+  /** Optional itemized rows for summary display. Totals still use the parent item. */
+  breakdown?: ResultItem[];
   /** Total mass in the whole building (kg). */
   totalMass_kg: number;
   /** Total cost in the whole building (руб). */

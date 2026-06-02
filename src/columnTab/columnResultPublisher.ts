@@ -1,10 +1,45 @@
-import { deriveColumnLayout } from "../building/layout";
+import { columnHeightAtX, deriveColumnLayout, groupColumnLengths, positionsAcrossSpan } from "../building/layout";
 import type { ColumnResultByType, ResultItem } from "../building/resultsContext";
 import type { CalculationInput, CalculationOutput, ColumnType } from "../calc/types";
 
 const STRUT_MASS_KG_PER_M = 9.6;
 
 type ResultsByColumnType = Record<ColumnType, CalculationOutput>;
+
+function buildFachwerkBreakdown(
+  input: CalculationInput,
+  result: CalculationOutput["results"][number],
+  strutMassPerPiece_kg: number,
+): ResultItem[] {
+  const groups = groupColumnLengths(
+    positionsAcrossSpan(input.span_m, input.fachverkPitch_m),
+    2,
+    (x_m) =>
+      columnHeightAtX({
+        span_m: input.span_m,
+        height_m: input.height_m,
+        roofSlope_deg: input.roofSlope_deg,
+        roofType: input.roofType,
+        x_m,
+      }),
+  );
+
+  return groups.map((group) => {
+    const totalMass_kg =
+      result.mass_per_m * group.totalLength_m + strutMassPerPiece_kg * group.count;
+
+    return {
+      profile: result.profileName,
+      steel: result.steel,
+      massPerPiece_kg: totalMass_kg / group.count,
+      count: group.count,
+      lengthPerPiece_m: group.length_m,
+      totalLength_m: group.totalLength_m,
+      totalMass_kg,
+      cost_rub: totalMass_kg * input.prices[result.steel],
+    };
+  });
+}
 
 export function buildColumnResultPayload(
   input: CalculationInput,
@@ -25,7 +60,7 @@ export function buildColumnResultPayload(
     const totalMass_kg =
       result.mass_per_m * group.totalHeight_m + strutMassPerPiece_kg * group.count;
 
-    return {
+    const item: ResultItem = {
       profile: result.profileName,
       steel: result.steel,
       massPerPiece_kg: totalMass_kg / group.count,
@@ -35,6 +70,12 @@ export function buildColumnResultPayload(
       totalMass_kg,
       cost_rub: totalMass_kg * input.prices[result.steel],
     };
+
+    if (columnType === "fachwerk") {
+      item.breakdown = buildFachwerkBreakdown(input, result, strutMassPerPiece_kg);
+    }
+
+    return item;
   };
 
   return {
