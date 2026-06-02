@@ -66,6 +66,12 @@ describe("column result publisher", () => {
     expect(payload.edge?.count).toBe(4);
     expect(payload.edge?.lengthPerPiece_m).toBeCloseTo(10, 10);
     expect(payload.edge?.totalLength_m).toBeCloseTo(40, 10);
+    expect(payload.edge?.breakdown).toHaveLength(1);
+    expect(payload.edge?.breakdown?.[0]).toMatchObject({
+      count: 4,
+      lengthPerPiece_m: 10,
+      totalLength_m: 40,
+    });
     expect(payload.edge?.totalMass_kg).toBeCloseTo(40 * 40 + 2 * 9.6 * 6 * 1.15 * 4, 10);
     expect(payload.edge?.cost_rub).toBeCloseTo(payload.edge!.totalMass_kg * 100, 10);
 
@@ -123,5 +129,41 @@ describe("column result publisher", () => {
     );
     expect(breakdownLength).toBeCloseTo(payload.fachwerk!.totalLength_m!, 10);
     expect(breakdownMass).toBeCloseTo(payload.fachwerk!.totalMass_kg, 10);
+  });
+
+  it("groups edge columns by length for monoslope roofs", () => {
+    const input: CalculationInput = {
+      ...DEFAULT_COLUMN_INPUT,
+      span_m: 24,
+      length_m: 72,
+      height_m: 12,
+      framePitch_m: 6,
+      fachverkPitch_m: 6,
+      roofSlope_deg: 5,
+      roofType: "single_slope",
+      spanCount: "single",
+      prices: {
+        ...DEFAULT_COLUMN_INPUT.prices,
+        С345: 100,
+      },
+    };
+    const results: Record<ColumnType, CalculationOutput> = {
+      edge: resultFor("edge-test", 40, 0),
+      fachwerk: resultFor("fachwerk-test", 20, 0),
+      middle: resultFor("middle-test", 30, 0),
+    };
+
+    const payload = buildColumnResultPayload(input, results);
+
+    expect(payload.edge?.count).toBe(22);
+    expect(payload.edge?.breakdown).toHaveLength(2);
+    expect(payload.edge?.breakdown?.map((item) => item.count)).toEqual([11, 11]);
+    expect(payload.edge?.breakdown?.[0].lengthPerPiece_m).toBeCloseTo(12, 10);
+    expect(payload.edge?.breakdown?.[1].lengthPerPiece_m).toBeGreaterThan(14);
+    const breakdownMass = payload.edge!.breakdown!.reduce(
+      (sum, item) => sum + item.totalMass_kg,
+      0,
+    );
+    expect(breakdownMass).toBeCloseTo(payload.edge!.totalMass_kg, 10);
   });
 });

@@ -1,4 +1,11 @@
-import { columnHeightAtX, deriveColumnLayout, groupColumnLengths, positionsAcrossSpan } from "../building/layout";
+import {
+  columnHeightAtX,
+  deriveColumnLayout,
+  deriveFrameLayout,
+  groupColumnLengths,
+  spanCountAsNumber,
+  positionsAcrossSpan,
+} from "../building/layout";
 import type { ColumnResultByType, ResultItem } from "../building/resultsContext";
 import type { CalculationInput, CalculationOutput, ColumnType } from "../calc/types";
 
@@ -6,14 +13,44 @@ const STRUT_MASS_KG_PER_M = 9.6;
 
 type ResultsByColumnType = Record<ColumnType, CalculationOutput>;
 
-function buildFachwerkBreakdown(
+function columnPositions(input: CalculationInput, columnType: ColumnType): {
+  positions: number[];
+  quantityPerPosition: number;
+} {
+  if (columnType === "edge") {
+    return {
+      positions: [0, input.span_m],
+      quantityPerPosition: deriveFrameLayout(input.length_m, input.framePitch_m).interiorFrameCount,
+    };
+  }
+
+  if (columnType === "middle") {
+    const spanCount = spanCountAsNumber(input.spanCount);
+    return {
+      positions:
+        spanCount > 1
+          ? Array.from({ length: spanCount - 1 }, (_, index) => (input.span_m / spanCount) * (index + 1))
+          : [],
+      quantityPerPosition: deriveFrameLayout(input.length_m, input.framePitch_m).interiorFrameCount,
+    };
+  }
+
+  return {
+    positions: positionsAcrossSpan(input.span_m, input.fachverkPitch_m),
+    quantityPerPosition: 2,
+  };
+}
+
+function buildColumnLengthBreakdown(
   input: CalculationInput,
+  columnType: ColumnType,
   result: CalculationOutput["results"][number],
   strutMassPerPiece_kg: number,
 ): ResultItem[] {
+  const { positions, quantityPerPosition } = columnPositions(input, columnType);
   const groups = groupColumnLengths(
-    positionsAcrossSpan(input.span_m, input.fachverkPitch_m),
-    2,
+    positions,
+    quantityPerPosition,
     (x_m) =>
       columnHeightAtX({
         span_m: input.span_m,
@@ -71,9 +108,7 @@ export function buildColumnResultPayload(
       cost_rub: totalMass_kg * input.prices[result.steel],
     };
 
-    if (columnType === "fachwerk") {
-      item.breakdown = buildFachwerkBreakdown(input, result, strutMassPerPiece_kg);
-    }
+    item.breakdown = buildColumnLengthBreakdown(input, columnType, result, strutMassPerPiece_kg);
 
     return item;
   };

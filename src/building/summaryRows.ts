@@ -44,24 +44,27 @@ function rowFromItem(label: string, item: ResultItem | null, note?: string): Sum
   };
 }
 
+function pushItemRows(rows: SummaryRow[], label: string, item: ResultItem | null): void {
+  const breakdown = item?.breakdown ?? [];
+  if (breakdown.length > 0) {
+    for (const breakdownItem of breakdown) {
+      const row = rowFromItem(label, breakdownItem);
+      if (row) rows.push(row);
+    }
+    return;
+  }
+
+  const row = rowFromItem(label, item);
+  if (row) rows.push(row);
+}
+
 export function buildSummaryRows(results: BuildingResults): SummaryRow[] {
   const rows: SummaryRow[] = [];
 
   if (results.column) {
-    const edge = rowFromItem("Колонна крайняя", results.column.edge);
-    if (edge) rows.push(edge);
-    const middle = rowFromItem("Колонна средняя", results.column.middle);
-    if (middle) rows.push(middle);
-    const fachwerkBreakdown = results.column.fachwerk?.breakdown ?? [];
-    if (fachwerkBreakdown.length > 0) {
-      for (const item of fachwerkBreakdown) {
-        const fachwerk = rowFromItem("Колонна фахверк", item);
-        if (fachwerk) rows.push(fachwerk);
-      }
-    } else {
-      const fachwerk = rowFromItem("Колонна фахверк", results.column.fachwerk);
-      if (fachwerk) rows.push(fachwerk);
-    }
+    pushItemRows(rows, "Колонна крайняя", results.column.edge);
+    pushItemRows(rows, "Колонна средняя", results.column.middle);
+    pushItemRows(rows, "Колонна фахверк", results.column.fachwerk);
   }
 
   if (results.truss) {
