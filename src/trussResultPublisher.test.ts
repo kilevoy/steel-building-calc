@@ -88,6 +88,8 @@ describe("truss result publisher", () => {
     });
 
     expect(payload.n_trusses).toBe(11);
+    expect(payload.lengthPerPiece_m).toBe(24);
+    expect(payload.totalLength_m).toBe(264);
     expect(payload.sections).toEqual([
       { section: "ВП", profile: "VP-profile", steel: "С345", totalMass_kg: 1_100 },
       { section: "НП", profile: "NP-profile", steel: "С345", totalMass_kg: 880 },
@@ -117,5 +119,6 @@ describe("truss result publisher", () => {
       V_wind_kN: 45,
       H_kN: null,
     });
+    expect(payload.lengthPerPiece_m).toBe(9);
   });
 });

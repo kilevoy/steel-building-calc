@@ -85,6 +85,8 @@ describe("summary rows", () => {
         label: "Ферма покрытия",
         steel: "C345",
         count: "2",
+        lengthPerPiece_m: "—",
+        totalLength_m: "—",
         unitMass_kg: "35.0 кг",
         totalMass_kg: 70,
         note: "12.3 кг/м²",
@@ -114,6 +116,28 @@ describe("summary rows", () => {
       lengthPerPiece_m: "6.00 м",
       totalLength_m: "936.00 м",
       note: "Разрезной, шаг 1500 мм",
+    });
+  });
+
+  it("shows truss length fields when published by the truss module", () => {
+    const results: BuildingResults = {
+      ...emptyResults,
+      truss: {
+        sections: [{ section: "ВП", profile: "100х100х4", steel: "С345", totalMass_kg: 300 }],
+        totalMass_kg: 900,
+        totalCost_rub: 135_000,
+        unitMass_kg_per_m2: 10,
+        n_trusses: 3,
+        lengthPerPiece_m: 24,
+        totalLength_m: 72,
+      },
+    };
+
+    expect(buildSummaryRows(results)[0]).toMatchObject({
+      label: "Ферма покрытия",
+      count: "3",
+      lengthPerPiece_m: "24.00 м",
+      totalLength_m: "72.00 м",
     });
   });
 

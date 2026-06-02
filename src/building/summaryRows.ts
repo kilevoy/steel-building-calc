@@ -73,8 +73,12 @@ export function buildSummaryRows(results: BuildingResults): SummaryRow[] {
       profile: results.truss.sections.map((s) => `${s.section}: ${s.profile}`).join(" / "),
       steel: results.truss.sections[0]?.steel ?? "—",
       count: `${results.truss.n_trusses}`,
-      lengthPerPiece_m: "—",
-      totalLength_m: "—",
+      lengthPerPiece_m: results.truss.lengthPerPiece_m
+        ? `${results.truss.lengthPerPiece_m.toFixed(2)} м`
+        : "—",
+      totalLength_m: results.truss.totalLength_m
+        ? `${results.truss.totalLength_m.toFixed(2)} м`
+        : "—",
       unitMass_kg: formatSummaryMass(results.truss.totalMass_kg / results.truss.n_trusses),
       totalMass_kg: results.truss.totalMass_kg,
       cost_rub: results.truss.totalCost_rub,

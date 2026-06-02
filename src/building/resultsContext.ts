@@ -39,6 +39,10 @@ export interface TrussResult {
   totalCost_rub: number;
   unitMass_kg_per_m2: number;
   n_trusses: number;
+  /** Length of one truss piece in summary accounting, m. */
+  lengthPerPiece_m?: number;
+  /** Total truss length in summary accounting, m. */
+  totalLength_m?: number;
   /** Support reactions for one truss (kN). For automatic load transfer to column. */
   reactions?: {
     V_perm_kN: number;

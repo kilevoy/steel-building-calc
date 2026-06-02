@@ -14,6 +14,8 @@ export function buildTrussResultPayload(params: {
   spanCount: SpanCount;
   priceC345_rubKg: number;
 }): TrussResult {
+  const spanCount = params.spanCount === "multi" ? 2 : 1;
+  const lengthPerPiece_m = params.input.span_m / spanCount;
   const n_trusses = deriveRoofElementLayout({
     length_m: params.input.length_m,
     framePitch_m: params.input.framePitch_m,
@@ -41,6 +43,8 @@ export function buildTrussResultPayload(params: {
     totalCost_rub: totalMass_kg * params.priceC345_rubKg,
     unitMass_kg_per_m2: params.output.unitMass_kg_per_m2,
     n_trusses,
+    lengthPerPiece_m,
+    totalLength_m: n_trusses * lengthPerPiece_m,
     reactions: {
       V_perm_kN: (params.output.loads.roof_kN_per_m * params.input.span_m) / 2,
       V_snow_kN: (params.output.loads.snow_kN_per_m * params.input.span_m) / 2,
