@@ -1,4 +1,5 @@
 import type { RoofType, SpanCount } from "../calc/types";
+import type { RoofShape } from "./buildingContext";
 
 export interface FrameLayout {
   frameCount: number;
@@ -30,12 +31,43 @@ export interface RoofElementLayout {
   endRoofBeamCount: number;
 }
 
+export interface EndRoofBeamLayout {
+  count: number;
+  lengthPerPiece_m: number;
+  totalLength_m: number;
+}
+
 export function spanCountAsNumber(spanCount: SpanCount): number {
   return spanCount === "multi" ? 2 : 1;
 }
 
 export function deriveEndRoofBeamQuantity(spanCount: SpanCount): number {
   return 2 * spanCountAsNumber(spanCount);
+}
+
+export function deriveEndRoofBeamLayout(params: {
+  span_m: number;
+  roofSlope_deg: number;
+  roofShape: RoofShape;
+  spanCount: SpanCount;
+}): EndRoofBeamLayout {
+  const crossSpanCount = spanCountAsNumber(params.spanCount);
+  const roofPlaneCount = params.roofShape === "gable" ? 2 : 1;
+  const count = 2 * crossSpanCount * roofPlaneCount;
+  const spanPerBay_m = crossSpanCount > 0 ? params.span_m / crossSpanCount : 0;
+  const horizontalLength_m =
+    params.roofShape === "gable" ? spanPerBay_m / 2 : spanPerBay_m;
+  const cosSlope = Math.cos((params.roofSlope_deg * Math.PI) / 180);
+  const lengthPerPiece_m =
+    Number.isFinite(cosSlope) && cosSlope > 0
+      ? horizontalLength_m / cosSlope
+      : horizontalLength_m;
+
+  return {
+    count,
+    lengthPerPiece_m,
+    totalLength_m: count * lengthPerPiece_m,
+  };
 }
 
 export function deriveRoofElementLayout(params: {

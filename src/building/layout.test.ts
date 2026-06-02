@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   columnHeightAtX,
   deriveEndRoofBeamQuantity,
+  deriveEndRoofBeamLayout,
   deriveColumnLayout,
   deriveFrameLayout,
   deriveRoofElementLayout,
@@ -19,6 +20,26 @@ describe("building layout helpers", () => {
   it("counts end roof beams by span count", () => {
     expect(deriveEndRoofBeamQuantity("single")).toBe(2);
     expect(deriveEndRoofBeamQuantity("multi")).toBe(4);
+  });
+
+  it("counts and sizes end roof beams by roof shape", () => {
+    const gable = deriveEndRoofBeamLayout({
+      span_m: 24,
+      roofSlope_deg: 5,
+      roofShape: "gable",
+      spanCount: "single",
+    });
+    expect(gable.count).toBe(4);
+    expect(gable.lengthPerPiece_m).toBeCloseTo(12 / Math.cos((5 * Math.PI) / 180), 10);
+
+    const monoslope = deriveEndRoofBeamLayout({
+      span_m: 24,
+      roofSlope_deg: 5,
+      roofShape: "monoslope",
+      spanCount: "single",
+    });
+    expect(monoslope.count).toBe(2);
+    expect(monoslope.lengthPerPiece_m).toBeCloseTo(24 / Math.cos((5 * Math.PI) / 180), 10);
   });
 
   it("derives roof element counts from the same frame model", () => {

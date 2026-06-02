@@ -5,7 +5,9 @@ import { useBuildingResults } from "./building/useBuildingResults";
 import { SyncedNumField } from "./building/SyncedField";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
+import { deriveEndRoofBeamLayout } from "./building/layout";
 import { buildBeamCellResultItem } from "./beamCellResultPublisher";
+import { ReadOnlyField } from "./components/form";
 import type {
   CalculatorInputs,
   MemberSolution,
@@ -13,6 +15,15 @@ import type {
 } from "./calc/beamCell/types";
 
 const STEELS: readonly Steel[] = ["C245", "C345"];
+
+function roofBeamSpan_m(building: Building): number {
+  return deriveEndRoofBeamLayout({
+    span_m: building.span_m,
+    roofSlope_deg: building.roofSlope_deg,
+    roofShape: building.roofShape,
+    spanCount: building.spanCount,
+  }).lengthPerPiece_m;
+}
 
 function fmtKg(v: number | undefined): string {
   if (v === undefined || !Number.isFinite(v)) return "—";
@@ -39,7 +50,7 @@ export function BeamCellApp() {
   const [inputs, setInputs] = useState<CalculatorInputs>(() => ({
     ...defaultInputs,
     floorType: "балка покрытия",
-    mainBeamSpan: building.span_m,
+    mainBeamSpan: roofBeamSpan_m(building),
     mainBeamStep: building.framePitch_m,
     prices: {
       ...defaultInputs.prices,
@@ -51,7 +62,7 @@ export function BeamCellApp() {
   useEffect(() => {
     setInputs((cur) => ({
       ...cur,
-      mainBeamSpan: building.span_m,
+      mainBeamSpan: roofBeamSpan_m(building),
       mainBeamStep: building.framePitch_m,
       prices: {
         ...cur.prices,
@@ -59,7 +70,9 @@ export function BeamCellApp() {
         ibeamC345: building.priceC345_rubKg,
       },
     }));
-  }, [building.span_m, building.framePitch_m, building.priceC245_rubKg, building.priceC345_rubKg]);
+  }, [
+    building,
+  ]);
 
   const updSynced = <K extends keyof Building>(key: K, value: number) => {
     setBuilding({ [key]: value } as Partial<Building>);
@@ -76,6 +89,9 @@ export function BeamCellApp() {
       solution: result.main[inputs.acceptedMainSteel],
       length_m: building.length_m,
       framePitch_m: building.framePitch_m,
+      span_m: building.span_m,
+      roofSlope_deg: building.roofSlope_deg,
+      roofShape: building.roofShape,
       spanCount: building.spanCount,
     });
     if (!item) {
@@ -88,6 +104,9 @@ export function BeamCellApp() {
     inputs.acceptedMainSteel,
     building.length_m,
     building.framePitch_m,
+    building.span_m,
+    building.roofSlope_deg,
+    building.roofShape,
     building.spanCount,
     setResult,
   ]);
@@ -108,7 +127,8 @@ export function BeamCellApp() {
           <legend style={{ fontWeight: 600 }}>Геометрия</legend>
           <NumField label="Вдоль ГБ, м" value={inputs.lengthAlongMain} step={0.5} onChange={(v) => upd("lengthAlongMain", v)} />
           <NumField label="Поперёк ГБ, м" value={inputs.widthAcrossMain} step={0.5} onChange={(v) => upd("widthAcrossMain", v)} />
-          <SyncedNumField label="Пролёт ГБ (= пролёт здания), м" value={inputs.mainBeamSpan} step={0.5} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+          <SyncedNumField label="Пролёт здания, м" value={building.span_m} step={0.5} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+          <ReadOnlyField label="Расчётная длина балки покрытия, м" value={inputs.mainBeamSpan.toFixed(2)} />
           <SyncedNumField label="Шаг ГБ (= шаг рам), м" value={inputs.mainBeamStep} step={0.5} onChange={(v) => updSynced("framePitch_m", v)} validationKind="positive" />
         </fieldset>
 

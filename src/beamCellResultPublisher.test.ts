@@ -16,7 +16,14 @@ function solution(patch: Partial<MemberSolution> = {}): MemberSolution {
 
 describe("beam cell result publisher", () => {
   it("returns null for non-selected or incomplete main beam solution", () => {
-    const common = { length_m: 72, framePitch_m: 6, spanCount: "single" as const };
+    const common = {
+      length_m: 72,
+      framePitch_m: 6,
+      span_m: 24,
+      roofSlope_deg: 5,
+      roofShape: "gable" as const,
+      spanCount: "single" as const,
+    };
 
     expect(buildBeamCellResultItem({
       ...common,
@@ -37,17 +44,23 @@ describe("beam cell result publisher", () => {
       solution: solution(),
       length_m: 72,
       framePitch_m: 6,
+      span_m: 24,
+      roofSlope_deg: 5,
+      roofShape: "gable",
       spanCount: "single",
     });
 
-    expect(item).toEqual({
+    expect(item).toMatchObject({
       profile: "40 Б2",
       steel: "С245",
       massPerPiece_kg: 792,
-      count: 2,
-      totalMass_kg: 1_584,
-      cost_rub: 306_000,
+      count: 4,
+      totalMass_kg: 3_168,
+      cost_rub: 612_000,
+      note: "торцы, 2 ската",
     });
+    expect(item?.lengthPerPiece_m).toBeCloseTo(12 / Math.cos((5 * Math.PI) / 180), 10);
+    expect(item?.totalLength_m).toBeCloseTo(4 * 12 / Math.cos((5 * Math.PI) / 180), 10);
   });
 
   it("publishes doubled end roof beam count for a multi-span building", () => {
@@ -60,16 +73,22 @@ describe("beam cell result publisher", () => {
       }),
       length_m: 72,
       framePitch_m: 6,
+      span_m: 24,
+      roofSlope_deg: 0,
+      roofShape: "monoslope",
       spanCount: "multi",
     });
 
-    expect(item).toEqual({
+    expect(item).toMatchObject({
       profile: "35 Б2",
       steel: "С345",
       massPerPiece_kg: 595.2,
       count: 4,
       totalMass_kg: 2_380.8,
       cost_rub: 484_000,
+      lengthPerPiece_m: 12,
+      totalLength_m: 48,
+      note: "торцы, 1 скат",
     });
   });
 });

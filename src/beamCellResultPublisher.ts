@@ -1,4 +1,5 @@
-import { deriveRoofElementLayout } from "./building/layout";
+import { deriveEndRoofBeamLayout } from "./building/layout";
+import type { RoofShape } from "./building/buildingContext";
 import type { ResultItem } from "./building/resultsContext";
 import type { MemberSolution, Steel } from "./calc/beamCell/types";
 import type { SpanCount } from "./calc/types";
@@ -7,6 +8,9 @@ export function buildBeamCellResultItem(params: {
   solution: MemberSolution | undefined;
   length_m: number;
   framePitch_m: number;
+  span_m: number;
+  roofSlope_deg: number;
+  roofShape: RoofShape;
   spanCount: SpanCount;
 }): ResultItem | null {
   const { solution } = params;
@@ -14,20 +18,24 @@ export function buildBeamCellResultItem(params: {
     return null;
   }
 
-  const count = deriveRoofElementLayout({
-    length_m: params.length_m,
-    framePitch_m: params.framePitch_m,
+  const layout = deriveEndRoofBeamLayout({
+    span_m: params.span_m,
+    roofSlope_deg: params.roofSlope_deg,
+    roofShape: params.roofShape,
     spanCount: params.spanCount,
-  }).endRoofBeamCount;
+  });
   const steelLabel = steelLabelRu(solution.material);
 
   return {
     profile: solution.profile,
     steel: steelLabel,
     massPerPiece_kg: solution.weightKg,
-    count,
-    totalMass_kg: solution.weightKg * count,
-    cost_rub: (solution.costRub ?? 0) * count,
+    count: layout.count,
+    lengthPerPiece_m: layout.lengthPerPiece_m,
+    totalLength_m: layout.totalLength_m,
+    totalMass_kg: solution.weightKg * layout.count,
+    cost_rub: (solution.costRub ?? 0) * layout.count,
+    note: params.roofShape === "gable" ? "торцы, 2 ската" : "торцы, 1 скат",
   };
 }
 
