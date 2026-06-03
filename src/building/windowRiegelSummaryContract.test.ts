@@ -45,7 +45,7 @@ describe("window riegel summary contract", () => {
       unitMass_kg: "87.0 кг",
       totalMass_kg: 87.0017 * 12,
       cost_rub: 87.0017 * 12 * 130.2,
-      note: "количество задано расчетчиком",
+      details: "количество задано расчетчиком",
     });
     expect(calculateBuildingSummaryTotals(results)).toEqual({
       totalMass_kg: 87.0017 * 12,

@@ -52,7 +52,7 @@ describe("crane beam summary contract", () => {
       unitMass_kg: "522.0 кг",
       totalMass_kg: 522.00147 * 24,
       cost_rub: 522.00147 * 24 * 141,
-      note: "2 нитки подкранового пути",
+      details: "2 нитки подкранового пути",
     });
     expect(calculateBuildingSummaryTotals(results)).toEqual({
       totalMass_kg: 522.00147 * 24,

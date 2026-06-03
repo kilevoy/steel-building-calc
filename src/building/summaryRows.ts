@@ -10,7 +10,6 @@ export interface SummaryRow {
   unitMass_kg: string;
   totalMass_kg: number;
   cost_rub: number;
-  note?: string;
   details?: string;
 }
 
@@ -42,8 +41,7 @@ function rowFromItem(label: string, item: ResultItem | null, note?: string): Sum
     unitMass_kg: hasExplicitCount ? formatSummaryMass(unit) : "—",
     totalMass_kg: item.totalMass_kg,
     cost_rub: item.cost_rub,
-    note: note ?? item.note,
-    details: item.details,
+    details: item.details ?? note ?? item.note,
   };
 }
 
@@ -85,7 +83,7 @@ export function buildSummaryRows(results: BuildingResults): SummaryRow[] {
       unitMass_kg: formatSummaryMass(results.truss.totalMass_kg / results.truss.n_trusses),
       totalMass_kg: results.truss.totalMass_kg,
       cost_rub: results.truss.totalCost_rub,
-      note: `внутренние рамы, ${results.truss.unitMass_kg_per_m2.toFixed(1)} кг/м²`,
+      details: `внутренние рамы, ${results.truss.unitMass_kg_per_m2.toFixed(1)} кг/м²`,
     });
   }
 

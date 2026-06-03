@@ -89,7 +89,7 @@ describe("summary rows", () => {
         totalLength_m: "—",
         unitMass_kg: "35.0 кг",
         totalMass_kg: 70,
-        note: "внутренние рамы, 12.3 кг/м²",
+        details: "внутренние рамы, 12.3 кг/м²",
       },
       { label: "Прогоны (ЛСТК)", steel: "MP350", totalMass_kg: 300 },
       { label: "Подкрановая балка", steel: "C345", totalMass_kg: 60 },
@@ -115,7 +115,7 @@ describe("summary rows", () => {
       count: "156",
       lengthPerPiece_m: "6.00 м",
       totalLength_m: "936.00 м",
-      note: "Разрезной, шаг 1500 мм",
+      details: "Разрезной, шаг 1500 мм",
     });
   });
 

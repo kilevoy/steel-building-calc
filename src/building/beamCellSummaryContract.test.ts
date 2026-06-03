@@ -45,7 +45,7 @@ describe("beam cell summary contract", () => {
       unitMass_kg: "792.0 кг",
       totalMass_kg: 792 * 4,
       cost_rub: 153_000 * 4,
-      note: "торцы, 2 ската",
+      details: "торцы, 2 ската",
     });
     expect(calculateBuildingSummaryTotals(results)).toEqual({
       totalMass_kg: 792 * 4,

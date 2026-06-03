@@ -108,14 +108,7 @@ export function SummaryApp() {
             {rows.map((r, i) => (
               <tr key={i}>
                 <td style={{ ...td, fontWeight: 600 }}>{r.label}</td>
-                <td style={td}>
-                  {r.profile}
-                  {r.note && (
-                    <span style={{ color: "#a16207", fontSize: 11, marginLeft: 6 }}>
-                      ({r.note})
-                    </span>
-                  )}
-                </td>
+                <td style={td}>{r.profile}</td>
                 <td style={td}>{r.details ?? "—"}</td>
                 <td style={td}>{r.steel}</td>
                 <td style={tdR}>{r.count}</td>

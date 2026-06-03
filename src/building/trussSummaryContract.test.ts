@@ -47,7 +47,7 @@ describe("truss summary contract", () => {
       unitMass_kg: "636.4 кг",
       totalMass_kg: 7_000,
       cost_rub: 987_000,
-      note: "внутренние рамы, 18.5 кг/м²",
+      details: "внутренние рамы, 18.5 кг/м²",
     });
     expect(calculateBuildingSummaryTotals(results)).toEqual({
       totalMass_kg: 7_000,

@@ -46,12 +46,12 @@ describe("purlin summary contract", () => {
       label: "Прогоны (ЛСТК)",
       lengthPerPiece_m: "6.00 м",
     });
-    expect(splitRow.note).toContain("Разрезной");
+    expect(splitRow.details).toContain("Разрезной");
     expect(continuousRow).toMatchObject({
       label: "Прогоны (ЛСТК)",
       lengthPerPiece_m: "72.00 м",
     });
-    expect(continuousRow.note).toContain("Неразрезной");
+    expect(continuousRow.details).toContain("Неразрезной");
     expect(Number(splitRow.count)).toBeGreaterThan(Number(continuousRow.count));
     expect(split?.totalMass_kg).toBeCloseTo(continuous?.totalMass_kg ?? 0, 8);
     expect(calculateBuildingSummaryTotals(emptyResults(split))).toEqual({
