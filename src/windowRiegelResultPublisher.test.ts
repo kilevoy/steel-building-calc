@@ -32,7 +32,7 @@ describe("window riegel result publisher", () => {
     expect(buildWindowRiegelResultItem(result({
       lowerAndUpperProfiles: [{
         number: 1,
-        profile: "кв.120х4",
+        profile: "кв.120×4",
         steel: "С245",
         weightKg: null,
       }],
@@ -43,14 +43,14 @@ describe("window riegel result publisher", () => {
     const item = buildWindowRiegelResultItem(result({
       lowerAndUpperProfiles: [{
         number: 1,
-        profile: "кв.120х4",
+        profile: "кв.120×4",
         steel: "С245",
         weightKg: 87.0017,
       }],
     }));
 
     expect(item).toEqual({
-      profile: "кв.120х4",
+      profile: "кв.120×4",
       steel: "С245",
       massPerPiece_kg: 87.0017,
       count: 1,
@@ -60,11 +60,38 @@ describe("window riegel result publisher", () => {
     });
   });
 
+  it("publishes manually assigned building count with total mass and cost", () => {
+    const item = buildWindowRiegelResultItem(
+      result({
+        lowerAndUpperProfiles: [{
+          number: 1,
+          profile: "кв.120×4",
+          steel: "С245",
+          weightKg: 87.0017,
+        }],
+      }),
+      {
+        count: 12.9,
+        priceC245_rubKg: 130.2,
+      },
+    );
+
+    expect(item).toMatchObject({
+      profile: "кв.120×4",
+      steel: "С245",
+      massPerPiece_kg: 87.0017,
+      count: 12,
+      note: "количество задано расчетчиком",
+      totalMass_kg: 87.0017 * 12,
+      cost_rub: 87.0017 * 12 * 130.2,
+    });
+  });
+
   it("keeps missing steel visible as a placeholder", () => {
     const item = buildWindowRiegelResultItem(result({
       lowerAndUpperProfiles: [{
         number: 1,
-        profile: "кв.120х4",
+        profile: "кв.120×4",
         steel: null,
         weightKg: 87.0017,
       }],

@@ -74,16 +74,26 @@ export function WindowRiegelApp() {
     }
   }, [inputs]);
 
-  // Publish window-riegel top-1 selection (per-piece) to shared results bus.
+  // Publish selected riegel to the shared results bus; count is a summary-level input.
   const { setResult } = useBuildingResults();
   useEffect(() => {
-    const item = buildWindowRiegelResultItem(result);
+    const item = buildWindowRiegelResultItem(result, {
+      count: building.windowRiegelCount,
+      priceC245_rubKg: building.priceC245_rubKg,
+      priceC345_rubKg: building.priceC345_rubKg,
+    });
     if (!item) {
       setResult("windowRiegel", null);
       return;
     }
     setResult("windowRiegel", item);
-  }, [result, setResult]);
+  }, [
+    building.priceC245_rubKg,
+    building.priceC345_rubKg,
+    building.windowRiegelCount,
+    result,
+    setResult,
+  ]);
 
   const upd = <K extends keyof WindowRiegelInputs>(k: K, v: WindowRiegelInputs[K]) =>
     setInputs((cur) => ({ ...cur, [k]: v }));
@@ -135,6 +145,17 @@ export function WindowRiegelApp() {
           <SyncedNumField label="Высота здания, м" value={inputs.buildingHeightM} step={0.5} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
           <SyncedNumField label="Пролёт здания, м" value={inputs.buildingSpanM} step={1} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
           <SyncedNumField label="Длина здания, м" value={inputs.buildingLengthM} step={1} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
+          <SyncedNumField
+            label="Кол-во ригелей для сводки, шт."
+            value={building.windowRiegelCount}
+            step={1}
+            onChange={(v) => updSynced("windowRiegelCount", Math.max(1, Math.floor(v)))}
+            validationKind="positive"
+            hint="Количество задаётся расчетчиком по фасадам; расчёт ниже подбирает один типовой ригель."
+          />
+          <div style={{ color: "#64748b", fontSize: 11, marginTop: -2 }}>
+            Количество нужно задать по фасадам вручную до появления отдельной модели окон.
+          </div>
         </fieldset>
 
         {/* Column 2: Wind & loads */}

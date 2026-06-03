@@ -29,6 +29,7 @@ export interface Building {
   priceMP390_rubKg: number;
   purlinSelectionMode: PurlinSelectionMode;
   purlinContinuityScheme: PurlinContinuityScheme;
+  windowRiegelCount: number;
 }
 
 export interface BuildingContextValue {
@@ -59,6 +60,7 @@ export const DEFAULT_BUILDING: Building = {
   priceMP390_rubKg: 180,
   purlinSelectionMode: "auto",
   purlinContinuityScheme: "split",
+  windowRiegelCount: 1,
 };
 
 export const BuildingContext = createContext<BuildingContextValue | null>(null);
