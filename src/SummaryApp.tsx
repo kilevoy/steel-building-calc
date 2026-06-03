@@ -6,6 +6,7 @@ import {
 import { useBuilding } from "./building/useBuilding";
 import { useBuildingResults } from "./building/useBuildingResults";
 import { useCraneBeamRunner } from "./building/useCraneBeamRunner";
+import type { BuildingResults } from "./building/resultsContext";
 import {
   buildSummaryRows,
   formatSummaryCost,
@@ -66,6 +67,7 @@ export function SummaryApp() {
         <BuildingBlock />
         <PurlinSelectionWarning warning={purlinWarning} />
         <BuildingCountDiagnostics />
+        <ColumnCountSummaryBlock results={summaryResults} />
         <CraneBeamTrigger />
       </div>
     );
@@ -82,6 +84,7 @@ export function SummaryApp() {
       <BuildingBlock />
       <PurlinSelectionWarning warning={purlinWarning} />
       <BuildingCountDiagnostics />
+      <ColumnCountSummaryBlock results={summaryResults} />
       <CraneBeamTrigger />
       <IncompleteQuantityWarning
         hasWindowRiegel={!!summaryResults.windowRiegel}
@@ -390,6 +393,74 @@ function BuildingCountDiagnostics() {
         <div>Фахверковых стоек по торцам всего: <b>{fachwerkColumnCount ?? "—"}</b></div>
         <div>Всего колонн здания: <b>{totalAcceptedColumnCount ?? "—"}</b></div>
       </div>
+    </fieldset>
+  );
+}
+
+function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
+  const { building } = useBuilding();
+  const layout = deriveUnifiedBuildingLayoutFromBuilding(building);
+  const columnResults = results.column;
+  const edgeCount = columnResults?.edge?.count ?? 0;
+  const middleCount = columnResults?.middle?.count ?? 0;
+  const publishedMainCount = edgeCount + middleCount;
+  const fachwerkCount = columnResults?.fachwerk?.count ?? null;
+  const acceptedTotal =
+    fachwerkCount === null ? null : layout.columns.mainTotal + fachwerkCount;
+  const hasPublishedColumns = columnResults !== null;
+  const mainCountMismatch =
+    hasPublishedColumns && publishedMainCount !== layout.columns.mainTotal;
+
+  return (
+    <fieldset
+      style={{
+        border: "1px solid #cbd5e1",
+        padding: 12,
+        borderRadius: 6,
+        marginBottom: 24,
+        background: "#f8fafc",
+      }}
+    >
+      <legend style={{ fontWeight: 600 }}>Колонны — итог по количеству</legend>
+      {!hasPublishedColumns && (
+        <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>
+          Итог по колоннам появится после расчёта вкладки «Колонна».
+        </div>
+      )}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, minmax(150px, 1fr))",
+          gap: 8,
+          fontSize: 13,
+        }}
+      >
+        <div>Основных колонн по ГИП: <b>{layout.columns.mainTotal}</b></div>
+        <div>Опубликовано подбором: <b>{hasPublishedColumns ? publishedMainCount : "—"}</b></div>
+        <div>Фахверковых стоек: <b>{fachwerkCount ?? "—"}</b></div>
+        <div>Всего колонн здания: <b>{acceptedTotal ?? "—"}</b></div>
+        <div>Крайних в подборе: <b>{hasPublishedColumns ? edgeCount : "—"}</b></div>
+        <div>Средних в подборе: <b>{hasPublishedColumns ? middleCount : "—"}</b></div>
+        <div>Режим: <b>{building.hasCrane ? "с краном" : "без крана"}</b></div>
+        <div>Торцевых осей: <b>{layout.frames.endFrameAxes}</b></div>
+      </div>
+      {mainCountMismatch && (
+        <div
+          style={{
+            marginTop: 10,
+            border: "1px solid #f59e0b",
+            background: "#fffbeb",
+            color: "#92400e",
+            borderRadius: 6,
+            padding: "8px 10px",
+            fontSize: 12,
+          }}
+        >
+          Внимание: количество основных колонн по ГИП отличается от количества,
+          опубликованного текущим подбором колонн. Это нужно сверить перед
+          использованием итоговой ведомости.
+        </div>
+      )}
     </fieldset>
   );
 }
