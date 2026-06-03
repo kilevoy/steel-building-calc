@@ -10,6 +10,11 @@ import type {
 import { getRy, steelsForCategory, pricePerKg } from "./steel";
 import { calcWind } from "./wind";
 import profilesJson from "../data/profiles/profiles.json";
+import {
+  COLUMN_STRUT_ALLOWANCE,
+  COLUMN_STRUT_MASS_KG_PER_M,
+  COLUMN_STRUT_STEEL,
+} from "../columnTab/columnStruts";
 
 const PROFILES = profilesJson as ProfileData[];
 const E_MPA = 206000;
@@ -188,10 +193,14 @@ function checkProfile(
 
   const strutStep =
     input.columnType === "fachwerk" ? input.fachverkPitch_m : input.framePitch_m;
-  const strutMass = struts * 9.6 * strutStep * 1.15;
-  const columnMass = profile.mass_kg_per_m * H * 1.15;
+  const strutMass =
+    struts * COLUMN_STRUT_MASS_KG_PER_M * strutStep * COLUMN_STRUT_ALLOWANCE;
+  const columnMass = profile.mass_kg_per_m * H * COLUMN_STRUT_ALLOWANCE;
   const totalMass = columnMass + strutMass;
-  const cost = (totalMass * pricePerKg(steel, input.prices)) / 1000;
+  const cost =
+    (columnMass * pricePerKg(steel, input.prices) +
+      strutMass * pricePerKg(COLUMN_STRUT_STEEL, input.prices)) /
+    1000;
 
   return {
     rank: 0,

@@ -8,8 +8,12 @@ import {
 } from "../building/layout";
 import type { ColumnResultByType, ResultItem } from "../building/resultsContext";
 import type { CalculationInput, CalculationOutput, ColumnType } from "../calc/types";
-
-const STRUT_MASS_KG_PER_M = 9.6;
+import {
+  COLUMN_STRUT_ALLOWANCE,
+  COLUMN_STRUT_MASS_KG_PER_M,
+  COLUMN_STRUT_PROFILE,
+  COLUMN_STRUT_STEEL,
+} from "./columnStruts";
 
 type ResultsByColumnType = Record<ColumnType, CalculationOutput>;
 
@@ -62,8 +66,10 @@ function buildColumnLengthBreakdown(
   );
 
   return groups.map((group) => {
+    const strutMass_kg = strutMassPerPiece_kg * group.count;
+    const columnMass_kg = result.mass_per_m * group.totalLength_m;
     const totalMass_kg =
-      result.mass_per_m * group.totalLength_m + strutMassPerPiece_kg * group.count;
+      columnMass_kg + strutMass_kg;
 
     return {
       profile: result.profileName,
@@ -73,7 +79,10 @@ function buildColumnLengthBreakdown(
       lengthPerPiece_m: group.length_m,
       totalLength_m: group.totalLength_m,
       totalMass_kg,
-      cost_rub: totalMass_kg * input.prices[result.steel],
+      cost_rub:
+        columnMass_kg * input.prices[result.steel] +
+        strutMass_kg * input.prices[COLUMN_STRUT_STEEL],
+      note: `распорки ${COLUMN_STRUT_PROFILE}, ${COLUMN_STRUT_STEEL}`,
     };
   });
 }
@@ -93,9 +102,10 @@ export function buildColumnResultPayload(
 
     const strutStep = columnType === "fachwerk" ? input.fachverkPitch_m : input.framePitch_m;
     const strutMassPerPiece_kg =
-      result.strutCount * STRUT_MASS_KG_PER_M * strutStep * 1.15;
-    const totalMass_kg =
-      result.mass_per_m * group.totalHeight_m + strutMassPerPiece_kg * group.count;
+      result.strutCount * COLUMN_STRUT_MASS_KG_PER_M * strutStep * COLUMN_STRUT_ALLOWANCE;
+    const strutMass_kg = strutMassPerPiece_kg * group.count;
+    const columnMass_kg = result.mass_per_m * group.totalHeight_m;
+    const totalMass_kg = columnMass_kg + strutMass_kg;
 
     const item: ResultItem = {
       profile: result.profileName,
@@ -105,7 +115,10 @@ export function buildColumnResultPayload(
       lengthPerPiece_m: group.totalHeight_m / group.count,
       totalLength_m: group.totalHeight_m,
       totalMass_kg,
-      cost_rub: totalMass_kg * input.prices[result.steel],
+      cost_rub:
+        columnMass_kg * input.prices[result.steel] +
+        strutMass_kg * input.prices[COLUMN_STRUT_STEEL],
+      note: `распорки ${COLUMN_STRUT_PROFILE}, ${COLUMN_STRUT_STEEL}`,
     };
 
     item.breakdown = buildColumnLengthBreakdown(input, columnType, result, strutMassPerPiece_kg);

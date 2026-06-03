@@ -73,7 +73,10 @@ describe("column result publisher", () => {
       totalLength_m: 40,
     });
     expect(payload.edge?.totalMass_kg).toBeCloseTo(40 * 40 + 2 * 9.6 * 6 * 1.15 * 4, 10);
-    expect(payload.edge?.cost_rub).toBeCloseTo(payload.edge!.totalMass_kg * 100, 10);
+    expect(payload.edge?.cost_rub).toBeCloseTo(
+      40 * 40 * 100 + 2 * 9.6 * 6 * 1.15 * 4 * input.prices["С255Б"],
+      10,
+    );
 
     expect(payload.fachwerk?.count).toBe(10);
     expect(payload.fachwerk?.lengthPerPiece_m).toBeCloseTo(10, 10);
