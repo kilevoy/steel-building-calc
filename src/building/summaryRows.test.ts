@@ -89,7 +89,7 @@ describe("summary rows", () => {
         totalLength_m: "—",
         unitMass_kg: "35.0 кг",
         totalMass_kg: 70,
-        note: "12.3 кг/м²",
+        note: "внутренние рамы, 12.3 кг/м²",
       },
       { label: "Прогоны (ЛСТК)", steel: "MP350", totalMass_kg: 300 },
       { label: "Подкрановая балка", steel: "C345", totalMass_kg: 60 },

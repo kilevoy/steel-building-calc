@@ -82,7 +82,7 @@ export function buildSummaryRows(results: BuildingResults): SummaryRow[] {
       unitMass_kg: formatSummaryMass(results.truss.totalMass_kg / results.truss.n_trusses),
       totalMass_kg: results.truss.totalMass_kg,
       cost_rub: results.truss.totalCost_rub,
-      note: `${results.truss.unitMass_kg_per_m2.toFixed(1)} кг/м²`,
+      note: `внутренние рамы, ${results.truss.unitMass_kg_per_m2.toFixed(1)} кг/м²`,
     });
   }
 
