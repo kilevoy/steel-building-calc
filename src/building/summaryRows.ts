@@ -29,15 +29,16 @@ export function formatSummaryCost(v: number): string {
 function rowFromItem(label: string, item: ResultItem | null, note?: string): SummaryRow | null {
   if (!item) return null;
   const count = item.count ?? 1;
+  const hasExplicitCount = item.count != null;
   const unit = item.massPerPiece_kg ?? item.totalMass_kg / Math.max(1, count);
   return {
     label,
     profile: item.profile,
     steel: item.steel,
-    count: count > 1 ? `${count}` : "—",
+    count: hasExplicitCount ? `${count}` : "—",
     lengthPerPiece_m: item.lengthPerPiece_m ? `${item.lengthPerPiece_m.toFixed(2)} м` : "—",
     totalLength_m: item.totalLength_m ? `${item.totalLength_m.toFixed(2)} м` : "—",
-    unitMass_kg: count > 1 ? formatSummaryMass(unit) : "—",
+    unitMass_kg: hasExplicitCount ? formatSummaryMass(unit) : "—",
     totalMass_kg: item.totalMass_kg,
     cost_rub: item.cost_rub,
     note: note ?? item.note,

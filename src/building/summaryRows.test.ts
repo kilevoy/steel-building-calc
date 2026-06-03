@@ -119,6 +119,26 @@ describe("summary rows", () => {
     });
   });
 
+  it("shows explicit single-piece counts instead of hiding them", () => {
+    const results: BuildingResults = {
+      ...emptyResults,
+      craneBeam: {
+        profile: "30К1",
+        steel: "С345",
+        count: 1,
+        massPerPiece_kg: 522.00147,
+        totalMass_kg: 522.00147,
+        cost_rub: 0,
+      },
+    };
+
+    expect(buildSummaryRows(results)[0]).toMatchObject({
+      label: "Подкрановая балка",
+      count: "1",
+      unitMass_kg: "522.0 кг",
+    });
+  });
+
   it("shows truss length fields when published by the truss module", () => {
     const results: BuildingResults = {
       ...emptyResults,
