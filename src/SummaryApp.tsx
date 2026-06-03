@@ -67,8 +67,8 @@ export function SummaryApp() {
         </p>
         <BuildingBlock />
         <PurlinSelectionWarning warning={purlinWarning} />
-        <BuildingCountDiagnostics />
         <ColumnCountSummaryBlock results={summaryResults} />
+        <BuildingCountDiagnostics />
         <CraneBeamTrigger />
       </div>
     );
@@ -84,8 +84,8 @@ export function SummaryApp() {
 
       <BuildingBlock />
       <PurlinSelectionWarning warning={purlinWarning} />
-      <BuildingCountDiagnostics />
       <ColumnCountSummaryBlock results={summaryResults} />
+      <BuildingCountDiagnostics />
       <CraneBeamTrigger />
       <IncompleteQuantityWarning
         hasWindowRiegel={!!summaryResults.windowRiegel}
