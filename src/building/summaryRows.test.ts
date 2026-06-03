@@ -119,6 +119,30 @@ describe("summary rows", () => {
     });
   });
 
+  it("passes accounting details into a dedicated summary field", () => {
+    const results: BuildingResults = {
+      ...emptyResults,
+      column: {
+        edge: {
+          profile: "35 Б1",
+          steel: "С355Б",
+          count: 4,
+          massPerPiece_kg: 100,
+          totalMass_kg: 400,
+          cost_rub: 40_000,
+          details: "распорок на колонну: 2",
+        },
+        middle: null,
+        fachwerk: null,
+      },
+    };
+
+    expect(buildSummaryRows(results)[0]).toMatchObject({
+      label: "Колонна крайняя",
+      details: "распорок на колонну: 2",
+    });
+  });
+
   it("shows explicit single-piece counts instead of hiding them", () => {
     const results: BuildingResults = {
       ...emptyResults,

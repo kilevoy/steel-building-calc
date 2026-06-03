@@ -11,6 +11,7 @@ export interface SummaryRow {
   totalMass_kg: number;
   cost_rub: number;
   note?: string;
+  details?: string;
 }
 
 export function formatSummaryMass(v: number): string {
@@ -42,6 +43,7 @@ function rowFromItem(label: string, item: ResultItem | null, note?: string): Sum
     totalMass_kg: item.totalMass_kg,
     cost_rub: item.cost_rub,
     note: note ?? item.note,
+    details: item.details,
   };
 }
 

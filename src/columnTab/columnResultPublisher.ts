@@ -81,7 +81,7 @@ function buildColumnLengthBreakdown(
       cost_rub:
         columnMass_kg * input.prices[result.steel] +
         strutMass_kg * input.prices[COLUMN_STRUT_STEEL],
-      note: `распорок на колонну: ${result.strutCount}`,
+      details: `распорок на колонну: ${result.strutCount}`,
     };
   });
 }
@@ -117,7 +117,7 @@ export function buildColumnResultPayload(
       cost_rub:
         columnMass_kg * input.prices[result.steel] +
         strutMass_kg * input.prices[COLUMN_STRUT_STEEL],
-      note: `распорок на колонну: ${result.strutCount}`,
+      details: `распорок на колонну: ${result.strutCount}`,
     };
 
     item.breakdown = buildColumnLengthBreakdown(input, columnType, result, strutMassPerPiece_kg);

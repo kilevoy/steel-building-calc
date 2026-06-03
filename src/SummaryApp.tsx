@@ -94,6 +94,7 @@ export function SummaryApp() {
             <tr>
               <th style={th}>Элемент</th>
               <th style={th}>Профиль</th>
+              <th style={th}>Доп.</th>
               <th style={th}>Сталь</th>
               <th style={{ ...th, textAlign: "right" }}>Шт.</th>
               <th style={{ ...th, textAlign: "right" }}>Длина 1 шт.</th>
@@ -115,6 +116,7 @@ export function SummaryApp() {
                     </span>
                   )}
                 </td>
+                <td style={td}>{r.details ?? "—"}</td>
                 <td style={td}>{r.steel}</td>
                 <td style={tdR}>{r.count}</td>
                 <td style={tdR}>{r.lengthPerPiece_m}</td>
@@ -127,7 +129,7 @@ export function SummaryApp() {
           </tbody>
           <tfoot>
             <tr style={{ background: "#f8fafc" }}>
-              <td style={{ ...td, fontWeight: 700 }} colSpan={7}>Итого по зданию</td>
+              <td style={{ ...td, fontWeight: 700 }} colSpan={8}>Итого по зданию</td>
               <td style={{ ...tdR, fontWeight: 700 }}>{formatSummaryMass(totals.totalMass_kg)}</td>
               <td style={{ ...tdR, fontWeight: 700 }}>{formatSummaryCost(totals.totalCost_rub)}</td>
             </tr>

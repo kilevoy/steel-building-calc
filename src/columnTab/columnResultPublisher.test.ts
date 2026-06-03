@@ -64,11 +64,11 @@ describe("column result publisher", () => {
     const payload = buildColumnResultPayload(input, results);
 
     expect(payload.edge?.count).toBe(4);
-    expect(payload.edge?.note).toBe("распорок на колонну: 2");
+    expect(payload.edge?.details).toBe("распорок на колонну: 2");
     expect(payload.edge?.lengthPerPiece_m).toBeCloseTo(10, 10);
     expect(payload.edge?.totalLength_m).toBeCloseTo(40, 10);
     expect(payload.edge?.breakdown).toHaveLength(1);
-    expect(payload.edge?.breakdown?.[0].note).toBe("распорок на колонну: 2");
+    expect(payload.edge?.breakdown?.[0].details).toBe("распорок на колонну: 2");
     expect(payload.edge?.breakdown?.[0]).toMatchObject({
       count: 4,
       lengthPerPiece_m: 10,
@@ -81,7 +81,7 @@ describe("column result publisher", () => {
     );
 
     expect(payload.fachwerk?.count).toBe(10);
-    expect(payload.fachwerk?.note).toBe("распорок на колонну: 1");
+    expect(payload.fachwerk?.details).toBe("распорок на колонну: 1");
     expect(payload.fachwerk?.lengthPerPiece_m).toBeCloseTo(10, 10);
     expect(payload.fachwerk?.totalLength_m).toBeCloseTo(100, 10);
     expect(payload.fachwerk?.breakdown).toHaveLength(1);
