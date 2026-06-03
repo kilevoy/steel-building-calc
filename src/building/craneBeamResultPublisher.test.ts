@@ -39,9 +39,27 @@ describe("crane beam result publisher", () => {
       steel: "С345",
       massPerPiece_kg: 522.00147,
       count: 1,
-      note: "единичная подобранная балка; количество крановых путей требуется задать отдельно",
+      note: "единичная подобранная балка",
       totalMass_kg: 522.00147,
       cost_rub: 0,
+    });
+  });
+
+  it("publishes a two-line crane runway set for the building summary", () => {
+    expect(buildCraneBeamResultItem(result(), {
+      buildingLength_m: 72,
+      beamSpan_m: 6,
+      priceC345_rubKg: 141,
+    })).toMatchObject({
+      profile: "30К1",
+      steel: "С345",
+      massPerPiece_kg: 522.00147,
+      count: 24,
+      lengthPerPiece_m: 6,
+      totalLength_m: 144,
+      note: "2 нитки подкранового пути",
+      totalMass_kg: 522.00147 * 24,
+      cost_rub: 522.00147 * 24 * 141,
     });
   });
 });

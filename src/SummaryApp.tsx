@@ -85,7 +85,6 @@ export function SummaryApp() {
       <CraneBeamTrigger />
       <IncompleteQuantityWarning
         hasWindowRiegel={!!summaryResults.windowRiegel}
-        hasCraneBeam={!!summaryResults.craneBeam}
       />
 
       <h3 style={{ marginBottom: 6 }}>Подобранные элементы</h3>
@@ -194,8 +193,8 @@ export function SummaryApp() {
       <details style={{ marginTop: 16, fontSize: 12, color: "#475569" }}>
         <summary style={{ cursor: "pointer", fontWeight: 600 }}>Примечания к сводке</summary>
         <ul style={{ marginTop: 8 }}>
-          <li>Оконные ригели и подкрановая балка пока публикуются как единичные подобранные
-              элементы; итоговое количество и стоимость по зданию нужно задавать отдельной моделью компоновки.</li>
+          <li>Оконные ригели пока публикуются как единичный подобранный элемент;
+              итоговое количество и стоимость по зданию нужно задавать отдельной моделью компоновки.</li>
           <li>Количество элементов (фермы / колонны / балки покрытия) определяется
               автоматически из длины здания и шага рам.</li>
         </ul>
@@ -303,17 +302,10 @@ function PurlinSelectionWarning({ warning }: { warning: string | null }) {
 
 function IncompleteQuantityWarning({
   hasWindowRiegel,
-  hasCraneBeam,
 }: {
   hasWindowRiegel: boolean;
-  hasCraneBeam: boolean;
 }) {
-  if (!hasWindowRiegel && !hasCraneBeam) return null;
-
-  const items = [
-    hasWindowRiegel ? "оконные ригели" : null,
-    hasCraneBeam ? "подкрановая балка" : null,
-  ].filter(Boolean).join(", ");
+  if (!hasWindowRiegel) return null;
 
   return (
     <div
@@ -327,7 +319,7 @@ function IncompleteQuantityWarning({
         fontSize: 13,
       }}
     >
-      Внимание: {items} сейчас учтены в сводке как единичные подобранные элементы.
+      Внимание: оконные ригели сейчас учтены в сводке как единичный подобранный элемент.
       Итоговая масса и стоимость по зданию требуют отдельной модели количества.
     </div>
   );

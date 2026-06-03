@@ -31,13 +31,17 @@ export function CraneBeamRunnerProvider({ children }: { children: ReactNode }) {
   }, [building.hasCrane, publishResult]);
 
   useEffect(() => {
-    const item = buildCraneBeamResultItem(result);
+    const item = buildCraneBeamResultItem(result, {
+      buildingLength_m: building.length_m,
+      beamSpan_m: inputs.beamSpan,
+      priceC345_rubKg: building.priceC345_rubKg,
+    });
     if (!item) {
       publishResult("craneBeam", null);
       return;
     }
     publishResult("craneBeam", item);
-  }, [result, publishResult]);
+  }, [result, building.length_m, building.priceC345_rubKg, inputs.beamSpan, publishResult]);
 
   const upd = useCallback(
     <K extends keyof typeof defaultCraneInputs>(k: K, v: (typeof defaultCraneInputs)[K]) =>
