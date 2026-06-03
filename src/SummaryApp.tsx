@@ -334,7 +334,7 @@ function BuildingCountDiagnostics() {
     fachwerkColumnCount === undefined ? null : layout.columns.mainTotal + fachwerkColumnCount;
 
   return (
-    <fieldset
+    <details
       style={{
         border: "1px solid #f59e0b",
         padding: 12,
@@ -343,7 +343,9 @@ function BuildingCountDiagnostics() {
         background: "#fffbeb",
       }}
     >
-      <legend style={{ fontWeight: 600 }}>Предварительный подсчёт здания</legend>
+      <summary style={{ cursor: "pointer", fontWeight: 600 }}>
+        Подробная диагностика подсчёта колонн
+      </summary>
       <div style={{ color: "#92400e", fontSize: 12, marginBottom: 10 }}>
         Диагностика для обсуждения с ГИПом. Значения не используются в расчёте массы и
         стоимости до подтверждения модели торцевых колонн.
@@ -394,7 +396,7 @@ function BuildingCountDiagnostics() {
         <div>Фахверковых стоек по торцам всего: <b>{fachwerkColumnCount ?? "—"}</b></div>
         <div>Всего колонн здания: <b>{totalAcceptedColumnCount ?? "—"}</b></div>
       </div>
-    </fieldset>
+    </details>
   );
 }
 
