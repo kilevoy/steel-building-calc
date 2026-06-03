@@ -83,6 +83,10 @@ export function SummaryApp() {
       <PurlinSelectionWarning warning={purlinWarning} />
       <BuildingCountDiagnostics />
       <CraneBeamTrigger />
+      <IncompleteQuantityWarning
+        hasWindowRiegel={!!summaryResults.windowRiegel}
+        hasCraneBeam={!!summaryResults.craneBeam}
+      />
 
       <h3 style={{ marginBottom: 6 }}>Подобранные элементы</h3>
       <div style={{ overflow: "auto", marginBottom: 24 }}>
@@ -293,6 +297,38 @@ function PurlinSelectionWarning({ warning }: { warning: string | null }) {
       }}
     >
       {warning}
+    </div>
+  );
+}
+
+function IncompleteQuantityWarning({
+  hasWindowRiegel,
+  hasCraneBeam,
+}: {
+  hasWindowRiegel: boolean;
+  hasCraneBeam: boolean;
+}) {
+  if (!hasWindowRiegel && !hasCraneBeam) return null;
+
+  const items = [
+    hasWindowRiegel ? "оконные ригели" : null,
+    hasCraneBeam ? "подкрановая балка" : null,
+  ].filter(Boolean).join(", ");
+
+  return (
+    <div
+      style={{
+        border: "1px solid #f59e0b",
+        background: "#fffbeb",
+        color: "#92400e",
+        borderRadius: 6,
+        padding: "8px 10px",
+        marginBottom: 16,
+        fontSize: 13,
+      }}
+    >
+      Внимание: {items} сейчас учтены в сводке как единичные подобранные элементы.
+      Итоговая масса и стоимость по зданию требуют отдельной модели количества.
     </div>
   );
 }
