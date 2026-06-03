@@ -17,6 +17,7 @@ import {
   calculateBuildingSummaryTotalsBySteel,
 } from "./building/summaryTotals";
 import { applyAutoPurlinResult } from "./building/autoPurlinResult";
+import { buildColumnCountSummary } from "./building/columnCountSummary";
 import {
   getAvailablePurlinSelectionModes,
   getPurlinSelectionWarning,
@@ -399,17 +400,7 @@ function BuildingCountDiagnostics() {
 
 function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
   const { building } = useBuilding();
-  const layout = deriveUnifiedBuildingLayoutFromBuilding(building);
-  const columnResults = results.column;
-  const edgeCount = columnResults?.edge?.count ?? 0;
-  const middleCount = columnResults?.middle?.count ?? 0;
-  const publishedMainCount = edgeCount + middleCount;
-  const fachwerkCount = columnResults?.fachwerk?.count ?? null;
-  const acceptedTotal =
-    fachwerkCount === null ? null : layout.columns.mainTotal + fachwerkCount;
-  const hasPublishedColumns = columnResults !== null;
-  const mainCountMismatch =
-    hasPublishedColumns && publishedMainCount !== layout.columns.mainTotal;
+  const summary = buildColumnCountSummary(building, results);
 
   return (
     <fieldset
@@ -422,7 +413,7 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
       }}
     >
       <legend style={{ fontWeight: 600 }}>Колонны — итог по количеству</legend>
-      {!hasPublishedColumns && (
+      {!summary.hasPublishedColumns && (
         <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>
           Итог по колоннам появится после расчёта вкладки «Колонна».
         </div>
@@ -435,16 +426,16 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
           fontSize: 13,
         }}
       >
-        <div>Основных колонн по ГИП: <b>{layout.columns.mainTotal}</b></div>
-        <div>Опубликовано подбором: <b>{hasPublishedColumns ? publishedMainCount : "—"}</b></div>
-        <div>Фахверковых стоек: <b>{fachwerkCount ?? "—"}</b></div>
-        <div>Всего колонн здания: <b>{acceptedTotal ?? "—"}</b></div>
-        <div>Крайних в подборе: <b>{hasPublishedColumns ? edgeCount : "—"}</b></div>
-        <div>Средних в подборе: <b>{hasPublishedColumns ? middleCount : "—"}</b></div>
-        <div>Режим: <b>{building.hasCrane ? "с краном" : "без крана"}</b></div>
-        <div>Торцевых осей: <b>{layout.frames.endFrameAxes}</b></div>
+        <div>Основных колонн по ГИП: <b>{summary.mainByGip}</b></div>
+        <div>Опубликовано подбором: <b>{summary.publishedMain ?? "—"}</b></div>
+        <div>Фахверковых стоек: <b>{summary.fachwerkPublished ?? "—"}</b></div>
+        <div>Всего колонн здания: <b>{summary.totalAccepted ?? "—"}</b></div>
+        <div>Крайних в подборе: <b>{summary.edgePublished ?? "—"}</b></div>
+        <div>Средних в подборе: <b>{summary.middlePublished ?? "—"}</b></div>
+        <div>Режим: <b>{summary.hasCrane ? "с краном" : "без крана"}</b></div>
+        <div>Торцевых осей: <b>{summary.endFrameAxes}</b></div>
       </div>
-      {mainCountMismatch && (
+      {summary.mainCountMismatch && (
         <div
           style={{
             marginTop: 10,
