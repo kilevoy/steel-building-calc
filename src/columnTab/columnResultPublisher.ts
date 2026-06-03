@@ -11,7 +11,6 @@ import type { CalculationInput, CalculationOutput, ColumnType } from "../calc/ty
 import {
   COLUMN_STRUT_ALLOWANCE,
   COLUMN_STRUT_MASS_KG_PER_M,
-  COLUMN_STRUT_PROFILE,
   COLUMN_STRUT_STEEL,
 } from "./columnStruts";
 
@@ -82,7 +81,7 @@ function buildColumnLengthBreakdown(
       cost_rub:
         columnMass_kg * input.prices[result.steel] +
         strutMass_kg * input.prices[COLUMN_STRUT_STEEL],
-      note: `распорки ${COLUMN_STRUT_PROFILE}, ${COLUMN_STRUT_STEEL}`,
+      note: `распорок на колонну: ${result.strutCount}`,
     };
   });
 }
@@ -118,7 +117,7 @@ export function buildColumnResultPayload(
       cost_rub:
         columnMass_kg * input.prices[result.steel] +
         strutMass_kg * input.prices[COLUMN_STRUT_STEEL],
-      note: `распорки ${COLUMN_STRUT_PROFILE}, ${COLUMN_STRUT_STEEL}`,
+      note: `распорок на колонну: ${result.strutCount}`,
     };
 
     item.breakdown = buildColumnLengthBreakdown(input, columnType, result, strutMassPerPiece_kg);
