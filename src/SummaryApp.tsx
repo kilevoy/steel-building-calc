@@ -94,7 +94,7 @@ export function SummaryApp() {
             <tr>
               <th style={th}>Элемент</th>
               <th style={th}>Профиль</th>
-              <th style={th}>Доп.</th>
+              <th style={th}>Детали</th>
               <th style={th}>Сталь</th>
               <th style={{ ...th, textAlign: "right" }}>Шт.</th>
               <th style={{ ...th, textAlign: "right" }}>Длина 1 шт.</th>
