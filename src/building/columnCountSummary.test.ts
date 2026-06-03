@@ -32,6 +32,7 @@ describe("column count summary", () => {
       publishedMain: null,
       fachwerkPublished: null,
       totalAccepted: null,
+      totalFormulaText: null,
       mainCountMismatch: false,
     });
   });
@@ -52,6 +53,7 @@ describe("column count summary", () => {
       publishedMain: 22,
       fachwerkPublished: 10,
       totalAccepted: 32,
+      totalFormulaText: "32 = 22 основных + 10 фахверковых",
       mainCountMismatch: false,
     });
   });
@@ -74,6 +76,7 @@ describe("column count summary", () => {
       mainByGip: 26,
       publishedMain: 22,
       totalAccepted: 36,
+      totalFormulaText: "36 = 26 основных + 10 фахверковых",
       mainCountMismatch: true,
     });
   });

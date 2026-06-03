@@ -10,6 +10,7 @@ export interface ColumnCountSummary {
   middlePublished: number | null;
   fachwerkPublished: number | null;
   totalAccepted: number | null;
+  totalFormulaText: string | null;
   endFrameAxes: number;
   hasCrane: boolean;
   mainCountMismatch: boolean;
@@ -29,6 +30,10 @@ export function buildColumnCountSummary(
     hasPublishedColumns ? (edgePublished ?? 0) + (middlePublished ?? 0) : null;
   const totalAccepted =
     fachwerkPublished === null ? null : layout.columns.mainTotal + fachwerkPublished;
+  const totalFormulaText =
+    totalAccepted === null
+      ? null
+      : `${totalAccepted} = ${layout.columns.mainTotal} основных + ${fachwerkPublished} фахверковых`;
 
   return {
     hasPublishedColumns,
@@ -38,6 +43,7 @@ export function buildColumnCountSummary(
     middlePublished,
     fachwerkPublished,
     totalAccepted,
+    totalFormulaText,
     endFrameAxes: layout.frames.endFrameAxes,
     hasCrane: building.hasCrane,
     mainCountMismatch:

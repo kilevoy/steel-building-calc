@@ -429,7 +429,7 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
         <div>Основных колонн по ГИП: <b>{summary.mainByGip}</b></div>
         <div>Опубликовано подбором: <b>{summary.publishedMain ?? "—"}</b></div>
         <div>Фахверковых стоек: <b>{summary.fachwerkPublished ?? "—"}</b></div>
-        <div>Всего колонн здания: <b>{summary.totalAccepted ?? "—"}</b></div>
+        <div>Всего колонн здания: <b>{summary.totalFormulaText ?? "—"}</b></div>
         <div>Крайних в подборе: <b>{summary.edgePublished ?? "—"}</b></div>
         <div>Средних в подборе: <b>{summary.middlePublished ?? "—"}</b></div>
         <div>Режим: <b>{summary.hasCrane ? "с краном" : "без крана"}</b></div>
