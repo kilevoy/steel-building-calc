@@ -39,6 +39,7 @@ describe("crane beam result publisher", () => {
       steel: "С345",
       massPerPiece_kg: 522.00147,
       count: 1,
+      note: "единичная подобранная балка; количество крановых путей требуется задать отдельно",
       totalMass_kg: 522.00147,
       cost_rub: 0,
     });

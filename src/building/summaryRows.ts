@@ -99,14 +99,12 @@ export function buildSummaryRows(results: BuildingResults): SummaryRow[] {
   const windowRiegel = rowFromItem(
     "Оконные ригели (★ top‑1)",
     results.windowRiegel,
-    "Масса 1 ригеля; кол-во не учитывается",
   );
   if (windowRiegel) rows.push(windowRiegel);
 
   const craneBeam = rowFromItem(
     "Подкрановая балка",
     results.craneBeam,
-    "Масса 1 балки; кол-во не учитывается",
   );
   if (craneBeam) rows.push(craneBeam);
 

@@ -14,6 +14,7 @@ export function buildWindowRiegelResultItem(
     steel: top.steel ? String(top.steel) : "—",
     massPerPiece_kg: top.weightKg,
     count: 1,
+    note: "единичный подобранный ригель; количество по фасадам требуется задать отдельно",
     totalMass_kg: top.weightKg,
     cost_rub: 0,
   };

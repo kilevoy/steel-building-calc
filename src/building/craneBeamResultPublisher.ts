@@ -13,6 +13,7 @@ export function buildCraneBeamResultItem(
     steel: "С345",
     massPerPiece_kg: result.weightKg,
     count: 1,
+    note: "единичная подобранная балка; количество крановых путей требуется задать отдельно",
     totalMass_kg: result.weightKg,
     cost_rub: 0,
   };

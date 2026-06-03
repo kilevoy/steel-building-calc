@@ -54,6 +54,7 @@ describe("window riegel result publisher", () => {
       steel: "С245",
       massPerPiece_kg: 87.0017,
       count: 1,
+      note: "единичный подобранный ригель; количество по фасадам требуется задать отдельно",
       totalMass_kg: 87.0017,
       cost_rub: 0,
     });
