@@ -31,7 +31,7 @@
 ## Стек
 
 - **Frontend:** Vite 8 + React 18 + TypeScript 5 (strict).
-- **Тесты:** Vitest 4 — 143 теста в 36 файлах, включая Excel/workbook acceptance-сценарии по основным расчётным модулям.
+- **Тесты:** Vitest 4 — 146 тестов в 37 файлах, включая Excel/workbook acceptance-сценарии по основным расчётным модулям.
 - **Линт:** ESLint 10 + typescript-eslint 8.
 - **CI:** GitHub Actions — typecheck → lint → test → build на каждый push и PR.
 - **Pre-commit / pre-push:** Husky + lint-staged. Pre-push прогоняет typecheck и тесты, не даёт уйти красному коду на сервер.
@@ -45,7 +45,7 @@ cd steel-building-calc
 npm ci          # ставит зависимости и активирует git-хуки
 npm run dev     # dev-сервер на localhost:5173
 npm run build   # production-сборка в dist/
-npm test        # 143 теста в 36 файлах
+npm test        # 146 тестов в 37 файлах
 ```
 
 > **Важно:** не размещай рабочий клон в синхронизирующихся облаках (Google Drive, Dropbox, OneDrive). Они засоряют `.git/` своими служебными файлами и ломают git. Источник синхронизации между машинами — сам GitHub.

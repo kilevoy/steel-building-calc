@@ -18,6 +18,7 @@ import {
 } from "./building/summaryTotals";
 import { applyAutoPurlinResult } from "./building/autoPurlinResult";
 import { buildColumnCountSummary } from "./building/columnCountSummary";
+import { buildPurlinBuildingSummary } from "./building/purlinSummary";
 import {
   getAvailablePurlinSelectionModes,
   getPurlinSelectionWarning,
@@ -68,6 +69,7 @@ export function SummaryApp() {
         <BuildingBlock />
         <PurlinSelectionWarning warning={purlinWarning} />
         <ColumnCountSummaryBlock results={summaryResults} />
+        <PurlinBuildingSummaryBlock results={summaryResults} />
         <BuildingCountDiagnostics />
         <CraneBeamTrigger />
       </div>
@@ -85,6 +87,7 @@ export function SummaryApp() {
       <BuildingBlock />
       <PurlinSelectionWarning warning={purlinWarning} />
       <ColumnCountSummaryBlock results={summaryResults} />
+      <PurlinBuildingSummaryBlock results={summaryResults} />
       <BuildingCountDiagnostics />
       <CraneBeamTrigger />
       <IncompleteQuantityWarning
@@ -454,6 +457,49 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
           использованием итоговой ведомости.
         </div>
       )}
+    </fieldset>
+  );
+}
+
+function PurlinBuildingSummaryBlock({ results }: { results: BuildingResults }) {
+  const { building } = useBuilding();
+  const summary = buildPurlinBuildingSummary(building, results.purlin);
+
+  return (
+    <fieldset
+      style={{
+        border: "1px solid #cbd5e1",
+        padding: 12,
+        borderRadius: 6,
+        marginBottom: 24,
+        background: "#f8fafc",
+      }}
+    >
+      <legend style={{ fontWeight: 600 }}>Прогоны — итог по количеству</legend>
+      {!summary.hasResult && (
+        <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>
+          Итог по прогонам появится после расчёта вкладки «Прогоны» или авто-подбора в сводке.
+        </div>
+      )}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, minmax(150px, 1fr))",
+          gap: 8,
+          fontSize: 13,
+        }}
+      >
+        <div>Принятый тип: <b>{summary.selectedType}</b></div>
+        <div>Схема: <b>{summary.scheme}</b></div>
+        <div>Параметр: <b>{summary.details ?? "—"}</b></div>
+        <div>Шт.: <b>{summary.count ?? "—"}</b></div>
+        <div>
+          Длина 1 шт.: <b>{summary.lengthPerPiece_m == null ? "—" : `${summary.lengthPerPiece_m.toFixed(2)} м`}</b>
+        </div>
+        <div>
+          Σ длина: <b>{summary.totalLength_m == null ? "—" : `${summary.totalLength_m.toFixed(2)} м`}</b>
+        </div>
+      </div>
     </fieldset>
   );
 }
