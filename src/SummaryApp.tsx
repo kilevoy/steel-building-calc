@@ -17,6 +17,7 @@ import {
   calculateBuildingSummaryTotalsBySteel,
 } from "./building/summaryTotals";
 import { applyAutoPurlinResult } from "./building/autoPurlinResult";
+import { buildBeamCellBuildingSummary } from "./building/beamCellBuildingSummary";
 import { buildColumnCountSummary } from "./building/columnCountSummary";
 import { buildPurlinBuildingSummary } from "./building/purlinSummary";
 import { buildTrussBuildingSummary } from "./building/trussBuildingSummary";
@@ -72,6 +73,7 @@ export function SummaryApp() {
         <ColumnCountSummaryBlock results={summaryResults} />
         <TrussBuildingSummaryBlock results={summaryResults} />
         <PurlinBuildingSummaryBlock results={summaryResults} />
+        <BeamCellBuildingSummaryBlock results={summaryResults} />
         <BuildingCountDiagnostics />
         <CraneBeamTrigger />
       </div>
@@ -91,6 +93,7 @@ export function SummaryApp() {
       <ColumnCountSummaryBlock results={summaryResults} />
       <TrussBuildingSummaryBlock results={summaryResults} />
       <PurlinBuildingSummaryBlock results={summaryResults} />
+      <BeamCellBuildingSummaryBlock results={summaryResults} />
       <BuildingCountDiagnostics />
       <CraneBeamTrigger />
       <IncompleteQuantityWarning
@@ -550,6 +553,52 @@ function PurlinBuildingSummaryBlock({ results }: { results: BuildingResults }) {
         </div>
         <div>
           Σ длина: <b>{summary.totalLength_m == null ? "—" : `${summary.totalLength_m.toFixed(2)} м`}</b>
+        </div>
+      </div>
+    </fieldset>
+  );
+}
+
+function BeamCellBuildingSummaryBlock({ results }: { results: BuildingResults }) {
+  const summary = buildBeamCellBuildingSummary(results.beamCell);
+
+  return (
+    <fieldset
+      style={{
+        border: "1px solid #cbd5e1",
+        padding: 12,
+        borderRadius: 6,
+        marginBottom: 24,
+        background: "#f8fafc",
+      }}
+    >
+      <legend style={{ fontWeight: 600 }}>Балка покрытия — итог по количеству</legend>
+      {!summary.hasResult && (
+        <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>
+          Итог по балке покрытия появится после расчёта вкладки «Балка покрытия».
+        </div>
+      )}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, minmax(150px, 1fr))",
+          gap: 8,
+          fontSize: 13,
+        }}
+      >
+        <div>Балки: <b>{summary.count ?? "—"}</b></div>
+        <div>Детали: <b>{summary.details ?? "—"}</b></div>
+        <div>
+          Длина 1 шт.: <b>{summary.lengthPerPiece_m == null ? "—" : `${summary.lengthPerPiece_m.toFixed(2)} м`}</b>
+        </div>
+        <div>
+          Σ длина: <b>{summary.totalLength_m == null ? "—" : `${summary.totalLength_m.toFixed(2)} м`}</b>
+        </div>
+        <div>
+          Масса 1 шт.: <b>{summary.massPerPiece_kg == null ? "—" : formatSummaryMass(summary.massPerPiece_kg)}</b>
+        </div>
+        <div>
+          Σ масса: <b>{summary.totalMass_kg == null ? "—" : formatSummaryMass(summary.totalMass_kg)}</b>
         </div>
       </div>
     </fieldset>
