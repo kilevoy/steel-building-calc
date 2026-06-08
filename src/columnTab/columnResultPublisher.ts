@@ -16,6 +16,10 @@ import {
 
 type ResultsByColumnType = Record<ColumnType, CalculationOutput>;
 
+function strutDetails(strutCount: number, columnCount: number): string {
+  return `распорок на колонну: ${strutCount}; всего распорок: ${strutCount * columnCount}`;
+}
+
 function columnPositions(input: CalculationInput, columnType: ColumnType): {
   positions: number[];
   quantityPerPosition: number;
@@ -81,7 +85,7 @@ function buildColumnLengthBreakdown(
       cost_rub:
         columnMass_kg * input.prices[result.steel] +
         strutMass_kg * input.prices[COLUMN_STRUT_STEEL],
-      details: `распорок на колонну: ${result.strutCount}`,
+      details: strutDetails(result.strutCount, group.count),
     };
   });
 }
@@ -117,7 +121,7 @@ export function buildColumnResultPayload(
       cost_rub:
         columnMass_kg * input.prices[result.steel] +
         strutMass_kg * input.prices[COLUMN_STRUT_STEEL],
-      details: `распорок на колонну: ${result.strutCount}`,
+      details: strutDetails(result.strutCount, group.count),
     };
 
     item.breakdown = buildColumnLengthBreakdown(input, columnType, result, strutMassPerPiece_kg);

@@ -130,7 +130,7 @@ describe("summary rows", () => {
           massPerPiece_kg: 100,
           totalMass_kg: 400,
           cost_rub: 40_000,
-          details: "распорок на колонну: 2",
+          details: "распорок на колонну: 2; всего распорок: 8",
         },
         middle: null,
         fachwerk: null,
@@ -139,7 +139,7 @@ describe("summary rows", () => {
 
     expect(buildSummaryRows(results)[0]).toMatchObject({
       label: "Колонна крайняя",
-      details: "распорок на колонну: 2",
+      details: "распорок на колонну: 2; всего распорок: 8",
     });
   });
 
