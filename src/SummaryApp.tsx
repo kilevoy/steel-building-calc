@@ -641,6 +641,12 @@ function WindowRiegelBuildingSummaryBlock({ results }: { results: BuildingResult
         <div>Ригели: <b>{summary.count ?? "—"}</b></div>
         <div>Детали: <b>{summary.details ?? "—"}</b></div>
         <div>
+          Длина 1 шт.: <b>{summary.lengthPerPiece_m == null ? "—" : `${summary.lengthPerPiece_m.toFixed(2)} м`}</b>
+        </div>
+        <div>
+          Σ длина: <b>{summary.totalLength_m == null ? "—" : `${summary.totalLength_m.toFixed(2)} м`}</b>
+        </div>
+        <div>
           Масса 1 шт.: <b>{summary.massPerPiece_kg == null ? "—" : formatSummaryMass(summary.massPerPiece_kg)}</b>
         </div>
         <div>

@@ -42,10 +42,12 @@ describe("window riegel summary contract", () => {
     expect(buildSummaryRows(results)[0]).toMatchObject({
       label: "Оконные ригели (★ top‑1)",
       count: "12",
+      lengthPerPiece_m: "6.00 м",
+      totalLength_m: "72.00 м",
       unitMass_kg: "87.0 кг",
       totalMass_kg: 87.0017 * 12,
       cost_rub: 87.0017 * 12 * 130.2,
-      details: "количество задано расчетчиком",
+      details: "количество задано расчетчиком; длина из плоскости 6.00 м; в плоскости 5.00 м",
     });
     expect(calculateBuildingSummaryTotals(results)).toEqual({
       totalMass_kg: 87.0017 * 12,

@@ -24,15 +24,28 @@ export function buildWindowRiegelResultItem(
     : steel.includes("345")
       ? (params?.priceC345_rubKg ?? 0)
       : 0;
+  const lengthPerPiece_m =
+    result.outOfPlaneLengthM != null && Number.isFinite(result.outOfPlaneLengthM)
+      ? result.outOfPlaneLengthM
+      : undefined;
+  const inPlaneLengthText =
+    result.inPlaneLengthM != null && Number.isFinite(result.inPlaneLengthM)
+      ? `; в плоскости ${result.inPlaneLengthM.toFixed(2)} м`
+      : "";
+  const lengthDetails = lengthPerPiece_m == null
+    ? ""
+    : `; длина из плоскости ${lengthPerPiece_m.toFixed(2)} м${inPlaneLengthText}`;
 
   return {
     profile: String(top.profile),
     steel,
     massPerPiece_kg: top.weightKg,
     count,
+    lengthPerPiece_m,
+    totalLength_m: lengthPerPiece_m == null ? undefined : lengthPerPiece_m * count,
     note: params
-      ? "количество задано расчетчиком"
-      : "единичный подобранный ригель; количество по фасадам требуется задать отдельно",
+      ? `количество задано расчетчиком${lengthDetails}`
+      : `единичный подобранный ригель; количество по фасадам требуется задать отдельно${lengthDetails}`,
     totalMass_kg: top.weightKg * count,
     cost_rub: top.weightKg * count * price,
   };

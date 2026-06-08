@@ -3,6 +3,8 @@ import type { ResultItem } from "./resultsContext";
 export interface WindowRiegelBuildingSummary {
   hasResult: boolean;
   count: number | null;
+  lengthPerPiece_m: number | null;
+  totalLength_m: number | null;
   massPerPiece_kg: number | null;
   totalMass_kg: number | null;
   details: string | null;
@@ -16,6 +18,8 @@ export function buildWindowRiegelBuildingSummary(
     return {
       hasResult: false,
       count: null,
+      lengthPerPiece_m: null,
+      totalLength_m: null,
       massPerPiece_kg: null,
       totalMass_kg: null,
       details: null,
@@ -26,6 +30,8 @@ export function buildWindowRiegelBuildingSummary(
   return {
     hasResult: true,
     count: windowRiegel.count ?? null,
+    lengthPerPiece_m: windowRiegel.lengthPerPiece_m ?? null,
+    totalLength_m: windowRiegel.totalLength_m ?? null,
     massPerPiece_kg: windowRiegel.massPerPiece_kg ?? null,
     totalMass_kg: windowRiegel.totalMass_kg,
     details: windowRiegel.details ?? windowRiegel.note ?? null,

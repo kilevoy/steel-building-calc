@@ -7,6 +7,8 @@ function windowRiegel(overrides: Partial<ResultItem> = {}): ResultItem {
     profile: "кв.120х4",
     steel: "С245",
     count: 12,
+    lengthPerPiece_m: 6,
+    totalLength_m: 72,
     massPerPiece_kg: 87.0017,
     totalMass_kg: 1_044.0204,
     cost_rub: 135_991.45608,
@@ -20,6 +22,8 @@ describe("window riegel building summary", () => {
     expect(buildWindowRiegelBuildingSummary(null)).toEqual({
       hasResult: false,
       count: null,
+      lengthPerPiece_m: null,
+      totalLength_m: null,
       massPerPiece_kg: null,
       totalMass_kg: null,
       details: null,
@@ -31,6 +35,8 @@ describe("window riegel building summary", () => {
     expect(buildWindowRiegelBuildingSummary(windowRiegel())).toEqual({
       hasResult: true,
       count: 12,
+      lengthPerPiece_m: 6,
+      totalLength_m: 72,
       massPerPiece_kg: 87.0017,
       totalMass_kg: 1_044.0204,
       details: "количество задано расчётчиком",

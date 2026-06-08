@@ -54,7 +54,9 @@ describe("window riegel result publisher", () => {
       steel: "С245",
       massPerPiece_kg: 87.0017,
       count: 1,
-      note: "единичный подобранный ригель; количество по фасадам требуется задать отдельно",
+      lengthPerPiece_m: 6,
+      totalLength_m: 6,
+      note: "единичный подобранный ригель; количество по фасадам требуется задать отдельно; длина из плоскости 6.00 м; в плоскости 5.00 м",
       totalMass_kg: 87.0017,
       cost_rub: 0,
     });
@@ -81,9 +83,34 @@ describe("window riegel result publisher", () => {
       steel: "С245",
       massPerPiece_kg: 87.0017,
       count: 12,
-      note: "количество задано расчетчиком",
+      lengthPerPiece_m: 6,
+      totalLength_m: 72,
+      note: "количество задано расчетчиком; длина из плоскости 6.00 м; в плоскости 5.00 м",
       totalMass_kg: 87.0017 * 12,
       cost_rub: 87.0017 * 12 * 130.2,
+    });
+  });
+
+  it("keeps length fields empty when workbook lengths are missing", () => {
+    const item = buildWindowRiegelResultItem(result({
+      outOfPlaneLengthM: null,
+      inPlaneLengthM: null,
+      lowerAndUpperProfiles: [{
+        number: 1,
+        profile: "кв.120×4",
+        steel: "С245",
+        weightKg: 87.0017,
+      }],
+    }), {
+      count: 3,
+      priceC245_rubKg: 130.2,
+    });
+
+    expect(item).toMatchObject({
+      count: 3,
+      lengthPerPiece_m: undefined,
+      totalLength_m: undefined,
+      note: "количество задано расчетчиком",
     });
   });
 
