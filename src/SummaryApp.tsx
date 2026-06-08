@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import {
   deriveUnifiedBuildingLayoutFromBuilding,
   deriveUnifiedBuildingLayoutInput,
@@ -57,6 +57,7 @@ export function SummaryApp() {
   const { handleCalc: handleCraneBeamCalc } = useCraneBeamRunner();
   const [autoCalculating, setAutoCalculating] = useState(false);
   const [autoCalculationErrors, setAutoCalculationErrors] = useState<string[]>([]);
+  const initialAutoCalculationStarted = useRef(false);
   const summaryResults = useMemo(
     () => applyAutoPurlinResult(results, building),
     [results, building],
@@ -75,7 +76,7 @@ export function SummaryApp() {
   );
   const hasMissingSummaryItems = hasMissingRequiredSummaryItems(readinessItems);
 
-  const calculateAllForSummary = async () => {
+  const calculateAllForSummary = useCallback(async () => {
     setAutoCalculating(true);
     try {
       const calculation = calculateBuildingResultsForSummary(building);
@@ -100,7 +101,15 @@ export function SummaryApp() {
     } finally {
       setAutoCalculating(false);
     }
-  };
+  }, [building, handleCraneBeamCalc, setResult]);
+
+  useEffect(() => {
+    if (!hasMissingSummaryItems || autoCalculating || initialAutoCalculationStarted.current) {
+      return;
+    }
+    initialAutoCalculationStarted.current = true;
+    void calculateAllForSummary();
+  }, [autoCalculating, calculateAllForSummary, hasMissingSummaryItems]);
 
   if (rows.length === 0) {
     return (
@@ -405,7 +414,7 @@ function AutoCalculateSummaryButton({
           {calculating ? "Расчёт..." : "Рассчитать всё для сводки"}
         </button>
         <span style={{ fontSize: 12, color: "#475569" }}>
-          Запускает основные модули по текущим общим параметрам здания без перехода по вкладкам.
+          При открытии сводки расчёт запускается автоматически. Кнопка нужна для ручного пересчёта после изменения параметров.
         </span>
       </div>
       {errors.length > 0 && (
