@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   deriveUnifiedBuildingLayoutFromBuilding,
   deriveUnifiedBuildingLayoutInput,
@@ -27,6 +27,7 @@ import {
   buildSummaryReadiness,
   hasMissingRequiredSummaryItems,
 } from "./building/summaryReadiness";
+import { calculateBuildingResultsForSummary } from "./building/calculateBuildingResultsForSummary";
 import {
   getAvailablePurlinSelectionModes,
   getPurlinSelectionWarning,
@@ -52,7 +53,10 @@ const tdR: React.CSSProperties = { ...td, textAlign: "right" };
 
 export function SummaryApp() {
   const { building } = useBuilding();
-  const { results } = useBuildingResults();
+  const { results, setResult } = useBuildingResults();
+  const { handleCalc: handleCraneBeamCalc } = useCraneBeamRunner();
+  const [autoCalculating, setAutoCalculating] = useState(false);
+  const [autoCalculationErrors, setAutoCalculationErrors] = useState<string[]>([]);
   const summaryResults = useMemo(
     () => applyAutoPurlinResult(results, building),
     [results, building],
@@ -71,6 +75,33 @@ export function SummaryApp() {
   );
   const hasMissingSummaryItems = hasMissingRequiredSummaryItems(readinessItems);
 
+  const calculateAllForSummary = async () => {
+    setAutoCalculating(true);
+    try {
+      const calculation = calculateBuildingResultsForSummary(building);
+      setResult("purlin", calculation.results.purlin);
+      setResult("beamCell", calculation.results.beamCell);
+      setResult("column", calculation.results.column);
+      setResult("truss", calculation.results.truss);
+      setResult("windowRiegel", calculation.results.windowRiegel);
+      if (!building.hasCrane) {
+        setResult("craneBeam", null);
+      }
+
+      const nextErrors = [...calculation.errors];
+      if (building.hasCrane) {
+        try {
+          await handleCraneBeamCalc();
+        } catch (error) {
+          nextErrors.push(`Подкрановая балка: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+      setAutoCalculationErrors(nextErrors);
+    } finally {
+      setAutoCalculating(false);
+    }
+  };
+
   if (rows.length === 0) {
     return (
       <div>
@@ -80,6 +111,11 @@ export function SummaryApp() {
           и результат сразу появится здесь.
         </p>
         <BuildingBlock />
+        <AutoCalculateSummaryButton
+          calculating={autoCalculating}
+          errors={autoCalculationErrors}
+          onCalculate={() => void calculateAllForSummary()}
+        />
         <SummaryReadinessBlock items={readinessItems} hasMissing={hasMissingSummaryItems} />
         <PurlinSelectionWarning warning={purlinWarning} />
         <ColumnCountSummaryBlock results={summaryResults} />
@@ -103,6 +139,11 @@ export function SummaryApp() {
       </p>
 
       <BuildingBlock />
+      <AutoCalculateSummaryButton
+        calculating={autoCalculating}
+        errors={autoCalculationErrors}
+        onCalculate={() => void calculateAllForSummary()}
+      />
       <SummaryReadinessBlock items={readinessItems} hasMissing={hasMissingSummaryItems} />
       <PurlinSelectionWarning warning={purlinWarning} />
       <ColumnCountSummaryBlock results={summaryResults} />
@@ -322,6 +363,72 @@ function PurlinSelectionWarning({ warning }: { warning: string | null }) {
     >
       {warning}
     </div>
+  );
+}
+
+function AutoCalculateSummaryButton({
+  calculating,
+  errors,
+  onCalculate,
+}: {
+  calculating: boolean;
+  errors: string[];
+  onCalculate: () => void;
+}) {
+  return (
+    <fieldset
+      style={{
+        border: "1px solid #cbd5e1",
+        padding: 12,
+        borderRadius: 6,
+        marginBottom: 24,
+        background: "#f0f9ff",
+      }}
+    >
+      <legend style={{ fontWeight: 600 }}>Автоматический расчёт сводки</legend>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <button
+          type="button"
+          onClick={onCalculate}
+          disabled={calculating}
+          style={{
+            padding: "8px 18px",
+            fontSize: 14,
+            fontWeight: 600,
+            background: calculating ? "#94a3b8" : "#0369a1",
+            color: "white",
+            border: "none",
+            borderRadius: 6,
+            cursor: calculating ? "wait" : "pointer",
+          }}
+        >
+          {calculating ? "Расчёт..." : "Рассчитать всё для сводки"}
+        </button>
+        <span style={{ fontSize: 12, color: "#475569" }}>
+          Запускает основные модули по текущим общим параметрам здания без перехода по вкладкам.
+        </span>
+      </div>
+      {errors.length > 0 && (
+        <div
+          style={{
+            marginTop: 10,
+            border: "1px solid #f59e0b",
+            background: "#fffbeb",
+            color: "#92400e",
+            borderRadius: 6,
+            padding: "8px 10px",
+            fontSize: 12,
+          }}
+        >
+          <b>Часть расчётов не опубликована:</b>
+          <ul style={{ margin: "6px 0 0 18px" }}>
+            {errors.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </fieldset>
   );
 }
 
