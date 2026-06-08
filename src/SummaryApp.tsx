@@ -24,6 +24,10 @@ import { buildPurlinBuildingSummary } from "./building/purlinSummary";
 import { buildTrussBuildingSummary } from "./building/trussBuildingSummary";
 import { buildWindowRiegelBuildingSummary } from "./building/windowRiegelBuildingSummary";
 import {
+  buildSummaryReadiness,
+  hasMissingRequiredSummaryItems,
+} from "./building/summaryReadiness";
+import {
   getAvailablePurlinSelectionModes,
   getPurlinSelectionWarning,
   purlinContinuitySchemeLabel,
@@ -61,6 +65,11 @@ export function SummaryApp() {
     building,
     summaryResults.purlin,
   );
+  const readinessItems = useMemo(
+    () => buildSummaryReadiness(building, summaryResults),
+    [building, summaryResults],
+  );
+  const hasMissingSummaryItems = hasMissingRequiredSummaryItems(readinessItems);
 
   if (rows.length === 0) {
     return (
@@ -71,6 +80,7 @@ export function SummaryApp() {
           и результат сразу появится здесь.
         </p>
         <BuildingBlock />
+        <SummaryReadinessBlock items={readinessItems} hasMissing={hasMissingSummaryItems} />
         <PurlinSelectionWarning warning={purlinWarning} />
         <ColumnCountSummaryBlock results={summaryResults} />
         <TrussBuildingSummaryBlock results={summaryResults} />
@@ -93,6 +103,7 @@ export function SummaryApp() {
       </p>
 
       <BuildingBlock />
+      <SummaryReadinessBlock items={readinessItems} hasMissing={hasMissingSummaryItems} />
       <PurlinSelectionWarning warning={purlinWarning} />
       <ColumnCountSummaryBlock results={summaryResults} />
       <TrussBuildingSummaryBlock results={summaryResults} />
@@ -312,6 +323,63 @@ function PurlinSelectionWarning({ warning }: { warning: string | null }) {
       {warning}
     </div>
   );
+}
+
+function SummaryReadinessBlock({
+  items,
+  hasMissing,
+}: {
+  items: ReturnType<typeof buildSummaryReadiness>;
+  hasMissing: boolean;
+}) {
+  return (
+    <fieldset
+      style={{
+        border: hasMissing ? "1px solid #f59e0b" : "1px solid #cbd5e1",
+        padding: 12,
+        borderRadius: 6,
+        marginBottom: 24,
+        background: hasMissing ? "#fffbeb" : "#f8fafc",
+      }}
+    >
+      <legend style={{ fontWeight: 600 }}>Готовность сводки</legend>
+      {hasMissing && (
+        <div style={{ color: "#92400e", fontSize: 13, marginBottom: 8 }}>
+          Ведомость пока неполная: есть разделы без опубликованного результата.
+        </div>
+      )}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(180px, 1fr))",
+          gap: 8,
+          fontSize: 13,
+        }}
+      >
+        {items.map((item) => (
+          <div key={item.label}>
+            <b>{item.label}:</b>{" "}
+            <span style={{ color: readinessColor(item.status) }}>
+              {readinessLabel(item.status)}
+            </span>
+            <div style={{ color: "#64748b", fontSize: 11 }}>{item.message}</div>
+          </div>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function readinessLabel(status: "ready" | "missing" | "not-required"): string {
+  if (status === "ready") return "готово";
+  if (status === "not-required") return "не требуется";
+  return "нет расчёта";
+}
+
+function readinessColor(status: "ready" | "missing" | "not-required"): string {
+  if (status === "ready") return "#15803d";
+  if (status === "not-required") return "#64748b";
+  return "#b45309";
 }
 
 function IncompleteQuantityWarning({
