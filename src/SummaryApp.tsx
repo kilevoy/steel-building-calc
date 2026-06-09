@@ -28,6 +28,7 @@ import {
   hasMissingRequiredSummaryItems,
 } from "./building/summaryReadiness";
 import { calculateBuildingResultsForSummary } from "./building/calculateBuildingResultsForSummary";
+import { buildSummaryAutoCalculationKey } from "./building/summaryAutoCalculationKey";
 import {
   getAvailablePurlinSelectionModes,
   getPurlinSelectionWarning,
@@ -57,7 +58,7 @@ export function SummaryApp() {
   const { handleCalc: handleCraneBeamCalc } = useCraneBeamRunner();
   const [autoCalculating, setAutoCalculating] = useState(false);
   const [autoCalculationErrors, setAutoCalculationErrors] = useState<string[]>([]);
-  const initialAutoCalculationStarted = useRef(false);
+  const lastAutoCalculationKey = useRef<string | null>(null);
   const summaryResults = useMemo(
     () => applyAutoPurlinResult(results, building),
     [results, building],
@@ -75,10 +76,15 @@ export function SummaryApp() {
     [building, summaryResults],
   );
   const hasMissingSummaryItems = hasMissingRequiredSummaryItems(readinessItems);
+  const autoCalculationKey = useMemo(
+    () => buildSummaryAutoCalculationKey(building),
+    [building],
+  );
 
   const calculateAllForSummary = useCallback(async () => {
     setAutoCalculating(true);
     try {
+      lastAutoCalculationKey.current = autoCalculationKey;
       const calculation = calculateBuildingResultsForSummary(building);
       setResult("purlin", calculation.results.purlin);
       setResult("beamCell", calculation.results.beamCell);
@@ -101,15 +107,18 @@ export function SummaryApp() {
     } finally {
       setAutoCalculating(false);
     }
-  }, [building, handleCraneBeamCalc, setResult]);
+  }, [autoCalculationKey, building, handleCraneBeamCalc, setResult]);
 
   useEffect(() => {
-    if (!hasMissingSummaryItems || autoCalculating || initialAutoCalculationStarted.current) {
+    if (autoCalculating || lastAutoCalculationKey.current === autoCalculationKey) {
       return;
     }
-    initialAutoCalculationStarted.current = true;
     void calculateAllForSummary();
-  }, [autoCalculating, calculateAllForSummary, hasMissingSummaryItems]);
+  }, [
+    autoCalculating,
+    autoCalculationKey,
+    calculateAllForSummary,
+  ]);
 
   if (rows.length === 0) {
     return (
