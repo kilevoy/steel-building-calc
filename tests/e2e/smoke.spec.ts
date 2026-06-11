@@ -52,13 +52,13 @@ test("прогоны: lazy-чанк загружается и показывае
 
 test("балка покрытия, оконные ригели и подкрановая балка открываются", async ({ page }) => {
   await page.getByRole("button", { name: "Балка покрытия", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Балка покрытия" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Балка покрытия", exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Оконные ригели", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Оконные ригели" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Оконные ригели", exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Подкрановая балка", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Подкрановая балка" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Подкрановая балка", exact: true })).toBeVisible();
 });
 
 test("сводка: автоматический расчёт собирает результаты по зданию", async ({ page }) => {
