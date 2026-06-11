@@ -7,3 +7,5 @@ tmp/
 .DS_Store
 desktop.ini
 scripts/__pycache__/
+playwright-report/
+test-results/
