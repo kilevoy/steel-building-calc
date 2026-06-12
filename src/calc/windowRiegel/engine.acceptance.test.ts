@@ -74,3 +74,16 @@ describe("window riegel Excel acceptance scenarios", () => {
     expect(result.upperType1Profiles[0].weightKg).toBeCloseTo(54.6347, 6);
   });
 });
+
+describe("window riegel engine — кэш книги не зависит от предыдущих расчётов", () => {
+  it("повторный расчёт сценария после другого сценария даёт тот же результат", () => {
+    const first = calculateWindowRiegel(SCN_WINDOW_RIEGEL_001);
+    calculateWindowRiegel(SCN_WINDOW_RIEGEL_002);
+    const again = calculateWindowRiegel(SCN_WINDOW_RIEGEL_001);
+
+    expect(again.lowerAndUpperProfiles).toEqual(first.lowerAndUpperProfiles);
+    expect(again.upperType1Profiles).toEqual(first.upperType1Profiles);
+    expect(again.horizontalLoadKpa).toBe(first.horizontalLoadKpa);
+    expect(again.warnings).toEqual(first.warnings);
+  });
+});

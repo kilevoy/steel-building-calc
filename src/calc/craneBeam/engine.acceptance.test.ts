@@ -117,3 +117,17 @@ describe("crane beam engine — Excel acceptance SCN-CRANE-BEAM-003", () => {
     expect(result.deflections[result.deflections.length - 1]?.value).toBeCloseTo(0.49794686031, 6);
   });
 });
+
+describe("crane beam engine — кэш книги не зависит от предыдущих расчётов", () => {
+  it("повторный расчёт сценария после другого сценария даёт тот же результат", () => {
+    const first = calculateCraneBeam(defaultCraneInputs);
+    calculateCraneBeam({ ...defaultCraneInputs, capacity: 10, craneCount: "два" });
+    const again = calculateCraneBeam(defaultCraneInputs);
+
+    expect(again.profile).toBe(first.profile);
+    expect(again.utilizationPercent).toBe(first.utilizationPercent);
+    expect(again.weightKg).toBe(first.weightKg);
+    expect(again.deflections).toEqual(first.deflections);
+    expect(again.localStability).toEqual(first.localStability);
+  });
+});
