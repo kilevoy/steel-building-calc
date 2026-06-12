@@ -107,7 +107,7 @@ export function SummaryApp() {
   if (rows.length === 0) {
     return (
       <div>
-        <h2 style={{ marginTop: 0 }}>Сводка по зданию</h2>
+        <h2 className="page-title">Сводка по зданию</h2>
         <p className="text-muted">
           Пока нет рассчитанных элементов. Нажмите «Рассчитать» в одной из вкладок,
           и результат сразу появится здесь.
@@ -138,7 +138,7 @@ export function SummaryApp() {
         Калькулятор стального каркаса — отчёт по зданию от{" "}
         {new Date().toLocaleDateString("ru-RU")}
       </div>
-      <h2 style={{ marginTop: 0 }}>Сводка по зданию</h2>
+      <h2 className="page-title">Сводка по зданию</h2>
       <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Подобранные профили и металлоёмкость из всех вкладок одновременно. Все данные
         автоматически обновляются при изменении исходных параметров.

@@ -108,12 +108,12 @@ export function WindowRiegelApp() {
 
   return (
     <div>
-      <h2 style={{ marginTop: 0 }}>Оконные ригели</h2>
+      <h2 className="page-title">Оконные ригели</h2>
       <div style={{ marginBottom: 16 }}>
        <Collapsible title="📥 Исходные данные" storageKey="windowriegel-inputs" defaultOpen={true}>
       <div className="grid grid--3" style={{ gap: 12 }}>
         {/* Column 1: Geometry */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+        <fieldset>
           <legend style={{ fontWeight: 600 }}>Геометрия здания и окна</legend>
           <div className="synced-field" title="Синхронизировано со всеми вкладками">
             <label className="field__label">
@@ -158,7 +158,7 @@ export function WindowRiegelApp() {
         </fieldset>
 
         {/* Column 2: Wind & loads */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+        <fieldset>
           <legend style={{ fontWeight: 600 }}>Ветер и нагрузки</legend>
           <SyncedSelectField
             label="Тип местности"
@@ -183,7 +183,7 @@ export function WindowRiegelApp() {
         </fieldset>
 
         {/* Column 3: Calculated loads */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+        <fieldset>
           <legend style={{ fontWeight: 600 }}>Расчётные нагрузки и длины</legend>
           <div className="text-small" style={{ lineHeight: 1.7 }}>
             <div>Вертикальная нагрузка: <b>{fmt(result?.verticalLoadKpa)} кПа</b></div>
@@ -246,7 +246,7 @@ function RiegelTable({ title, rows }: { title: string; rows: WindowRiegelOption[
               </tr>
             ) : (
               rows.map((r, i) => (
-                <tr key={i} style={i === 0 ? { background: "#fffbeb" } : undefined}>
+                <tr key={i} className={i === 0 ? "row-accepted" : undefined}>
                   <td>{r.number}{i === 0 ? " ★" : ""}</td>
                   <td>{r.profile ?? "—"}</td>
                   <td>{r.steel ?? "—"}</td>

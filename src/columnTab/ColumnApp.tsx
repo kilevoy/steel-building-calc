@@ -202,7 +202,7 @@ export function ColumnApp() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>
+      <h1 className="page-title">
         Калькулятор стальных колонн промышленных зданий
       </h1>
       <p className="text-muted text-small" style={{ marginTop: 0 }}>

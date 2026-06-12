@@ -29,7 +29,7 @@ export function CraneBeamApp() {
 
   return (
     <div>
-      <h2 style={{ marginTop: 0 }}>Подкрановая балка</h2>
+      <h2 className="page-title">Подкрановая балка</h2>
       <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Расчёт по СП 16.13330 + СП 35.13330. Подбор сечения, проверка прочности / общей и местной
         устойчивости / усталости (7К–8К) / прогибов. Расчёт занимает ~3–10 секунд.
@@ -39,7 +39,7 @@ export function CraneBeamApp() {
        <Collapsible title="📥 Исходные данные" storageKey="cranebeam-inputs" defaultOpen={true}>
       <div className="grid grid--3" style={{ gap: 12 }}>
         {/* Column 1: Crane */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+        <fieldset>
           <legend style={{ fontWeight: 600 }}>Кран</legend>
           <SelField
             label="Грузоподъёмность, т"
@@ -81,7 +81,7 @@ export function CraneBeamApp() {
         </fieldset>
 
         {/* Column 2: Beam geometry */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+        <fieldset>
           <legend style={{ fontWeight: 600 }}>Балка</legend>
           <NumField label="Пролёт балки, м" value={inputs.beamSpan} step={0.5} onChange={(v) => upd("beamSpan", v)} />
           <SelField
@@ -100,7 +100,7 @@ export function CraneBeamApp() {
         </fieldset>
 
         {/* Column 3: Factors */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+        <fieldset>
           <legend style={{ fontWeight: 600 }}>Коэффициенты</legend>
           <NumField label="γf (нагрузка)" value={inputs.gammaF} step={0.05} onChange={(v) => upd("gammaF", v)} />
           <NumField label="γd (динамика)" value={inputs.gammaDynamic} step={0.05} onChange={(v) => upd("gammaDynamic", v)} />
@@ -149,7 +149,7 @@ export function CraneBeamApp() {
 
       {result && (
         <div style={{ marginTop: 20 }}>
-          <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+          <fieldset>
             <legend style={{ fontWeight: 600 }}>Подобранное сечение</legend>
             <div className="grid grid--4" style={{ gap: 12 }}>
               <Stat label="Профиль" value={result.profile ?? "—"} />
