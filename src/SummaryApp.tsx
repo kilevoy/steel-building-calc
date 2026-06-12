@@ -107,13 +107,19 @@ export function SummaryApp() {
   if (rows.length === 0) {
     return (
       <div>
-        <h2 className="page-title">Сводка по зданию</h2>
+        <h2 className="page-title">
+          Сводка по зданию
+          {autoCalculating && (
+            <span className="text-small text-muted" style={{ fontWeight: 400, marginLeft: 10 }}>
+              ⏳ Пересчёт...
+            </span>
+          )}
+        </h2>
         <p className="text-muted">
-          Пока нет рассчитанных элементов. Нажмите «Рассчитать» в одной из вкладок,
-          и результат сразу появится здесь.
+          Сводка рассчитывается автоматически по общим параметрам здания.
         </p>
         <BuildingBlock />
-        <AutoCalculateSummaryButton
+        <SummaryCalcErrors
           calculating={autoCalculating}
           errors={autoCalculationErrors}
           onCalculate={() => void calculateAllForSummary()}
@@ -138,14 +144,32 @@ export function SummaryApp() {
         Калькулятор стального каркаса — отчёт по зданию от{" "}
         {new Date().toLocaleDateString("ru-RU")}
       </div>
-      <h2 className="page-title">Сводка по зданию</h2>
-      <p className="text-muted text-small" style={{ marginTop: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <h2 className="page-title" style={{ margin: 0 }}>
+          Сводка по зданию
+          {autoCalculating && (
+            <span className="text-small text-muted" style={{ fontWeight: 400, marginLeft: 10 }}>
+              ⏳ Пересчёт...
+            </span>
+          )}
+        </h2>
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="btn"
+          style={{ marginLeft: "auto" }}
+          title="Печать или сохранение сводки в PDF через диалог печати браузера"
+        >
+          🖨 Печать / PDF
+        </button>
+      </div>
+      <p className="text-muted text-small" style={{ marginTop: 4 }}>
         Подобранные профили и металлоёмкость из всех вкладок одновременно. Все данные
         автоматически обновляются при изменении исходных параметров.
       </p>
 
       <BuildingBlock />
-      <AutoCalculateSummaryButton
+      <SummaryCalcErrors
         calculating={autoCalculating}
         errors={autoCalculationErrors}
         onCalculate={() => void calculateAllForSummary()}
@@ -362,7 +386,12 @@ function PurlinSelectionWarning({ warning }: { warning: string | null }) {
   );
 }
 
-function AutoCalculateSummaryButton({
+/**
+ * Сводка пересчитывается автоматически (при открытии и при изменении
+ * параметров здания), поэтому постоянной кнопки расчёта нет. Блок
+ * показывает только ошибки авторасчёта с кнопкой повтора.
+ */
+function SummaryCalcErrors({
   calculating,
   errors,
   onCalculate,
@@ -371,49 +400,21 @@ function AutoCalculateSummaryButton({
   errors: string[];
   onCalculate: () => void;
 }) {
+  if (errors.length === 0) return null;
   return (
-    <fieldset
-      style={{
-        border: "1px solid #cbd5e1",
-        padding: 12,
-        borderRadius: 6,
-        marginBottom: 24,
-        background: "#f0f9ff",
-      }}
-    >
-      <legend style={{ fontWeight: 600 }}>Автоматический расчёт сводки</legend>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <button
-          type="button"
-          onClick={onCalculate}
-          disabled={calculating}
-          className="btn btn--primary"
-        >
-          {calculating ? "Расчёт..." : "Рассчитать всё для сводки"}
+    <div className="note note--warn" style={{ marginBottom: 24 }}>
+      <b>Часть расчётов не опубликована:</b>
+      <ul style={{ margin: "6px 0 0 18px" }}>
+        {errors.map((error) => (
+          <li key={error}>{error}</li>
+        ))}
+      </ul>
+      <div style={{ marginTop: 8 }}>
+        <button type="button" onClick={onCalculate} disabled={calculating} className="btn">
+          {calculating ? "Расчёт..." : "Повторить расчёт"}
         </button>
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="btn"
-          title="Печать или сохранение сводки в PDF через диалог печати браузера"
-        >
-          🖨 Печать / PDF
-        </button>
-        <span className="text-small text-muted">
-          При открытии сводки расчёт запускается автоматически. Кнопка нужна для ручного пересчёта после изменения параметров.
-        </span>
       </div>
-      {errors.length > 0 && (
-        <div className="note note--warn" style={{ marginTop: 10 }}>
-          <b>Часть расчётов не опубликована:</b>
-          <ul style={{ margin: "6px 0 0 18px" }}>
-            {errors.map((error) => (
-              <li key={error}>{error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </fieldset>
+    </div>
   );
 }
 
