@@ -387,7 +387,7 @@ export function TrussApp() {
           </div>
 
           {/* Sticky summary */}
-          <div style={{ display: "flex", gap: 16, padding: "12px 16px", background: "#f1f5f9", borderRadius: 6, marginBottom: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 16, padding: "12px 16px", background: "var(--c-soft)", borderRadius: 6, marginBottom: 12, alignItems: "center", flexWrap: "wrap" }}>
             <Stat label="Общая масса фермы, кг" value={out.totalMass_kg.toFixed(1)} />
             <Stat label="Удельная масса, кг/м²" value={out.unitMass_kg_per_m2.toFixed(2)} />
             <Stat label="Снег, кН/м" value={out.loads.snow_kN_per_m.toFixed(2)} />

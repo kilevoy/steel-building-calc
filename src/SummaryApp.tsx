@@ -309,11 +309,11 @@ function BuildingBlock() {
   return (
     <fieldset
       style={{
-        border: "1px solid #cbd5e1",
+        border: "1px solid var(--c-border)",
         padding: 12,
         borderRadius: 6,
         marginBottom: 24,
-        background: "#f8fafc",
+        background: "var(--c-soft)",
       }}
     >
       <legend style={{ fontWeight: 600 }}>Исходные данные</legend>
@@ -428,11 +428,11 @@ function SummaryReadinessBlock({
   return (
     <fieldset
       style={{
-        border: hasMissing ? "1px solid #f59e0b" : "1px solid #cbd5e1",
+        border: hasMissing ? "1px solid var(--c-warn)" : "1px solid var(--c-border)",
         padding: 12,
         borderRadius: 6,
         marginBottom: 24,
-        background: hasMissing ? "#fffbeb" : "#f8fafc",
+        background: hasMissing ? "var(--c-warn-soft)" : "var(--c-soft)",
       }}
     >
       <legend style={{ fontWeight: 600 }}>Готовность сводки</legend>
@@ -498,11 +498,11 @@ function BuildingCountDiagnostics() {
   return (
     <details
       style={{
-        border: "1px solid #f59e0b",
+        border: "1px solid var(--c-warn)",
         padding: 12,
         borderRadius: 6,
         marginBottom: 24,
-        background: "#fffbeb",
+        background: "var(--c-warn-soft)",
       }}
     >
       <summary style={{ cursor: "pointer", fontWeight: 600 }}>
@@ -552,11 +552,11 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
   return (
     <fieldset
       style={{
-        border: "1px solid #cbd5e1",
+        border: "1px solid var(--c-border)",
         padding: 12,
         borderRadius: 6,
         marginBottom: 24,
-        background: "#f8fafc",
+        background: "var(--c-soft)",
       }}
     >
       <legend style={{ fontWeight: 600 }}>Колонны — итог по количеству</legend>
@@ -601,11 +601,11 @@ function TrussBuildingSummaryBlock({ results }: { results: BuildingResults }) {
   return (
     <fieldset
       style={{
-        border: "1px solid #cbd5e1",
+        border: "1px solid var(--c-border)",
         padding: 12,
         borderRadius: 6,
         marginBottom: 24,
-        background: "#f8fafc",
+        background: "var(--c-soft)",
       }}
     >
       <legend style={{ fontWeight: 600 }}>Фермы — итог по количеству</legend>
@@ -644,11 +644,11 @@ function PurlinBuildingSummaryBlock({ results }: { results: BuildingResults }) {
   return (
     <fieldset
       style={{
-        border: "1px solid #cbd5e1",
+        border: "1px solid var(--c-border)",
         padding: 12,
         borderRadius: 6,
         marginBottom: 24,
-        background: "#f8fafc",
+        background: "var(--c-soft)",
       }}
     >
       <legend style={{ fontWeight: 600 }}>Прогоны — итог по количеству</legend>
@@ -679,11 +679,11 @@ function BeamCellBuildingSummaryBlock({ results }: { results: BuildingResults })
   return (
     <fieldset
       style={{
-        border: "1px solid #cbd5e1",
+        border: "1px solid var(--c-border)",
         padding: 12,
         borderRadius: 6,
         marginBottom: 24,
-        background: "#f8fafc",
+        background: "var(--c-soft)",
       }}
     >
       <legend style={{ fontWeight: 600 }}>Балка покрытия — итог по количеству</legend>
@@ -718,11 +718,11 @@ function WindowRiegelBuildingSummaryBlock({ results }: { results: BuildingResult
   return (
     <fieldset
       style={{
-        border: "1px solid #cbd5e1",
+        border: "1px solid var(--c-border)",
         padding: 12,
         borderRadius: 6,
         marginBottom: 24,
-        background: "#f8fafc",
+        background: "var(--c-soft)",
       }}
     >
       <legend style={{ fontWeight: 600 }}>Оконные ригели — итог по количеству</legend>
@@ -758,11 +758,11 @@ function CraneBeamBuildingSummaryBlock({ results }: { results: BuildingResults }
   return (
     <fieldset
       style={{
-        border: "1px solid #cbd5e1",
+        border: "1px solid var(--c-border)",
         padding: 12,
         borderRadius: 6,
         marginBottom: 24,
-        background: "#f8fafc",
+        background: "var(--c-soft)",
       }}
     >
       <legend style={{ fontWeight: 600 }}>Подкрановая балка — итог по количеству</legend>
@@ -799,11 +799,11 @@ function CraneBeamTrigger() {
     return (
       <fieldset
         style={{
-          border: "1px solid #cbd5e1",
+          border: "1px solid var(--c-border)",
           padding: 12,
           borderRadius: 6,
           marginBottom: 24,
-          background: "#f8fafc",
+          background: "var(--c-soft)",
         }}
       >
         <legend style={{ fontWeight: 600 }}>Подкрановая балка</legend>
@@ -817,11 +817,11 @@ function CraneBeamTrigger() {
   return (
     <fieldset
       style={{
-        border: "1px solid #cbd5e1",
+        border: "1px solid var(--c-border)",
         padding: 12,
         borderRadius: 6,
         marginBottom: 24,
-        background: "#f0f9ff",
+        background: "var(--c-accent-soft)",
       }}
     >
       <legend style={{ fontWeight: 600 }}>Подкрановая балка (медленный расчёт)</legend>
