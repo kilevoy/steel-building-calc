@@ -205,13 +205,13 @@ export function ColumnApp() {
       <h1 style={{ fontSize: 22, marginBottom: 4 }}>
         Калькулятор стальных колонн промышленных зданий
       </h1>
-      <p style={{ color: "#666", fontSize: 13, marginTop: 0 }}>
+      <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Подбор профиля по СП 16.13330 / СП 20.13330. 208 профилей × 4 марки стали × 0–4 распорки.
       </p>
 
       <div style={{ marginBottom: 16 }}>
         <Collapsible title="📥 Исходные данные" storageKey="column-inputs" defaultOpen={true}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+          <div className="grid grid--3" style={{ marginBottom: 16 }}>
             <GeometrySection input={input} building={building} updSynced={updSynced} upd={upd} />
             <LoadsSection
               input={input}
@@ -236,7 +236,7 @@ export function ColumnApp() {
       {/* Auto-propagation info banner */}
       <LoadPropagationBanner />
 
-      {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
+      {error && <div className="note note--danger" style={{ marginBottom: 12 }}>{error}</div>}
 
       {results && (
         <ResultsView

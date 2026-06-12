@@ -20,8 +20,8 @@ export function GeometrySection({
   upd: (patch: Partial<CalculationInput>) => void;
 }) {
   return (
-    <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-      <legend style={{ fontWeight: 600 }}>Геометрия здания</legend>
+    <fieldset className="card" style={{ padding: 12 }}>
+      <legend className="section-title">Геометрия здания</legend>
       <SyncedNumField label="Пролёт, м" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
       <SyncedNumField label="Длина, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
       <SyncedNumField label="Высота, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />

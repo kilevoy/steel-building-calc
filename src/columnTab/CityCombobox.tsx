@@ -74,22 +74,13 @@ export function CityCombobox() {
   );
 
   return (
-    <div
-      title="Синхронизировано со всеми вкладками"
-      style={{
-        marginBottom: 6,
-        background: "#fef9c3",
-        border: "1px dashed #eab308",
-        borderRadius: 4,
-        padding: "4px 6px",
-      }}
-    >
-      <label style={{ fontSize: 13, display: "block" }}>
-        <span style={{ color: "#92400e", marginRight: 4 }}>🔗</span>
+    <div className="synced-field" title="Синхронизировано со всеми вкладками">
+      <label className="field__label">
+        <span className="synced-field__badge">🔗</span>
         Город (автозаполнение w₀, Sg)
       </label>
       <input
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
+        type="text"
         value={cityQuery}
         onChange={(e) => {
           setCityQuery(e.target.value);
@@ -116,7 +107,7 @@ export function CityCombobox() {
               onMouseOut={(e) => (e.currentTarget.style.background = "")}
             >
               {s.settlement} — {s.region}{" "}
-              <span style={{ color: "#999" }}>
+              <span className="text-muted">
                 (w₀={s.wind.w0Kpa ?? "—"}, Sg={s.snow.sgKpa ?? "—"})
               </span>
             </div>
@@ -124,7 +115,7 @@ export function CityCombobox() {
         </div>
       )}
       {cityLoading && (
-        <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>
+        <div className="field__hint" style={{ marginTop: 4 }}>
           Поиск...
         </div>
       )}

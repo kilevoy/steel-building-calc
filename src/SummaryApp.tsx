@@ -36,22 +36,6 @@ import {
   purlinSelectionModeLabel,
 } from "./building/purlinSelection";
 
-const th: React.CSSProperties = {
-  padding: "8px 10px",
-  borderBottom: "2px solid #cbd5e1",
-  background: "#f1f5f9",
-  textAlign: "left",
-  fontSize: 12,
-  whiteSpace: "nowrap",
-};
-const td: React.CSSProperties = {
-  padding: "6px 10px",
-  borderBottom: "1px solid #e2e8f0",
-  fontSize: 13,
-  whiteSpace: "nowrap",
-};
-const tdR: React.CSSProperties = { ...td, textAlign: "right" };
-
 export function SummaryApp() {
   const { building } = useBuilding();
   const { results, setResult } = useBuildingResults();
@@ -124,7 +108,7 @@ export function SummaryApp() {
     return (
       <div>
         <h2 style={{ marginTop: 0 }}>Сводка по зданию</h2>
-        <p style={{ color: "#666" }}>
+        <p className="text-muted">
           Пока нет рассчитанных элементов. Нажмите «Рассчитать» в одной из вкладок,
           и результат сразу появится здесь.
         </p>
@@ -151,7 +135,7 @@ export function SummaryApp() {
   return (
     <div>
       <h2 style={{ marginTop: 0 }}>Сводка по зданию</h2>
-      <p style={{ color: "#666", fontSize: 13, marginTop: 0 }}>
+      <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Подобранные профили и металлоёмкость из всех вкладок одновременно. Все данные
         автоматически обновляются при изменении исходных параметров.
       </p>
@@ -177,43 +161,43 @@ export function SummaryApp() {
       />
 
       <h3 style={{ marginBottom: 6 }}>Подобранные элементы</h3>
-      <div style={{ overflow: "auto", marginBottom: 24 }}>
-        <table style={{ borderCollapse: "collapse", width: "100%" }}>
+      <div className="table-wrap" style={{ marginBottom: 24 }}>
+        <table className="table">
           <thead>
             <tr>
-              <th style={th}>Элемент</th>
-              <th style={th}>Профиль</th>
-              <th style={th}>Детали</th>
-              <th style={th}>Сталь</th>
-              <th style={{ ...th, textAlign: "right" }}>Шт.</th>
-              <th style={{ ...th, textAlign: "right" }}>Длина 1 шт.</th>
-              <th style={{ ...th, textAlign: "right" }}>Σ длина</th>
-              <th style={{ ...th, textAlign: "right" }}>Масса 1 шт.</th>
-              <th style={{ ...th, textAlign: "right" }}>Σ масса</th>
-              <th style={{ ...th, textAlign: "right" }}>Σ стоимость</th>
+              <th>Элемент</th>
+              <th>Профиль</th>
+              <th>Детали</th>
+              <th>Сталь</th>
+              <th className="num">Шт.</th>
+              <th className="num">Длина 1 шт.</th>
+              <th className="num">Σ длина</th>
+              <th className="num">Масса 1 шт.</th>
+              <th className="num">Σ масса</th>
+              <th className="num">Σ стоимость</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r, i) => (
               <tr key={i}>
-                <td style={{ ...td, fontWeight: 600 }}>{r.label}</td>
-                <td style={td}>{r.profile}</td>
-                <td style={td}>{r.details ?? "—"}</td>
-                <td style={td}>{r.steel}</td>
-                <td style={tdR}>{r.count}</td>
-                <td style={tdR}>{r.lengthPerPiece_m}</td>
-                <td style={tdR}>{r.totalLength_m}</td>
-                <td style={tdR}>{r.unitMass_kg}</td>
-                <td style={{ ...tdR, fontWeight: 600 }}>{formatSummaryMass(r.totalMass_kg)}</td>
-                <td style={tdR}>{formatSummaryCost(r.cost_rub)}</td>
+                <td style={{ fontWeight: 600 }}>{r.label}</td>
+                <td>{r.profile}</td>
+                <td>{r.details ?? "—"}</td>
+                <td>{r.steel}</td>
+                <td className="num">{r.count}</td>
+                <td className="num">{r.lengthPerPiece_m}</td>
+                <td className="num">{r.totalLength_m}</td>
+                <td className="num">{r.unitMass_kg}</td>
+                <td className="num" style={{ fontWeight: 600 }}>{formatSummaryMass(r.totalMass_kg)}</td>
+                <td className="num">{formatSummaryCost(r.cost_rub)}</td>
               </tr>
             ))}
           </tbody>
           <tfoot>
-            <tr style={{ background: "#f8fafc" }}>
-              <td style={{ ...td, fontWeight: 700 }} colSpan={8}>Итого по зданию</td>
-              <td style={{ ...tdR, fontWeight: 700 }}>{formatSummaryMass(totals.totalMass_kg)}</td>
-              <td style={{ ...tdR, fontWeight: 700 }}>{formatSummaryCost(totals.totalCost_rub)}</td>
+            <tr>
+              <td colSpan={8} style={{ fontWeight: 700 }}>Итого по зданию</td>
+              <td className="num" style={{ fontWeight: 700 }}>{formatSummaryMass(totals.totalMass_kg)}</td>
+              <td className="num" style={{ fontWeight: 700 }}>{formatSummaryCost(totals.totalCost_rub)}</td>
             </tr>
           </tfoot>
         </table>
@@ -222,21 +206,21 @@ export function SummaryApp() {
       {bySteel.length > 0 && (
         <>
           <h3 style={{ marginBottom: 6 }}>Расход стали по маркам</h3>
-          <div style={{ overflow: "auto", marginBottom: 24 }}>
-            <table style={{ borderCollapse: "collapse", width: "100%", maxWidth: 700 }}>
+          <div className="table-wrap" style={{ marginBottom: 24 }}>
+            <table className="table" style={{ maxWidth: 700 }}>
               <thead>
                 <tr>
-                  <th style={th}>Марка стали</th>
-                  <th style={{ ...th, textAlign: "right" }}>Σ масса</th>
-                  <th style={{ ...th, textAlign: "right" }}>Σ стоимость</th>
+                  <th>Марка стали</th>
+                  <th className="num">Σ масса</th>
+                  <th className="num">Σ стоимость</th>
                 </tr>
               </thead>
               <tbody>
                 {bySteel.map((s) => (
                   <tr key={s.steel}>
-                    <td style={{ ...td, fontWeight: 600 }}>{s.steel}</td>
-                    <td style={tdR}>{formatSummaryMass(s.totalMass_kg)}</td>
-                    <td style={tdR}>{formatSummaryCost(s.totalCost_rub)}</td>
+                    <td style={{ fontWeight: 600 }}>{s.steel}</td>
+                    <td className="num">{formatSummaryMass(s.totalMass_kg)}</td>
+                    <td className="num">{formatSummaryCost(s.totalCost_rub)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -249,23 +233,23 @@ export function SummaryApp() {
       {summaryResults.truss && summaryResults.truss.sections.length > 0 && (
         <>
           <h3 style={{ marginBottom: 6 }}>Ферма — разбивка по элементам</h3>
-          <div style={{ overflow: "auto", marginBottom: 24 }}>
-            <table style={{ borderCollapse: "collapse", width: "100%", maxWidth: 700 }}>
+          <div className="table-wrap" style={{ marginBottom: 24 }}>
+            <table className="table" style={{ maxWidth: 700 }}>
               <thead>
                 <tr>
-                  <th style={th}>Элемент</th>
-                  <th style={th}>Профиль</th>
-                  <th style={th}>Сталь</th>
-                  <th style={{ ...th, textAlign: "right" }}>Σ масса</th>
+                  <th>Элемент</th>
+                  <th>Профиль</th>
+                  <th>Сталь</th>
+                  <th className="num">Σ масса</th>
                 </tr>
               </thead>
               <tbody>
                 {summaryResults.truss.sections.map((s, i) => (
                   <tr key={i}>
-                    <td style={{ ...td, fontWeight: 600 }}>{s.section}</td>
-                    <td style={td}>{s.profile}</td>
-                    <td style={td}>{s.steel}</td>
-                    <td style={tdR}>{formatSummaryMass(s.totalMass_kg)}</td>
+                    <td style={{ fontWeight: 600 }}>{s.section}</td>
+                    <td>{s.profile}</td>
+                    <td>{s.steel}</td>
+                    <td className="num">{formatSummaryMass(s.totalMass_kg)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -274,7 +258,7 @@ export function SummaryApp() {
         </>
       )}
 
-      <details style={{ marginTop: 16, fontSize: 12, color: "#475569" }}>
+      <details className="text-muted text-small" style={{ marginTop: 16 }}>
         <summary style={{ cursor: "pointer", fontWeight: 600 }}>Примечания к сводке</summary>
         <ul style={{ marginTop: 8 }}>
           <li>Количество оконных ригелей задаётся вручную на вкладке «Оконные ригели»
@@ -305,7 +289,7 @@ function BuildingBlock() {
       }}
     >
       <legend style={{ fontWeight: 600 }}>Исходные данные</legend>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, fontSize: 13 }}>
+      <div className="grid grid--4" style={{ fontSize: 13 }}>
         {building.city && <div>Город: <b>{building.city}</b></div>}
         <div>Пролёт: <b>{building.span_m} м</b></div>
         <div>Длина: <b>{building.length_m} м</b></div>
@@ -355,7 +339,7 @@ function BuildingBlock() {
               </select>
             </label>
           </div>
-          <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>
+          <div className="field__hint">
             Принятый расчетчиком вариант прогонов для итоговой сводки.
           </div>
         </div>
@@ -368,17 +352,7 @@ function PurlinSelectionWarning({ warning }: { warning: string | null }) {
   if (!warning) return null;
 
   return (
-    <div
-      style={{
-        border: "1px solid #f59e0b",
-        background: "#fffbeb",
-        color: "#92400e",
-        borderRadius: 6,
-        padding: "8px 10px",
-        marginBottom: 16,
-        fontSize: 13,
-      }}
-    >
+    <div className="note note--warn" style={{ marginBottom: 16 }}>
       {warning}
     </div>
   );
@@ -409,35 +383,16 @@ function AutoCalculateSummaryButton({
           type="button"
           onClick={onCalculate}
           disabled={calculating}
-          style={{
-            padding: "8px 18px",
-            fontSize: 14,
-            fontWeight: 600,
-            background: calculating ? "#94a3b8" : "#0369a1",
-            color: "white",
-            border: "none",
-            borderRadius: 6,
-            cursor: calculating ? "wait" : "pointer",
-          }}
+          className="btn btn--primary"
         >
           {calculating ? "Расчёт..." : "Рассчитать всё для сводки"}
         </button>
-        <span style={{ fontSize: 12, color: "#475569" }}>
+        <span className="text-small text-muted">
           При открытии сводки расчёт запускается автоматически. Кнопка нужна для ручного пересчёта после изменения параметров.
         </span>
       </div>
       {errors.length > 0 && (
-        <div
-          style={{
-            marginTop: 10,
-            border: "1px solid #f59e0b",
-            background: "#fffbeb",
-            color: "#92400e",
-            borderRadius: 6,
-            padding: "8px 10px",
-            fontSize: 12,
-          }}
-        >
+        <div className="note note--warn" style={{ marginTop: 10 }}>
           <b>Часть расчётов не опубликована:</b>
           <ul style={{ margin: "6px 0 0 18px" }}>
             {errors.map((error) => (
@@ -469,25 +424,21 @@ function SummaryReadinessBlock({
     >
       <legend style={{ fontWeight: 600 }}>Готовность сводки</legend>
       {hasMissing && (
-        <div style={{ color: "#92400e", fontSize: 13, marginBottom: 8 }}>
+        <div className="text-warn" style={{ fontSize: 13, marginBottom: 8 }}>
           Ведомость пока неполная: есть разделы без опубликованного результата.
         </div>
       )}
       <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, minmax(180px, 1fr))",
-          gap: 8,
-          fontSize: 13,
-        }}
+        className="grid grid--3"
+        style={{ fontSize: 13 }}
       >
         {items.map((item) => (
           <div key={item.label}>
             <b>{item.label}:</b>{" "}
-            <span style={{ color: readinessColor(item.status) }}>
+            <span className={readinessClassName(item.status)}>
               {readinessLabel(item.status)}
             </span>
-            <div style={{ color: "#64748b", fontSize: 11 }}>{item.message}</div>
+            <div className="field__hint">{item.message}</div>
           </div>
         ))}
       </div>
@@ -501,10 +452,10 @@ function readinessLabel(status: "ready" | "missing" | "not-required"): string {
   return "нет расчёта";
 }
 
-function readinessColor(status: "ready" | "missing" | "not-required"): string {
-  if (status === "ready") return "#15803d";
-  if (status === "not-required") return "#64748b";
-  return "#b45309";
+function readinessClassName(status: "ready" | "missing" | "not-required"): string {
+  if (status === "ready") return "text-ok";
+  if (status === "not-required") return "text-muted";
+  return "text-warn";
 }
 
 function IncompleteQuantityWarning({
@@ -515,17 +466,7 @@ function IncompleteQuantityWarning({
   if (!hasWindowRiegel) return null;
 
   return (
-    <div
-      style={{
-        border: "1px solid #f59e0b",
-        background: "#fffbeb",
-        color: "#92400e",
-        borderRadius: 6,
-        padding: "8px 10px",
-        marginBottom: 16,
-        fontSize: 13,
-      }}
-    >
+    <div className="note note--warn" style={{ marginBottom: 16 }}>
       Внимание: количество оконных ригелей задано вручную на вкладке «Оконные ригели».
       Проверьте его по фасадам перед использованием итоговой массы и стоимости.
     </div>
@@ -554,37 +495,20 @@ function BuildingCountDiagnostics() {
       <summary style={{ cursor: "pointer", fontWeight: 600 }}>
         Подробная диагностика подсчёта колонн
       </summary>
-      <div style={{ color: "#92400e", fontSize: 12, marginBottom: 10 }}>
+      <div className="text-warn text-small" style={{ marginBottom: 10 }}>
         Диагностика для обсуждения с ГИПом. Значения не используются в расчёте массы и
         стоимости до подтверждения модели торцевых колонн.
       </div>
-      <div style={{ color: "#92400e", fontSize: 12, marginBottom: 10 }}>
+      <div className="text-warn text-small" style={{ marginBottom: 10 }}>
         По решению ГИПа: без крана торцевые колонны считаются отдельной группой, с краном —
         основными колоннами рам. Текущий режим: <b>{building.hasCrane ? "с краном" : "без крана"}</b>.
       </div>
-      <div
-        style={{
-          border: "1px solid #fbbf24",
-          background: "#fff7ed",
-          borderRadius: 6,
-          padding: "8px 10px",
-          marginBottom: 10,
-          fontSize: 13,
-          fontWeight: 600,
-        }}
-      >
+      <div className="note note--warn" style={{ marginBottom: 10, fontWeight: 600 }}>
         {totalAcceptedColumnCount === null
           ? "Итого колонн здания появится после расчёта вкладки «Колонна»."
           : `Итого колонн здания: ${totalAcceptedColumnCount} = основных по ГИП ${layout.columns.mainTotal} + фахверковых стоек ${fachwerkColumnCount}`}
       </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(130px, 1fr))",
-          gap: 8,
-          fontSize: 13,
-        }}
-      >
+      <div className="grid grid--4" style={{ fontSize: 13 }}>
         <div>Рам всего: <b>{layout.frames.totalFrameAxes}</b></div>
         <div>Внутренних рам: <b>{layout.frames.interiorFrameAxes}</b></div>
         <div>Торцевых рам: <b>{layout.frames.endFrameAxes}</b></div>
@@ -624,18 +548,11 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
     >
       <legend style={{ fontWeight: 600 }}>Колонны — итог по количеству</legend>
       {!summary.hasPublishedColumns && (
-        <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>
+        <div className="text-muted" style={{ fontSize: 13, marginBottom: 8 }}>
           Итог по колоннам появится после расчёта вкладки «Колонна».
         </div>
       )}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(150px, 1fr))",
-          gap: 8,
-          fontSize: 13,
-        }}
-      >
+      <div className="grid grid--4" style={{ fontSize: 13 }}>
         <div>Основных колонн по ГИП: <b>{summary.mainByGip}</b></div>
         <div>Опубликовано подбором: <b>{summary.publishedMain ?? "—"}</b></div>
         <div>Фахверковых стоек: <b>{summary.fachwerkPublished ?? "—"}</b></div>
@@ -646,17 +563,7 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
         <div>Торцевых осей: <b>{summary.endFrameAxes}</b></div>
       </div>
       {summary.mainCountMismatch && (
-        <div
-          style={{
-            marginTop: 10,
-            border: "1px solid #f59e0b",
-            background: "#fffbeb",
-            color: "#92400e",
-            borderRadius: 6,
-            padding: "8px 10px",
-            fontSize: 12,
-          }}
-        >
+        <div className="note note--warn" style={{ marginTop: 10 }}>
           Внимание: количество основных колонн по ГИП отличается от количества,
           опубликованного текущим подбором колонн. Это нужно сверить перед
           использованием итоговой ведомости.
@@ -681,18 +588,11 @@ function TrussBuildingSummaryBlock({ results }: { results: BuildingResults }) {
     >
       <legend style={{ fontWeight: 600 }}>Фермы — итог по количеству</legend>
       {!summary.hasResult && (
-        <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>
+        <div className="text-muted" style={{ fontSize: 13, marginBottom: 8 }}>
           Итог по фермам появится после расчёта вкладки «Ферма».
         </div>
       )}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(150px, 1fr))",
-          gap: 8,
-          fontSize: 13,
-        }}
-      >
+      <div className="grid grid--4" style={{ fontSize: 13 }}>
         <div>Ферм: <b>{summary.count ?? "—"}</b></div>
         <div>Детали: <b>{summary.details ?? "—"}</b></div>
         <div>
@@ -731,18 +631,11 @@ function PurlinBuildingSummaryBlock({ results }: { results: BuildingResults }) {
     >
       <legend style={{ fontWeight: 600 }}>Прогоны — итог по количеству</legend>
       {!summary.hasResult && (
-        <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>
+        <div className="text-muted" style={{ fontSize: 13, marginBottom: 8 }}>
           Итог по прогонам появится после расчёта вкладки «Прогоны» или авто-подбора в сводке.
         </div>
       )}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(150px, 1fr))",
-          gap: 8,
-          fontSize: 13,
-        }}
-      >
+      <div className="grid grid--4" style={{ fontSize: 13 }}>
         <div>Принятый тип: <b>{summary.selectedType}</b></div>
         <div>Схема: <b>{summary.scheme}</b></div>
         <div>Параметр: <b>{summary.details ?? "—"}</b></div>
@@ -773,18 +666,11 @@ function BeamCellBuildingSummaryBlock({ results }: { results: BuildingResults })
     >
       <legend style={{ fontWeight: 600 }}>Балка покрытия — итог по количеству</legend>
       {!summary.hasResult && (
-        <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>
+        <div className="text-muted" style={{ fontSize: 13, marginBottom: 8 }}>
           Итог по балке покрытия появится после расчёта вкладки «Балка покрытия».
         </div>
       )}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(150px, 1fr))",
-          gap: 8,
-          fontSize: 13,
-        }}
-      >
+      <div className="grid grid--4" style={{ fontSize: 13 }}>
         <div>Балки: <b>{summary.count ?? "—"}</b></div>
         <div>Детали: <b>{summary.details ?? "—"}</b></div>
         <div>
@@ -819,18 +705,11 @@ function WindowRiegelBuildingSummaryBlock({ results }: { results: BuildingResult
     >
       <legend style={{ fontWeight: 600 }}>Оконные ригели — итог по количеству</legend>
       {summary.message && (
-        <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>
+        <div className="text-muted" style={{ fontSize: 13, marginBottom: 8 }}>
           {summary.message}
         </div>
       )}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(150px, 1fr))",
-          gap: 8,
-          fontSize: 13,
-        }}
-      >
+      <div className="grid grid--4" style={{ fontSize: 13 }}>
         <div>Ригели: <b>{summary.count ?? "—"}</b></div>
         <div>Детали: <b>{summary.details ?? "—"}</b></div>
         <div>
@@ -866,18 +745,11 @@ function CraneBeamBuildingSummaryBlock({ results }: { results: BuildingResults }
     >
       <legend style={{ fontWeight: 600 }}>Подкрановая балка — итог по количеству</legend>
       {summary.message && (
-        <div style={{ fontSize: 13, color: "#475569", marginBottom: 8 }}>
+        <div className="text-muted" style={{ fontSize: 13, marginBottom: 8 }}>
           {summary.message}
         </div>
       )}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(150px, 1fr))",
-          gap: 8,
-          fontSize: 13,
-        }}
-      >
+      <div className="grid grid--4" style={{ fontSize: 13 }}>
         <div>Кран: <b>{summary.hasCrane ? "включён" : "не включён"}</b></div>
         <div>Балки: <b>{summary.count ?? "—"}</b></div>
         <div>Детали: <b>{summary.details ?? "—"}</b></div>
@@ -913,7 +785,7 @@ function CraneBeamTrigger() {
         }}
       >
         <legend style={{ fontWeight: 600 }}>Подкрановая балка</legend>
-        <div style={{ fontSize: 13, color: "#475569" }}>
+        <div className="text-muted" style={{ fontSize: 13 }}>
           Кран не включён на вкладке «Колонна», поэтому подкрановая балка не рассчитывается.
         </div>
       </fieldset>
@@ -935,20 +807,11 @@ function CraneBeamTrigger() {
         <button
           onClick={() => void handleCalc()}
           disabled={calculating}
-          style={{
-            padding: "8px 18px",
-            fontSize: 14,
-            fontWeight: 600,
-            background: calculating ? "#94a3b8" : "#0369a1",
-            color: "white",
-            border: "none",
-            borderRadius: 6,
-            cursor: calculating ? "wait" : "pointer",
-          }}
+          className="btn btn--primary"
         >
           {calculating ? "Расчёт..." : result ? "Пересчитать" : "Рассчитать"}
         </button>
-        <span style={{ fontSize: 12, color: "#475569" }}>
+        <span className="text-small text-muted">
           {result
             ? "Готово — параметры с вкладки «Подкрановая балка»."
             : "Расчёт ~3–10 секунд через HyperFormula. Параметры — на вкладке «Подкрановая балка»."}
@@ -956,19 +819,11 @@ function CraneBeamTrigger() {
       </div>
 
       {error && (
-        <div style={{ marginTop: 8, color: "#b91c1c", fontSize: 13 }}>Ошибка: {error}</div>
+        <div className="text-danger" style={{ marginTop: 8, fontSize: 13 }}>Ошибка: {error}</div>
       )}
 
       {result && (
-        <div
-          style={{
-            marginTop: 10,
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 8,
-            fontSize: 13,
-          }}
-        >
+        <div className="grid grid--4" style={{ marginTop: 10, fontSize: 13 }}>
           <div>Профиль: <b>{result.profile ?? "—"}</b></div>
           <div>K (Iпр+IIпр): <b>{result.utilizationPercent != null ? result.utilizationPercent.toFixed(2) + " %" : "—"}</b></div>
           <div>Масса 1 балки: <b>{result.weightKg != null ? result.weightKg.toFixed(1) + " кг" : "—"}</b></div>

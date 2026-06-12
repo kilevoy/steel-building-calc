@@ -14,18 +14,7 @@ export function LoadPropagationBanner() {
   if (!hasRoof && !hasTruss && !hasCrane) return null;
   const rx = results.truss?.reactions;
   return (
-    <div
-      style={{
-        marginBottom: 12,
-        padding: "8px 12px",
-        background: "#eff6ff",
-        border: "1px dashed #3b82f6",
-        borderRadius: 6,
-        fontSize: 12,
-        color: "#1e40af",
-        lineHeight: 1.6,
-      }}
-    >
+    <div className="note note--info text-small" style={{ marginBottom: 12, lineHeight: 1.6 }}>
       <b>🔗 Автопередача нагрузок</b>
       {hasRoof && (
         <div>

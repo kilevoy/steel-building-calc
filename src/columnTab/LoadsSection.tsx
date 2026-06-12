@@ -37,8 +37,8 @@ export function LoadsSection({
   setWallStructure: (id: string) => void;
 }) {
   return (
-    <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-      <legend style={{ fontWeight: 600 }}>Нагрузки</legend>
+    <fieldset className="card" style={{ padding: 12 }}>
+      <legend className="section-title">Нагрузки</legend>
       <CityCombobox />
       <SyncedSelectField
         label="Тип местности"
@@ -60,7 +60,7 @@ export function LoadsSection({
       />
       <Field label="Нагрузка от кровли, кПа" value={input.roofLoad_kPa} onChange={(v) => upd({ roofLoad_kPa: v })} step={0.001} />
       {(roofLoad.purlin_kPa > 0 || roofLoad.beamCell_kPa > 0) && (
-        <div style={{ fontSize: 11, color: "#0369a1", marginTop: -4, marginBottom: 6 }}>
+        <div className="field__hint" style={{ marginTop: -4, marginBottom: 6 }}>
           🔗 авто: {roofLoad.structure_kPa.toFixed(3)} (покрытие)
           {roofLoad.purlin_kPa > 0 && ` + ${roofLoad.purlin_kPa.toFixed(3)} (прогоны)`}
           {roofLoad.beamCell_kPa > 0 && ` + ${roofLoad.beamCell_kPa.toFixed(3)} (балка покр.)`}

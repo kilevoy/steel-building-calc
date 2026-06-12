@@ -16,14 +16,14 @@ export function EconomySection({
   upd: (patch: Partial<CalculationInput>) => void;
 }) {
   return (
-    <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-      <legend style={{ fontWeight: 600 }}>Колонна и экономика</legend>
-      <div style={{ marginBottom: 6, fontSize: 12, color: "#475569" }}>
+    <fieldset className="card" style={{ padding: 12 }}>
+      <legend className="section-title">Колонна и экономика</legend>
+      <div className="text-small text-muted" style={{ marginBottom: 6 }}>
         <div style={{ fontWeight: 600, marginBottom: 4 }}>μ по типу колонны (авто):</div>
         <div>Крайняя: <b>{muByType.edge.toFixed(2)}</b></div>
         <div>Фахверковая: <b>{muByType.fachwerk.toFixed(2)}</b></div>
         <div>Средняя: <b>{muByType.middle.toFixed(2)}</b></div>
-        <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>
+        <div className="field__hint" style={{ marginTop: 2 }}>
           Считается по связям / кол-ву пролётов
         </div>
       </div>

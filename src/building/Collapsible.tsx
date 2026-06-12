@@ -40,58 +40,21 @@ export function Collapsible({
 
   return (
     <div
-      style={{
-        border: "1px solid #ccc",
-        borderRadius: 6,
-        ...containerStyle,
-      }}
+      className={`collapsible ${open ? "collapsible--open" : "collapsible--closed"}`}
+      style={containerStyle}
     >
-      <div
-        onClick={() => setOpen((v) => !v)}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "6px 12px",
-          background: "#f8fafc",
-          borderBottom: open ? "1px solid #e2e8f0" : "none",
-          borderTopLeftRadius: 6,
-          borderTopRightRadius: 6,
-          borderBottomLeftRadius: open ? 0 : 6,
-          borderBottomRightRadius: open ? 0 : 6,
-          cursor: "pointer",
-          fontWeight: 600,
-          fontSize: 13,
-          color: "#0f172a",
-          userSelect: "none",
-          ...headerStyle,
-        }}
-      >
-        <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span
-            aria-hidden
-            style={{
-              display: "inline-block",
-              transform: open ? "rotate(90deg)" : "rotate(0deg)",
-              transition: "transform 0.15s",
-              fontSize: 10,
-              color: "#475569",
-            }}
-          >
-            ▶
-          </span>
+      <div className="collapsible__header" onClick={() => setOpen((v) => !v)} style={headerStyle}>
+        <span className="collapsible__title">
+          <span aria-hidden className="collapsible__chevron">▶</span>
           {title}
         </span>
         {rightHeader && (
-          <span
-            onClick={(e) => e.stopPropagation()}
-            style={{ fontWeight: 400, fontSize: 12, color: "#64748b" }}
-          >
+          <span className="collapsible__right" onClick={(e) => e.stopPropagation()}>
             {rightHeader}
           </span>
         )}
       </div>
-      {open && <div style={{ padding: 12 }}>{children}</div>}
+      {open && <div className="collapsible__body">{children}</div>}
     </div>
   );
 }

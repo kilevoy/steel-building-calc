@@ -270,246 +270,244 @@ export function PurlinApp() {
   return (
     <div>
       <h1 style={{ fontSize: 22, marginBottom: 4 }}>Калькулятор прогонов покрытия</h1>
-      <p style={{ color: "#666", fontSize: 13, marginTop: 0 }}>
+      <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Два каталога рядом: ЛСТК (2ТПС/2ПС/Z, МП350/МП390) и прокатные трубы (кв./пр., С245/С345). Шаг прокатных прогонов фиксирован 1500&nbsp;мм.
       </p>
 
       <div style={{ marginBottom: 16 }}>
-       <Collapsible title="📥 Исходные данные" storageKey="purlin-inputs" defaultOpen={true}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
-        {/* Column 1: geometry */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-          <legend style={{ fontWeight: 600 }}>Геометрия здания</legend>
-          <SyncedSelectField
-            label="Тип кровли"
-            value={building.roofShape}
-            options={[
-              ["gable", "двускатная"],
-              ["monoslope", "односкатная"],
-            ]}
-            onChange={(v) => updSynced("roofShape", v as Building["roofShape"])}
-          />
-          <SyncedNumField label="Пролёт, м" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
-          <SyncedNumField label="Длина здания, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
-          <SyncedNumField label="Высота до низа фермы, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
-          <SyncedNumField label="Уклон кровли, °" value={input.roofSlope_deg} onChange={(v) => updSynced("roofSlope_deg", v)} />
-          <SyncedNumField label="Шаг рам / пролёт прогона, м" value={input.framePitch_m} onChange={(v) => updSynced("framePitch_m", v)} validationKind="positive" />
-          <SyncedNumField
-            label="γₙ (коэф. ответственности)"
-            value={input.gamma_n}
-            onChange={(v) => setBuilding({ responsibilityCoeff: v })}
-            step={0.05}
-          />
-        </fieldset>
+        <Collapsible title="📥 Исходные данные" storageKey="purlin-inputs" defaultOpen={true}>
+          <div className="grid grid--3" style={{ marginBottom: 16 }}>
+            {/* Column 1: geometry */}
+            <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+              <legend style={{ fontWeight: 600 }}>Геометрия здания</legend>
+              <SyncedSelectField
+                label="Тип кровли"
+                value={building.roofShape}
+                options={[
+                  ["gable", "двускатная"],
+                  ["monoslope", "односкатная"],
+                ]}
+                onChange={(v) => updSynced("roofShape", v as Building["roofShape"])}
+              />
+              <SyncedNumField label="Пролёт, м" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+              <SyncedNumField label="Длина здания, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
+              <SyncedNumField label="Высота до низа фермы, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
+              <SyncedNumField label="Уклон кровли, °" value={input.roofSlope_deg} onChange={(v) => updSynced("roofSlope_deg", v)} />
+              <SyncedNumField label="Шаг рам / пролёт прогона, м" value={input.framePitch_m} onChange={(v) => updSynced("framePitch_m", v)} validationKind="positive" />
+              <SyncedNumField
+                label="γₙ (коэф. ответственности)"
+                value={input.gamma_n}
+                onChange={(v) => setBuilding({ responsibilityCoeff: v })}
+                step={0.05}
+              />
+            </fieldset>
 
-        {/* Column 2: loads */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-          <legend style={{ fontWeight: 600 }}>Климат и нагрузки</legend>
-          <div title="Синхронизировано со всеми вкладками" style={{ marginBottom: 6, background: "#fef9c3", border: "1px dashed #eab308", borderRadius: 4, padding: "4px 6px" }}>
-            <label style={{ fontSize: 13, display: "block" }}>
-              <span style={{ color: "#92400e", marginRight: 4 }}>🔗</span>
-              Город (автозаполнение w₀, Sg)
-            </label>
-            <input
-              style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
-              value={cityQuery}
-              onChange={(e) => {
-                setCityQuery(e.target.value);
-                setShowCityMatches(true);
-              }}
-              onFocus={() => setShowCityMatches(true)}
-              onBlur={() => {
-                setBuilding({ city: cityQuery });
-                window.setTimeout(() => setShowCityMatches(false), 150);
-              }}
-              placeholder="Введите название..."
-            />
-            {cityMatches.length > 0 && (
-              <div style={{ border: "1px solid #ddd", maxHeight: 200, overflow: "auto", background: "white" }}>
-                {cityMatches.map((s) => (
-                  <div
-                    key={s.id}
-                    style={{ padding: "4px 8px", cursor: "pointer", fontSize: 13 }}
-                    onMouseDown={(e) => { e.preventDefault(); handleCitySelect(s.id); }}
-                    onMouseOver={(e) => (e.currentTarget.style.background = "#eef")}
-                    onMouseOut={(e) => (e.currentTarget.style.background = "")}
-                  >
-                    {s.settlement} — {s.region}{" "}
-                    <span style={{ color: "#999" }}>
-                      (w₀={s.wind.w0Kpa ?? "—"}, Sg={s.snow.sgKpa ?? "—"})
-                    </span>
+            {/* Column 2: loads */}
+            <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+              <legend style={{ fontWeight: 600 }}>Климат и нагрузки</legend>
+              <div className="synced-field" title="Синхронизировано со всеми вкладками">
+                <label className="field__label">
+                  <span className="synced-field__badge">🔗</span>
+                  Город (автозаполнение w₀, Sg)
+                </label>
+                <input
+                  type="text"
+                  value={cityQuery}
+                  onChange={(e) => {
+                    setCityQuery(e.target.value);
+                    setShowCityMatches(true);
+                  }}
+                  onFocus={() => setShowCityMatches(true)}
+                  onBlur={() => {
+                    setBuilding({ city: cityQuery });
+                    window.setTimeout(() => setShowCityMatches(false), 150);
+                  }}
+                  placeholder="Введите название..."
+                />
+                {cityMatches.length > 0 && (
+                  <div style={{ border: "1px solid #ddd", maxHeight: 200, overflow: "auto", background: "white" }}>
+                    {cityMatches.map((s) => (
+                      <div
+                        key={s.id}
+                        style={{ padding: "4px 8px", cursor: "pointer", fontSize: 13 }}
+                        onMouseDown={(e) => { e.preventDefault(); handleCitySelect(s.id); }}
+                        onMouseOver={(e) => (e.currentTarget.style.background = "#eef")}
+                        onMouseOut={(e) => (e.currentTarget.style.background = "")}
+                      >
+                        {s.settlement} — {s.region}{" "}
+                        <span className="text-muted">
+                          (w₀={s.wind.w0Kpa ?? "—"}, Sg={s.snow.sgKpa ?? "—"})
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+                {cityLoading && (
+                  <div className="field__hint">
+                    Поиск...
+                  </div>
+                )}
               </div>
-            )}
-            {cityLoading && (
-              <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>
-                Поиск...
-              </div>
-            )}
-          </div>
-          <SyncedSelectField
-            label="Тип местности"
-            value={input.terrainType}
-            options={[
-              ["A", "A — открытая"],
-              ["B", "B — город/лес"],
-              ["C", "C — плотная застройка"],
-            ]}
-            onChange={(v) => updSynced("terrainType", v as Building["terrainType"])}
-          />
-          <SyncedNumField label="w₀ (ветер), кПа" value={input.w0_kPa} onChange={(v) => updSynced("w0_kPa", v)} step={0.01} validationKind="nonNegative" />
-          <SyncedNumField label="Sg (снег), кПа" value={input.Sg_kPa} onChange={(v) => updSynced("Sg_kPa", v)} step={0.05} validationKind="nonNegative" />
-          <SyncedSelectField
-            label="Конструкция покрытия"
-            value={input.roofStructure}
-            options={STRUCTURES.map((s) => [s.id, `${s.id} (${s.kPa.toFixed(3)} кПа)`])}
-            onChange={(v) => updSynced("roofStructure", v)}
-          />
-          <SelectField
-            label="Профлист"
-            value={input.deckProfile}
-            options={DECK_PROFILE_OPTIONS.map((profile) => [profile, profile])}
-            onChange={(v) => upd({ deckProfile: v })}
-          />
-          <Field
-            label="Нагрузка от кровли, кПа"
-            value={input.roofLoad_kPa}
-            onChange={(v) => upd({ roofLoad_kPa: v })}
-            step={0.001}
-          />
-        </fieldset>
+              <SyncedSelectField
+                label="Тип местности"
+                value={input.terrainType}
+                options={[
+                  ["A", "A — открытая"],
+                  ["B", "B — город/лес"],
+                  ["C", "C — плотная застройка"],
+                ]}
+                onChange={(v) => updSynced("terrainType", v as Building["terrainType"])}
+              />
+              <SyncedNumField label="w₀ (ветер), кПа" value={input.w0_kPa} onChange={(v) => updSynced("w0_kPa", v)} step={0.01} validationKind="nonNegative" />
+              <SyncedNumField label="Sg (снег), кПа" value={input.Sg_kPa} onChange={(v) => updSynced("Sg_kPa", v)} step={0.05} validationKind="nonNegative" />
+              <SyncedSelectField
+                label="Конструкция покрытия"
+                value={input.roofStructure}
+                options={STRUCTURES.map((s) => [s.id, `${s.id} (${s.kPa.toFixed(3)} кПа)`])}
+                onChange={(v) => updSynced("roofStructure", v)}
+              />
+              <SelectField
+                label="Профлист"
+                value={input.deckProfile}
+                options={DECK_PROFILE_OPTIONS.map((profile) => [profile, profile])}
+                onChange={(v) => upd({ deckProfile: v })}
+              />
+              <Field
+                label="Нагрузка от кровли, кПа"
+                value={input.roofLoad_kPa}
+                onChange={(v) => upd({ roofLoad_kPa: v })}
+                step={0.001}
+              />
+            </fieldset>
 
-        {/* Column 3: snow drift + step constraints */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-          <legend style={{ fontWeight: 600 }}>Снеговой мешок и параметры подбора</legend>
-          <SyncedSelectField
-            label="Принятый тип прогонов"
-            value={building.purlinSelectionMode}
-            options={getAvailablePurlinSelectionModes(building).map((mode) => [
-              mode,
-              purlinSelectionModeLabel(mode),
-            ])}
-            onChange={(v) => updSynced("purlinSelectionMode", v as Building["purlinSelectionMode"])}
-          />
-          <div style={{ color: "#64748b", fontSize: 11, margin: "-2px 0 8px" }}>
-            Этот выбор синхронизирован со сводкой. 2ТПС доступен только для послойной сборки «наше ...».
-          </div>
-          <SyncedSelectField
-            label="Схема работы прогонов"
-            value={building.purlinContinuityScheme}
-            options={[
-              ["split", purlinContinuitySchemeLabel("split")],
-              ["continuous", purlinContinuitySchemeLabel("continuous")],
-            ]}
-            onChange={(v) => updSynced("purlinContinuityScheme", v as Building["purlinContinuityScheme"])}
-          />
-          <SelectField
-            label="Снеговой мешок"
-            value={input.snowDrift}
-            options={[
-              ["none", "нет"],
-              ["along", "вдоль здания"],
-              ["across", "поперёк здания"],
-            ]}
-            onChange={(v) => upd({ snowDrift: v as SnowDriftMode })}
-          />
-          {input.snowDrift !== "none" && (
-            <>
+            {/* Column 3: snow drift + step constraints */}
+            <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+              <legend style={{ fontWeight: 600 }}>Снеговой мешок и параметры подбора</legend>
+              <SyncedSelectField
+                label="Принятый тип прогонов"
+                value={building.purlinSelectionMode}
+                options={getAvailablePurlinSelectionModes(building).map((mode) => [
+                  mode,
+                  purlinSelectionModeLabel(mode),
+                ])}
+                onChange={(v) => updSynced("purlinSelectionMode", v as Building["purlinSelectionMode"])}
+              />
+              <div className="field__hint" style={{ margin: "-2px 0 8px" }}>
+                Этот выбор синхронизирован со сводкой. 2ТПС доступен только для послойной сборки «наше ...».
+              </div>
+              <SyncedSelectField
+                label="Схема работы прогонов"
+                value={building.purlinContinuityScheme}
+                options={[
+                  ["split", purlinContinuitySchemeLabel("split")],
+                  ["continuous", purlinContinuitySchemeLabel("continuous")],
+                ]}
+                onChange={(v) => updSynced("purlinContinuityScheme", v as Building["purlinContinuityScheme"])}
+              />
+              <SelectField
+                label="Снеговой мешок"
+                value={input.snowDrift}
+                options={[
+                  ["none", "нет"],
+                  ["along", "вдоль здания"],
+                  ["across", "поперёк здания"],
+                ]}
+                onChange={(v) => upd({ snowDrift: v as SnowDriftMode })}
+              />
+              {input.snowDrift !== "none" && (
+                <>
+                  <Field
+                    label="Высота перепада, м"
+                    value={input.drift_dropHeight_m}
+                    onChange={(v) => upd({ drift_dropHeight_m: v })}
+                    step={0.5}
+                  />
+                  <Field
+                    label="Размер существующего здания, м"
+                    value={input.drift_existingSize_m}
+                    onChange={(v) => upd({ drift_existingSize_m: v })}
+                    step={0.5}
+                  />
+                </>
+              )}
               <Field
-                label="Высота перепада, м"
-                value={input.drift_dropHeight_m}
-                onChange={(v) => upd({ drift_dropHeight_m: v })}
-                step={0.5}
+                label="Мин. шаг прогонов, мм"
+                value={input.minStep_mm}
+                onChange={(v) => upd({ minStep_mm: v })}
+                step={5}
               />
               <Field
-                label="Размер существующего здания, м"
-                value={input.drift_existingSize_m}
-                onChange={(v) => upd({ drift_existingSize_m: v })}
-                step={0.5}
+                label="Макс. шаг прогонов, мм"
+                value={input.maxStep_mm}
+                onChange={(v) => upd({ maxStep_mm: v })}
+                step={5}
               />
-            </>
-          )}
-          <Field
-            label="Мин. шаг прогонов, мм"
-            value={input.minStep_mm}
-            onChange={(v) => upd({ minStep_mm: v })}
-            step={5}
-          />
-          <Field
-            label="Макс. шаг прогонов, мм"
-            value={input.maxStep_mm}
-            onChange={(v) => upd({ maxStep_mm: v })}
-            step={5}
-          />
-          <ReadonlyField
-            label="Макс. шаг авто, мм"
-            value={out?.autoMaxStep_mm === null || out?.autoMaxStep_mm === undefined
-              ? "—"
-              : out.autoMaxStep_mm.toFixed(0)}
-          />
-          <SelectField
-            label="Прогон под снегозадержание"
-            value={input.snowGuardPurlin ? "yes" : "no"}
-            options={[
-              ["no", "нет"],
-              ["yes", "да"],
-            ]}
-            onChange={(v) => upd({ snowGuardPurlin: v === "yes" })}
-          />
-          <SelectField
-            label="Прогон под ограждение"
-            value={input.fencePurlin ? "yes" : "no"}
-            options={[
-              ["no", "нет"],
-              ["yes", "да"],
-            ]}
-            onChange={(v) => upd({ fencePurlin: v === "yes" })}
-          />
-          <SelectField
-            label="Установка тяжей"
-            value={String(input.tieInstallation)}
-            options={[
-              ["none", "нет"],
-              ["1", "1"],
-              ["2", "2"],
-              ["3", "3"],
-            ]}
-            onChange={(v) =>
-              upd({ tieInstallation: v === "none" ? "none" : (Number(v) as 1 | 2 | 3) })
-            }
-          />
-          <Field
-            label="Шаг распорок, м"
-            value={input.braceStep_m}
-            onChange={(v) => upd({ braceStep_m: v })}
-            step={0.1}
-          />
-          <div style={{ marginBottom: 6 }}>
-            <label style={{ fontSize: 13, display: "block" }}>
-              <input
-                type="checkbox"
-                checked={maxUtilFixed}
-                onChange={(e) => setMaxUtilFixed(e.target.checked)}
-                style={{ marginRight: 6 }}
+              <ReadonlyField
+                label="Макс. шаг авто, мм"
+                value={out?.autoMaxStep_mm === null || out?.autoMaxStep_mm === undefined
+                  ? "—"
+                  : out.autoMaxStep_mm.toFixed(0)}
               />
-              Фикс. макс. к-т исп. (иначе по умолчанию: 0.85/0.87/0.90 по толщине)
-            </label>
-            {maxUtilFixed && (
-              <input
-                type="number"
-                step={0.01}
-                min={0.1}
-                max={1}
-                value={maxUtilValue}
-                onChange={(e) => setMaxUtilValue(Number(e.target.value))}
-                style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
+              <SelectField
+                label="Прогон под снегозадержание"
+                value={input.snowGuardPurlin ? "yes" : "no"}
+                options={[
+                  ["no", "нет"],
+                  ["yes", "да"],
+                ]}
+                onChange={(v) => upd({ snowGuardPurlin: v === "yes" })}
               />
-            )}
+              <SelectField
+                label="Прогон под ограждение"
+                value={input.fencePurlin ? "yes" : "no"}
+                options={[
+                  ["no", "нет"],
+                  ["yes", "да"],
+                ]}
+                onChange={(v) => upd({ fencePurlin: v === "yes" })}
+              />
+              <SelectField
+                label="Установка тяжей"
+                value={String(input.tieInstallation)}
+                options={[
+                  ["none", "нет"],
+                  ["1", "1"],
+                  ["2", "2"],
+                  ["3", "3"],
+                ]}
+                onChange={(v) =>
+                  upd({ tieInstallation: v === "none" ? "none" : (Number(v) as 1 | 2 | 3) })
+                }
+              />
+              <Field
+                label="Шаг распорок, м"
+                value={input.braceStep_m}
+                onChange={(v) => upd({ braceStep_m: v })}
+                step={0.1}
+              />
+              <div className="field">
+                <label className="field__label">
+                  <input
+                    type="checkbox"
+                    checked={maxUtilFixed}
+                    onChange={(e) => setMaxUtilFixed(e.target.checked)}
+                  />
+                  {" "}Фикс. макс. к-т исп. (иначе по умолчанию: 0.85/0.87/0.90 по толщине)
+                </label>
+                {maxUtilFixed && (
+                  <input
+                    type="number"
+                    step={0.01}
+                    min={0.1}
+                    max={1}
+                    value={maxUtilValue}
+                    onChange={(e) => setMaxUtilValue(Number(e.target.value))}
+                  />
+                )}
+              </div>
+            </fieldset>
           </div>
-        </fieldset>
-      </div>
-       </Collapsible>
+        </Collapsible>
       </div>
 
       <div style={{ marginBottom: 16 }}>
@@ -517,18 +515,18 @@ export function PurlinApp() {
       </div>
 
       {error && (
-        <div style={{ marginTop: 12, color: "#b91c1c", fontSize: 14 }}>
+        <div className="note note--danger" style={{ marginTop: 12 }}>
           Ошибка: {error}
         </div>
       )}
 
       {out && (
         <div style={{ marginTop: 18 }}>
-          <div style={{ background: "#fef3c7", border: "1px solid #fde68a", padding: 8, marginBottom: 12, color: "#92400e", fontSize: 13 }}>
+          <div className="note note--warn" style={{ marginBottom: 12 }}>
             ?????? ???????? ???????? ??? ????????? ???????? ????????? ?? Excel-??????: ???????? ????? ?? ???????? ??????? ?????? ?????????? ?? ?????? ????? ?????? ?????? ? ??? ???.
           </div>
 
-          <h2 style={{ fontSize: 18, marginBottom: 6 }}>Нагрузки</h2>
+          <h2 className="section-title" style={{ fontSize: 18 }}>Нагрузки</h2>
           <div
             style={{
               display: "grid",
@@ -551,25 +549,25 @@ export function PurlinApp() {
             <Stat label="μ₂" value={out.mu2.toFixed(3)} />
           </div>
 
-          <h2 style={{ fontSize: 18, marginBottom: 6 }}>Подобранные сечения по типам и маркам стали</h2>
-          <div style={{ overflow: "auto", marginBottom: 16 }}>
-            <table style={{ borderCollapse: "collapse", fontSize: 13, minWidth: 880 }}>
-              <thead style={{ background: "#f1f5f9" }}>
+          <h2 className="section-title" style={{ fontSize: 18 }}>Подобранные сечения по типам и маркам стали</h2>
+          <div className="table-wrap" style={{ marginBottom: 16 }}>
+            <table className="table" style={{ minWidth: 880 }}>
+              <thead>
                 <tr>
-                  <th style={th}>Сталь</th>
-                  <th style={th}>Тип</th>
-                  <th style={th}>Профиль</th>
-                  <th style={th}>Шаг, мм</th>
-                  <th style={th}>М_расч, кН·м</th>
-                  <th style={th}>М_пред, кН·м</th>
-                  <th style={th}>K</th>
-                  <th style={th}>Кол-во</th>
-                  <th style={th}>Масса/м, кг</th>
-                  <th style={th}>Масса на 1 шаг, кг</th>
-                  <th style={th}>Масса на здание, кг</th>
-                  <th style={th}>Черняк, кг</th>
-                  <th style={th}>Оцинковка, кг</th>
-                  <th style={th}>Масса с распорками, кг</th>
+                  <th>Сталь</th>
+                  <th>Тип</th>
+                  <th>Профиль</th>
+                  <th>Шаг, мм</th>
+                  <th>М_расч, кН·м</th>
+                  <th>М_пред, кН·м</th>
+                  <th>K</th>
+                  <th>Кол-во</th>
+                  <th>Масса/м, кг</th>
+                  <th>Масса на 1 шаг, кг</th>
+                  <th>Масса на здание, кг</th>
+                  <th>Черняк, кг</th>
+                  <th>Оцинковка, кг</th>
+                  <th>Масса с распорками, кг</th>
                 </tr>
               </thead>
               <tbody>
@@ -579,10 +577,10 @@ export function PurlinApp() {
                   if (!c) {
                     return (
                       <tr key={key}>
-                        <td style={td}>{GRADE_LABELS[s.grade]}</td>
-                        <td style={td}>{TYPE_LABELS[s.type]}</td>
-                        <td style={td} colSpan={12}>
-                          <span style={{ color: "#999" }}>нет подходящего профиля</span>
+                        <td>{GRADE_LABELS[s.grade]}</td>
+                        <td>{TYPE_LABELS[s.type]}</td>
+                        <td colSpan={12}>
+                          <span className="text-muted">нет подходящего профиля</span>
                         </td>
                       </tr>
                     );
@@ -592,22 +590,22 @@ export function PurlinApp() {
                       key={key}
                       style={{ background: c.K > 0.95 ? "#fef2f2" : undefined }}
                     >
-                      <td style={td}>{GRADE_LABELS[s.grade]}</td>
-                      <td style={td}>{TYPE_LABELS[s.type]}</td>
-                      <td style={td}>{c.profile.name}</td>
-                      <td style={td}>{c.spacing_mm}</td>
-                      <td style={td}>{c.M_design_kNm.toFixed(2)}</td>
-                      <td style={td}>{c.M_pred_eff_kNm.toFixed(2)}</td>
-                      <td style={td}>{c.K.toFixed(3)}</td>
-                      <td style={td}>{c.nPurlins}</td>
-                      <td style={td}>{c.profile.mass_kg_per_m.toFixed(3)}</td>
-                      <td style={td}>{c.massPerFrameStep_kg.toFixed(2)}</td>
-                      <td style={td}>{c.massPerBuilding_kg.toFixed(2)}</td>
-                      <td style={td}>{c.blackMass_kg === null ? "—" : c.blackMass_kg.toFixed(2)}</td>
-                      <td style={td}>
+                      <td>{GRADE_LABELS[s.grade]}</td>
+                      <td>{TYPE_LABELS[s.type]}</td>
+                      <td>{c.profile.name}</td>
+                      <td className="num">{c.spacing_mm}</td>
+                      <td className="num">{c.M_design_kNm.toFixed(2)}</td>
+                      <td className="num">{c.M_pred_eff_kNm.toFixed(2)}</td>
+                      <td className="num">{c.K.toFixed(3)}</td>
+                      <td className="num">{c.nPurlins}</td>
+                      <td className="num">{c.profile.mass_kg_per_m.toFixed(3)}</td>
+                      <td className="num">{c.massPerFrameStep_kg.toFixed(2)}</td>
+                      <td className="num">{c.massPerBuilding_kg.toFixed(2)}</td>
+                      <td className="num">{c.blackMass_kg === null ? "—" : c.blackMass_kg.toFixed(2)}</td>
+                      <td className="num">
                         {c.galvanizedMass_kg === null ? "—" : c.galvanizedMass_kg.toFixed(2)}
                       </td>
-                      <td style={td}>{c.massWithBraces_kg.toFixed(2)}</td>
+                      <td className="num">{c.massWithBraces_kg.toFixed(2)}</td>
                     </tr>
                   );
                 })}
@@ -616,16 +614,8 @@ export function PurlinApp() {
           </div>
 
           {diagnostics && (
-            <div
-              style={{
-                border: "1px solid #cbd5e1",
-                borderRadius: 6,
-                padding: 10,
-                marginBottom: 16,
-                background: "#f8fafc",
-              }}
-            >
-              <h2 style={{ fontSize: 17, margin: "0 0 8px" }}>
+            <div className="card" style={{ padding: 10, marginBottom: 16 }}>
+              <h2 className="section-title" style={{ fontSize: 17 }}>
                 Диагностика выбора ЛСТК-прогонов
               </h2>
               <div style={{ fontSize: 13, marginBottom: 8 }}>
@@ -638,48 +628,46 @@ export function PurlinApp() {
                     : "нет подходящего профиля"}
                 </strong>
               </div>
-              <div style={{ overflow: "auto", marginBottom: 8 }}>
-                <table style={{ borderCollapse: "collapse", fontSize: 12, minWidth: 760 }}>
-                  <thead style={{ background: "#e2e8f0" }}>
+              <div className="table-wrap" style={{ marginBottom: 8 }}>
+                <table className="table" style={{ minWidth: 760 }}>
+                  <thead>
                     <tr>
-                      <th style={th}>Сталь</th>
-                      <th style={th}>Тип</th>
-                      <th style={th}>Статус</th>
-                      <th style={th}>Профиль</th>
-                      <th style={th}>Шаг, мм</th>
-                      <th style={th}>K</th>
-                      <th style={th}>Масса, кг</th>
-                      <th style={th}>Пояснение</th>
+                      <th>Сталь</th>
+                      <th>Тип</th>
+                      <th>Статус</th>
+                      <th>Профиль</th>
+                      <th>Шаг, мм</th>
+                      <th>K</th>
+                      <th>Масса, кг</th>
+                      <th>Пояснение</th>
                     </tr>
                   </thead>
                   <tbody>
                     {diagnostics.familyDiagnostics.map((item) => (
                       <tr key={`${item.grade}-${item.type}`}>
-                        <td style={td}>{GRADE_LABELS[item.grade]}</td>
-                        <td style={td}>{TYPE_LABELS[item.type]}</td>
-                        <td style={td}>
-                          {item.status === "selected" ? "подходит" : "нет кандидата"}
-                        </td>
-                        <td style={td}>{item.profileName ?? "—"}</td>
-                        <td style={td}>{item.spacing_mm ?? "—"}</td>
-                        <td style={td}>{item.utilization === null ? "—" : item.utilization.toFixed(3)}</td>
-                        <td style={td}>
+                        <td>{GRADE_LABELS[item.grade]}</td>
+                        <td>{TYPE_LABELS[item.type]}</td>
+                        <td>{item.status === "selected" ? "подходит" : "нет кандидата"}</td>
+                        <td>{item.profileName ?? "—"}</td>
+                        <td className="num">{item.spacing_mm ?? "—"}</td>
+                        <td className="num">{item.utilization === null ? "—" : item.utilization.toFixed(3)}</td>
+                        <td className="num">
                           {item.massPerBuilding_kg === null
                             ? "—"
                             : item.massPerBuilding_kg.toFixed(2)}
                         </td>
-                        <td style={td}>{diagnosticNotesRu(item.notes).join(" ")}</td>
+                        <td>{diagnosticNotesRu(item.notes).join(" ")}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              <div style={{ fontSize: 12, color: "#475569" }}>
+              <div className="text-small text-muted">
                 Параметры Excel/VELICAN, которые ещё требуют полной сверки:{" "}
                 {diagnostics.oracleOnlyParameters.map(oracleParameterRu).join(", ")}.
               </div>
               {diagnostics.warnings.map((warning) => (
-                <div key={warning} style={{ fontSize: 12, color: "#92400e", marginTop: 4 }}>
+                <div key={warning} className="text-small text-warn" style={{ marginTop: 4 }}>
                   {warningRu(warning)}
                 </div>
               ))}
@@ -694,83 +682,87 @@ export function PurlinApp() {
               alignItems: "start",
             }}
           >
-            <div style={{ overflow: "auto" }}>
-              <h2 style={{ fontSize: 17, marginBottom: 6 }}>
+            <div>
+              <h2 className="section-title" style={{ fontSize: 17 }}>
                 Топ-10 ЛСТК (по массе на здание)
               </h2>
-              <table style={{ borderCollapse: "collapse", fontSize: 12, minWidth: 540 }}>
-                <thead style={{ background: "#f1f5f9" }}>
-                  <tr>
-                    <th style={th}>#</th>
-                    <th style={th}>Сталь</th>
-                    <th style={th}>Профиль</th>
-                    <th style={th}>Шаг, мм</th>
-                    <th style={th}>K</th>
-                    <th style={th}>Кол-во</th>
-                    <th style={th}>Масса/м, кг</th>
-                    <th style={th}>Масса, кг</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {out.top10.map((c, i) => (
-                    <tr
-                      key={i}
-                      style={{ background: c.K > 0.95 ? "#fef2f2" : undefined }}
-                    >
-                      <td style={td}>{i + 1}</td>
-                      <td style={td}>{c.profile.Ry_MPa === 350 ? "МП350" : "МП390"}</td>
-                      <td style={td}>{c.profile.name}</td>
-                      <td style={td}>{c.spacing_mm}</td>
-                      <td style={td}>{c.K.toFixed(3)}</td>
-                      <td style={td}>{c.nPurlins}</td>
-                      <td style={td}>{c.profile.mass_kg_per_m.toFixed(3)}</td>
-                      <td style={td}>{c.massPerBuilding_kg.toFixed(0)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div style={{ overflow: "auto" }}>
-              <h2 style={{ fontSize: 17, marginBottom: 6 }}>
-                Топ-10 прокатных труб (по стоимости, шаг 1500&nbsp;мм)
-              </h2>
-              {rolledTop10.length === 0 ? (
-                <div style={{ color: "#999", fontSize: 13, padding: 8 }}>
-                  Нет подходящих прокатных профилей при K&nbsp;≤&nbsp;{rolledMaxK.toFixed(2)}.
-                </div>
-              ) : (
-                <table style={{ borderCollapse: "collapse", fontSize: 12, minWidth: 540 }}>
-                  <thead style={{ background: "#f1f5f9" }}>
+              <div className="table-wrap">
+                <table className="table" style={{ minWidth: 540 }}>
+                  <thead>
                     <tr>
-                      <th style={th}>#</th>
-                      <th style={th}>Сталь</th>
-                      <th style={th}>Профиль</th>
-                      <th style={th}>Шаг, мм</th>
-                      <th style={th}>K</th>
-                      <th style={th}>Масса/м, кг</th>
-                      <th style={th}>Масса, кг</th>
-                      <th style={th}>₽ за шаг, тыс.</th>
+                      <th>#</th>
+                      <th>Сталь</th>
+                      <th>Профиль</th>
+                      <th>Шаг, мм</th>
+                      <th>K</th>
+                      <th>Кол-во</th>
+                      <th>Масса/м, кг</th>
+                      <th>Масса, кг</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {rolledTop10.map((c, i) => (
+                    {out.top10.map((c, i) => (
                       <tr
                         key={i}
                         style={{ background: c.K > 0.95 ? "#fef2f2" : undefined }}
                       >
-                        <td style={td}>{i + 1}</td>
-                        <td style={td}>{c.steel}</td>
-                        <td style={td}>{c.profile.name}</td>
-                        <td style={td}>{c.spacing_mm}</td>
-                        <td style={td}>{c.K.toFixed(3)}</td>
-                        <td style={td}>{c.profile.mass_kg_per_m.toFixed(2)}</td>
-                        <td style={td}>{c.massPerBuilding_kg.toFixed(0)}</td>
-                        <td style={td}>{c.costPerFrameStep_kRub.toFixed(2)}</td>
+                        <td>{i + 1}</td>
+                        <td>{c.profile.Ry_MPa === 350 ? "МП350" : "МП390"}</td>
+                        <td>{c.profile.name}</td>
+                        <td className="num">{c.spacing_mm}</td>
+                        <td className="num">{c.K.toFixed(3)}</td>
+                        <td className="num">{c.nPurlins}</td>
+                        <td className="num">{c.profile.mass_kg_per_m.toFixed(3)}</td>
+                        <td className="num">{c.massPerBuilding_kg.toFixed(0)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="section-title" style={{ fontSize: 17 }}>
+                Топ-10 прокатных труб (по стоимости, шаг 1500&nbsp;мм)
+              </h2>
+              {rolledTop10.length === 0 ? (
+                <div className="note note--info">
+                  Нет подходящих прокатных профилей при K&nbsp;≤&nbsp;{rolledMaxK.toFixed(2)}.
+                </div>
+              ) : (
+                <div className="table-wrap">
+                  <table className="table" style={{ minWidth: 540 }}>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Сталь</th>
+                        <th>Профиль</th>
+                        <th>Шаг, мм</th>
+                        <th>K</th>
+                        <th>Масса/м, кг</th>
+                        <th>Масса, кг</th>
+                        <th>₽ за шаг, тыс.</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rolledTop10.map((c, i) => (
+                        <tr
+                          key={i}
+                          style={{ background: c.K > 0.95 ? "#fef2f2" : undefined }}
+                        >
+                          <td>{i + 1}</td>
+                          <td>{c.steel}</td>
+                          <td>{c.profile.name}</td>
+                          <td className="num">{c.spacing_mm}</td>
+                          <td className="num">{c.K.toFixed(3)}</td>
+                          <td className="num">{c.profile.mass_kg_per_m.toFixed(2)}</td>
+                          <td className="num">{c.massPerBuilding_kg.toFixed(0)}</td>
+                          <td className="num">{c.costPerFrameStep_kRub.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           </div>
@@ -779,9 +771,6 @@ export function PurlinApp() {
     </div>
   );
 }
-
-const th: React.CSSProperties = { padding: "6px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "left", whiteSpace: "nowrap" };
-const td: React.CSSProperties = { padding: "4px 8px", borderBottom: "1px solid #f1f5f9" };
 
 function diagnosticNotesRu(notes: string[]): string[] {
   return notes.map((note) => {
@@ -857,14 +846,13 @@ function Field({
   step?: number;
 }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+    <div className="field">
+      <label className="field__label">{label}</label>
       <input
         type="number"
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       />
     </div>
   );
@@ -872,18 +860,12 @@ function Field({
 
 function ReadonlyField({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+    <div className="field">
+      <label className="field__label">{label}</label>
       <input
+        type="text"
         readOnly
         value={value}
-        style={{
-          width: "100%",
-          padding: 4,
-          boxSizing: "border-box",
-          background: "#f8fafc",
-          color: "#334155",
-        }}
       />
     </div>
   );
@@ -901,12 +883,11 @@ function SelectField({
   onChange: (v: string) => void;
 }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+    <div className="field">
+      <label className="field__label">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       >
         {options.map(([v, l]) => (
           <option key={v} value={v}>
@@ -921,8 +902,8 @@ function SelectField({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div style={{ fontSize: 11, color: "#888" }}>{label}</div>
-      <div style={{ fontSize: 16, fontWeight: 600 }}>{value}</div>
+      <div className="stat__label">{label}</div>
+      <div className="stat__value">{value}</div>
     </div>
   );
 }

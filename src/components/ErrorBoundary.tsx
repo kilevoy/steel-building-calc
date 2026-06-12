@@ -27,30 +27,20 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: 16, fontSize: 14, color: "#b91c1c" }}>
+        <div className="note note--danger" style={{ margin: 16 }}>
           <div>
             Ошибка в модуле расчёта. Проверьте входные данные или перезагрузите страницу.
           </div>
           {this.state.message ? (
-            <div style={{ marginTop: 8, fontSize: 12, color: "#7f1d1d" }}>
+            <div className="text-small" style={{ marginTop: 8 }}>
               {this.state.message}
             </div>
           ) : null}
-          <button
-            type="button"
-            onClick={this.reset}
-            style={{
-              marginTop: 12,
-              padding: "6px 12px",
-              border: "1px solid #fecaca",
-              borderRadius: 4,
-              background: "#fff1f2",
-              color: "#991b1b",
-              cursor: "pointer",
-            }}
-          >
-            Попробовать снова
-          </button>
+          <div style={{ marginTop: 12 }}>
+            <button type="button" className="btn btn--danger" onClick={this.reset}>
+              Попробовать снова
+            </button>
+          </div>
         </div>
       );
     }

@@ -1,7 +1,7 @@
 /**
- * Plain <select> with [value, label] tuples. Extracted from `App.tsx`
- * without behaviour changes. Cross-tab synced selects use
- * `building/SyncedField.SyncedSelectField` instead.
+ * Plain <select> with [value, label] tuples. Cross-tab synced selects use
+ * `building/SyncedField.SyncedSelectField` instead. Presentation comes
+ * from the shared design system in `src/styles.css`.
  */
 export function SelectField({
   label,
@@ -15,13 +15,9 @@ export function SelectField({
   onChange: (v: string) => void;
 }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
-      >
+    <div className="field">
+      <label className="field__label">{label}</label>
+      <select value={value} onChange={(e) => onChange(e.target.value)}>
         {options.map(([v, l]) => (
           <option key={v} value={v}>
             {l}
