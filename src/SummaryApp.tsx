@@ -134,6 +134,10 @@ export function SummaryApp() {
 
   return (
     <div>
+      <div className="print-only text-small text-muted">
+        Калькулятор стального каркаса — отчёт по зданию от{" "}
+        {new Date().toLocaleDateString("ru-RU")}
+      </div>
       <h2 style={{ marginTop: 0 }}>Сводка по зданию</h2>
       <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Подобранные профили и металлоёмкость из всех вкладок одновременно. Все данные
@@ -386,6 +390,14 @@ function AutoCalculateSummaryButton({
           className="btn btn--primary"
         >
           {calculating ? "Расчёт..." : "Рассчитать всё для сводки"}
+        </button>
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="btn"
+          title="Печать или сохранение сводки в PDF через диалог печати браузера"
+        >
+          🖨 Печать / PDF
         </button>
         <span className="text-small text-muted">
           При открытии сводки расчёт запускается автоматически. Кнопка нужна для ручного пересчёта после изменения параметров.

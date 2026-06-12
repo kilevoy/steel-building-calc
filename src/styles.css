@@ -469,7 +469,75 @@ input[type="checkbox"] {
   color: var(--c-text);
 }
 
+/* ---------- Меню проектов ---------- */
+
+.projects-menu {
+  position: relative;
+}
+
+.projects-menu__panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 30;
+  width: min(360px, 90vw);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.projects-menu__row {
+  display: flex;
+  gap: 6px;
+}
+
+.projects-menu__row input[type="text"] {
+  flex: 1;
+}
+
+.projects-menu__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  border-top: 1px solid var(--c-border-soft);
+}
+
+.projects-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.projects-menu__load {
+  flex: 1;
+  text-align: left;
+  padding: 7px 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--c-accent);
+}
+
+.projects-menu__load:hover {
+  background: var(--c-accent-soft);
+}
+
+.projects-menu__delete {
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
 /* ---------- Печать ---------- */
+
+.print-only {
+  display: none;
+}
 
 @media print {
   body {
@@ -477,13 +545,27 @@ input[type="checkbox"] {
   }
 
   .tabs,
-  .btn {
-    display: none;
+  .btn,
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
   }
 
   .collapsible,
   .card {
     box-shadow: none;
     border-color: #999;
+  }
+
+  .table th,
+  .table td {
+    border: 1px solid #bbb;
+  }
+
+  .table-wrap {
+    overflow: visible;
   }
 }
