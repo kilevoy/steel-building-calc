@@ -114,14 +114,14 @@ export function BeamCellApp() {
   return (
     <div>
       <h2 style={{ marginTop: 0 }}>Балка покрытия</h2>
-      <p style={{ color: "#666", marginTop: 0, fontSize: 13 }}>
+      <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Подбор главной балки (ГБ) покрытия — прокатный двутавр по сортаменту, с учётом снеговой
         нагрузки и собственного веса. Расчёт по СП 16.13330.
       </p>
 
       <div style={{ marginBottom: 16 }}>
        <Collapsible title="📥 Исходные данные" storageKey="beamcell-inputs" defaultOpen={true}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+      <div className="grid grid--3" style={{ gap: 12 }}>
         {/* Column 1: Geometry */}
         <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
           <legend style={{ fontWeight: 600 }}>Геометрия</legend>
@@ -141,9 +141,9 @@ export function BeamCellApp() {
             step={5}
             onChange={(v) => upd("floorLoadKgM2", v)}
           />
-          <div style={{ fontSize: 12, color: "#666", marginTop: 8, lineHeight: 1.6 }}>
+          <div className="text-small text-muted" style={{ marginTop: 8, lineHeight: 1.6 }}>
             <div>q расчётная = <b>{fmtN(result.qMain)} кН/м²</b></div>
-            <div style={{ marginTop: 6, color: "#a16207" }}>
+            <div className="text-warn" style={{ marginTop: 6 }}>
               ВБ (второстепенные балки) и колонны в этом режиме не считаются.
             </div>
           </div>
@@ -158,7 +158,7 @@ export function BeamCellApp() {
             options={STEELS.map((s) => [s, s])}
             onChange={(v) => upd("acceptedMainSteel", v as Steel)}
           />
-          <div style={{ fontSize: 12, color: "#666", marginTop: 8 }}>
+          <div className="text-small text-muted" style={{ marginTop: 8 }}>
             Цены С245/С345 — в общем блоке «Цены стали» ниже (синхронизированы между всеми вкладками).
           </div>
         </fieldset>
@@ -180,7 +180,7 @@ export function BeamCellApp() {
       />
 
       {result.warnings.length > 0 && (
-        <div style={{ marginTop: 12, fontSize: 12, color: "#a16207" }}>
+        <div className="text-small text-warn" style={{ marginTop: 12 }}>
           {result.warnings.map((w, i) => (
             <div key={i}>⚠ {w}</div>
           ))}
@@ -190,20 +190,6 @@ export function BeamCellApp() {
   );
 }
 
-const th: React.CSSProperties = {
-  padding: "6px 8px",
-  borderBottom: "1px solid #e2e8f0",
-  textAlign: "left",
-  whiteSpace: "nowrap",
-  background: "#f8fafc",
-  fontSize: 12,
-};
-const td: React.CSSProperties = {
-  padding: "4px 8px",
-  borderBottom: "1px solid #f1f5f9",
-  fontSize: 13,
-};
-
 function ResultTable({
   rows,
   accepted,
@@ -212,15 +198,15 @@ function ResultTable({
   accepted: Steel;
 }) {
   return (
-    <div>
-      <table style={{ borderCollapse: "collapse", width: "100%", maxWidth: 800 }}>
+    <div className="table-wrap">
+      <table className="table" style={{ maxWidth: 800 }}>
         <thead>
           <tr>
-            <th style={th}>Сталь</th>
-            <th style={th}>Профиль</th>
-            <th style={th}>Масса 1 балки</th>
-            <th style={th}>Стоимость 1 балки</th>
-            <th style={th}>K (использование)</th>
+            <th>Сталь</th>
+            <th>Профиль</th>
+            <th>Масса 1 балки</th>
+            <th>Стоимость 1 балки</th>
+            <th className="num">K (использование)</th>
           </tr>
         </thead>
         <tbody>
@@ -228,14 +214,14 @@ function ResultTable({
             const isAccepted = r.material === accepted;
             return (
               <tr key={r.material} style={isAccepted ? { background: "#fffbeb" } : undefined}>
-                <td style={td}>
+                <td>
                   <b>{r.material}</b>
                   {isAccepted ? " ★" : ""}
                 </td>
-                <td style={td}>{solutionText(r)}</td>
-                <td style={td}>{fmtKg(r.weightKg)}</td>
-                <td style={td}>{fmtRub(r.costRub)}</td>
-                <td style={td}>{r.utilization === undefined ? "—" : r.utilization.toFixed(3)}</td>
+                <td>{solutionText(r)}</td>
+                <td>{fmtKg(r.weightKg)}</td>
+                <td>{fmtRub(r.costRub)}</td>
+                <td className="num">{r.utilization === undefined ? "—" : r.utilization.toFixed(3)}</td>
               </tr>
             );
           })}
@@ -257,14 +243,13 @@ function NumField({
   step?: number;
 }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+    <div className="field">
+      <label className="field__label">{label}</label>
       <input
         type="number"
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       />
     </div>
   );
@@ -282,12 +267,11 @@ function SelField({
   onChange: (v: string) => void;
 }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+    <div className="field">
+      <label className="field__label">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       >
         {options.map(([v, l]) => (
           <option key={v} value={v}>

@@ -111,20 +111,19 @@ export function WindowRiegelApp() {
       <h2 style={{ marginTop: 0 }}>Оконные ригели</h2>
       <div style={{ marginBottom: 16 }}>
        <Collapsible title="📥 Исходные данные" storageKey="windowriegel-inputs" defaultOpen={true}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+      <div className="grid grid--3" style={{ gap: 12 }}>
         {/* Column 1: Geometry */}
         <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
           <legend style={{ fontWeight: 600 }}>Геометрия здания и окна</legend>
-          <div title="Синхронизировано со всеми вкладками" style={{ marginBottom: 6, background: "#fef9c3", border: "1px dashed #eab308", borderRadius: 4, padding: "4px 6px" }}>
-            <label style={{ fontSize: 13, display: "block" }}>
-              <span style={{ color: "#92400e", marginRight: 4 }}>🔗</span>
+          <div className="synced-field" title="Синхронизировано со всеми вкладками">
+            <label className="field__label">
+              <span className="synced-field__badge">🔗</span>
               Город (автозаполнение w₀)
             </label>
             <input
               list="window-riegel-cities"
               value={inputs.city}
               onChange={(e) => setCity(e.target.value)}
-              style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
             />
             <datalist id="window-riegel-cities">
               {windowRiegelClimateSettlements.slice(0, 500).map((s) => (
@@ -153,9 +152,9 @@ export function WindowRiegelApp() {
             validationKind="positive"
             hint="Количество задаётся расчетчиком по фасадам; расчёт ниже подбирает один типовой ригель."
           />
-          <div style={{ color: "#64748b", fontSize: 11, marginTop: -2 }}>
+          <p className="field__hint" style={{ marginTop: -2 }}>
             Количество нужно задать по фасадам вручную до появления отдельной модели окон.
-          </div>
+          </p>
         </fieldset>
 
         {/* Column 2: Wind & loads */}
@@ -186,19 +185,19 @@ export function WindowRiegelApp() {
         {/* Column 3: Calculated loads */}
         <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
           <legend style={{ fontWeight: 600 }}>Расчётные нагрузки и длины</legend>
-          <div style={{ fontSize: 13, lineHeight: 1.7 }}>
+          <div className="text-small" style={{ lineHeight: 1.7 }}>
             <div>Вертикальная нагрузка: <b>{fmt(result?.verticalLoadKpa)} кПа</b></div>
             <div>Горизонтальная нагрузка: <b>{fmt(result?.horizontalLoadKpa)} кПа</b></div>
             <div>Эфф. ветер w₀: <b>{fmt(result?.effectiveWindLoadKpa, 2)} кПа</b></div>
             <div>Длина из плоскости: <b>{fmt(result?.outOfPlaneLengthM, 2)} м</b></div>
             <div>Длина в плоскости: <b>{fmt(result?.inPlaneLengthM, 2)} м</b></div>
             {result?.climateSettlement && (
-              <div style={{ marginTop: 6, color: "#080" }}>
+              <div className="text-ok" style={{ marginTop: 6 }}>
                 Климат: {result.climateSettlement.settlement} — w₀ {fmt(result.climateSettlement.w0Kpa, 2)} кПа
               </div>
             )}
             {result?.warnings.map((w, i) => (
-              <div key={i} style={{ color: "#a16207", marginTop: 4 }}>⚠ {w}</div>
+              <div key={i} className="text-warn" style={{ marginTop: 4 }}>⚠ {w}</div>
             ))}
           </div>
         </fieldset>
@@ -212,7 +211,7 @@ export function WindowRiegelApp() {
 
       <hr style={{ margin: "20px 0" }} />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="grid grid--2" style={{ gap: 12 }}>
         <RiegelTable
           title="Нижний ригель (для типов 1–5) и верхний (для типов 2–5)"
           rows={result?.lowerAndUpperProfiles ?? []}
@@ -226,50 +225,38 @@ export function WindowRiegelApp() {
   );
 }
 
-const th: React.CSSProperties = {
-  padding: "6px 8px",
-  borderBottom: "1px solid #e2e8f0",
-  textAlign: "left",
-  whiteSpace: "nowrap",
-  background: "#f8fafc",
-  fontSize: 12,
-};
-const td: React.CSSProperties = {
-  padding: "4px 8px",
-  borderBottom: "1px solid #f1f5f9",
-  fontSize: 13,
-};
-
 function RiegelTable({ title, rows }: { title: string; rows: WindowRiegelOption[] }) {
   return (
     <div>
-      <h4 style={{ margin: "0 0 6px 0", fontSize: 14 }}>{title}</h4>
-      <table style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            <th style={th}>№</th>
-            <th style={th}>Профиль</th>
-            <th style={th}>Сталь</th>
-            <th style={th}>Масса 1 ригеля</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.length === 0 ? (
+      <h4 className="section-title" style={{ fontSize: 14 }}>{title}</h4>
+      <div className="table-wrap">
+        <table className="table">
+          <thead>
             <tr>
-              <td style={td} colSpan={4}>Нет данных</td>
+              <th>№</th>
+              <th>Профиль</th>
+              <th>Сталь</th>
+              <th className="num">Масса 1 ригеля</th>
             </tr>
-          ) : (
-            rows.map((r, i) => (
-              <tr key={i} style={i === 0 ? { background: "#fffbeb" } : undefined}>
-                <td style={td}>{r.number}{i === 0 ? " ★" : ""}</td>
-                <td style={td}>{r.profile ?? "—"}</td>
-                <td style={td}>{r.steel ?? "—"}</td>
-                <td style={td}>{fmtKg(r.weightKg)}</td>
+          </thead>
+          <tbody>
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan={4}>Нет данных</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              rows.map((r, i) => (
+                <tr key={i} style={i === 0 ? { background: "#fffbeb" } : undefined}>
+                  <td>{r.number}{i === 0 ? " ★" : ""}</td>
+                  <td>{r.profile ?? "—"}</td>
+                  <td>{r.steel ?? "—"}</td>
+                  <td className="num">{fmtKg(r.weightKg)}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -286,14 +273,13 @@ function NumField({
   step?: number;
 }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+    <div className="field">
+      <label className="field__label">{label}</label>
       <input
         type="number"
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       />
     </div>
   );
@@ -311,12 +297,11 @@ function SelField({
   onChange: (v: string) => void;
 }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+    <div className="field">
+      <label className="field__label">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       >
         {options.map(([v, l]) => (
           <option key={v} value={v}>

@@ -211,17 +211,17 @@ export function TrussApp() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Калькулятор стальной фермы покрытия</h1>
-      <p style={{ color: "#666", fontSize: 13, marginTop: 0 }}>
+      <h1 className="section-title" style={{ fontSize: 22, marginBottom: 4 }}>Калькулятор стальной фермы покрытия</h1>
+      <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Подбор сечений 5 элементов фермы (ВП, НП, ОРб, ОР, РР) по СП 16.13330. Каталог 579 трубных профилей с исключением нестандартных толщин.
       </p>
 
       <div style={{ marginBottom: 16 }}>
        <Collapsible title="📥 Исходные данные" storageKey="truss-inputs" defaultOpen={true}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+      <div className="grid grid--3" style={{ marginBottom: 16 }}>
         {/* Column 1: geometry */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-          <legend style={{ fontWeight: 600 }}>Геометрия фермы</legend>
+        <div className="card" style={{ padding: 12 }}>
+          <div className="section-title">Геометрия фермы</div>
           <SyncedNumField label="Пролёт, м (18–30)" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
           <SyncedNumField label="Длина здания, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
           <SyncedNumField label="Высота до низа фермы, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
@@ -239,18 +239,18 @@ export function TrussApp() {
             onChange={(v) => updSynced("responsibilityCoeff", v)}
             step={0.05}
           />
-        </fieldset>
+        </div>
 
         {/* Column 2: loads */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-          <legend style={{ fontWeight: 600 }}>Климат и нагрузки</legend>
-          <div title="Синхронизировано со всеми вкладками" style={{ marginBottom: 6, background: "#fef9c3", border: "1px dashed #eab308", borderRadius: 4, padding: "4px 6px" }}>
-            <label style={{ fontSize: 13, display: "block" }}>
-              <span style={{ color: "#92400e", marginRight: 4 }}>🔗</span>
+        <div className="card" style={{ padding: 12 }}>
+          <div className="section-title">Климат и нагрузки</div>
+          <div className="synced-field" title="Синхронизировано со всеми вкладками">
+            <label className="field__label">
+              <span className="synced-field__badge">🔗</span>
               Город (автозаполнение w₀, Sg)
             </label>
             <input
-              style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
+              type="text"
               value={cityQuery}
               onChange={(e) => {
                 setCityQuery(e.target.value);
@@ -264,7 +264,7 @@ export function TrussApp() {
               placeholder="Введите название..."
             />
             {cityMatches.length > 0 && (
-              <div style={{ border: "1px solid #ddd", maxHeight: 200, overflow: "auto", background: "white" }}>
+              <div style={{ border: "1px solid var(--c-border)", maxHeight: 200, overflow: "auto", background: "white" }}>
                 {cityMatches.map((s) => (
                   <div
                     key={s.id}
@@ -274,7 +274,7 @@ export function TrussApp() {
                     onMouseOut={(e) => (e.currentTarget.style.background = "")}
                   >
                     {s.settlement} — {s.region}{" "}
-                    <span style={{ color: "#999" }}>
+                    <span className="text-muted">
                       (w₀={s.wind.w0Kpa ?? "—"}, Sg={s.snow.sgKpa ?? "—"})
                     </span>
                   </div>
@@ -282,7 +282,7 @@ export function TrussApp() {
               </div>
             )}
             {cityLoading && (
-              <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>
+              <div className="field__hint" style={{ marginTop: 4 }}>
                 Поиск...
               </div>
             )}
@@ -312,7 +312,7 @@ export function TrussApp() {
             step={0.01}
           />
           {(roofLoad.purlin_kPa > 0 || roofLoad.beamCell_kPa > 0) && (
-            <div style={{ fontSize: 11, color: "#0369a1", marginTop: -4, marginBottom: 6 }}>
+            <div className="field__hint" style={{ marginTop: -4, marginBottom: 6 }}>
               🔗 авто: {roofLoad.structure_kPa.toFixed(3)} (покрытие)
               {roofLoad.purlin_kPa > 0 && ` + ${roofLoad.purlin_kPa.toFixed(3)} (прогоны)`}
               {roofLoad.beamCell_kPa > 0 && ` + ${roofLoad.beamCell_kPa.toFixed(3)} (балка покр.)`}
@@ -325,19 +325,19 @@ export function TrussApp() {
             value={input.loadAddition_pct}
             onChange={(v) => upd({ loadAddition_pct: v })}
           />
-        </fieldset>
+        </div>
 
         {/* Column 3: constraints */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-          <legend style={{ fontWeight: 600 }}>Ограничения сечений</legend>
+        <div className="card" style={{ padding: 12 }}>
+          <div className="section-title">Ограничения сечений</div>
           <Field
             label="Макс. к-т использования"
             value={input.maxUtilization}
             onChange={(v) => upd({ maxUtilization: v })}
             step={0.05}
           />
-          <div style={{ fontSize: 12, color: "#666", marginTop: 8, marginBottom: 4 }}>Мин. толщина стенки, мм</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+          <div className="text-small text-muted" style={{ marginTop: 8, marginBottom: 4 }}>Мин. толщина стенки, мм</div>
+          <div className="grid grid--2">
             {TRUSS_SECTIONS.map((s) => (
               <Field
                 key={s}
@@ -348,22 +348,22 @@ export function TrussApp() {
               />
             ))}
           </div>
-          <div style={{ fontSize: 12, color: "#666", marginTop: 8, marginBottom: 4 }}>
+          <div className="text-small text-muted" style={{ marginTop: 8, marginBottom: 4 }}>
             Макс. ширина пояса, мм
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+          <div className="grid grid--2">
             <Field label="ВП" value={input.maxWidth_mm.VP} onChange={(v) => updMaxWidth("VP", v)} step={10} />
             <Field label="НП" value={input.maxWidth_mm.NP} onChange={(v) => updMaxWidth("NP", v)} step={10} />
           </div>
-          <div style={{ fontSize: 12, color: "#666", marginTop: 8, marginBottom: 4 }}>
+          <div className="text-small text-muted" style={{ marginTop: 8, marginBottom: 4 }}>
             Мин. ширина раскоса, мм
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+          <div className="grid grid--3">
             <Field label="ОРб" value={input.minWidth_mm.ORb} onChange={(v) => updMinWidth("ORb", v)} step={10} />
             <Field label="ОР" value={input.minWidth_mm.OR} onChange={(v) => updMinWidth("OR", v)} step={10} />
             <Field label="РР" value={input.minWidth_mm.RR} onChange={(v) => updMinWidth("RR", v)} step={10} />
           </div>
-        </fieldset>
+        </div>
       </div>
        </Collapsible>
       </div>
@@ -375,14 +375,14 @@ export function TrussApp() {
 
 
       {error && (
-        <div style={{ background: "#fef2f2", border: "1px solid #fecaca", padding: 8, marginBottom: 16, color: "#991b1b" }}>
+        <div className="note note--danger" style={{ marginBottom: 16 }}>
           Ошибка: {error}
         </div>
       )}
 
       {out && (
         <div>
-          <div style={{ background: "#fef3c7", border: "1px solid #fde68a", padding: 8, marginBottom: 12, color: "#92400e", fontSize: 13 }}>
+          <div className="note note--warn" style={{ marginBottom: 12 }}>
             Внимание: горизонтальная реакция H в ферменном Excel-oracle не найдена и сейчас не передаётся в расчёт колонн как число. Для колонн это открытый инженерный вопрос, а не подтверждённое H = 0.
           </div>
 
@@ -396,7 +396,7 @@ export function TrussApp() {
           </div>
 
           {out.warnings.length > 0 && (
-            <div style={{ background: "#fef3c7", border: "1px solid #fde68a", padding: 8, marginBottom: 12, color: "#92400e", fontSize: 13 }}>
+            <div className="note note--warn" style={{ marginBottom: 12 }}>
               {out.warnings.map((w, i) => (
                 <div key={i}>⚠ {w}</div>
               ))}
@@ -404,7 +404,7 @@ export function TrussApp() {
           )}
 
           {/* 5 cards summary */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 16 }}>
+          <div className="grid grid--5" style={{ marginBottom: 16 }}>
             {TRUSS_SECTIONS.map((sec) => {
               const r = out.sections[sec];
               const sel = r.selected;
@@ -413,20 +413,19 @@ export function TrussApp() {
                 <button
                   key={sec}
                   onClick={() => setActiveSection(sec)}
+                  className="btn"
                   style={{
                     background: isActive ? "#0369a1" : "white",
                     color: isActive ? "white" : "#0f172a",
-                    border: isActive ? "1px solid #0369a1" : "1px solid #cbd5e1",
-                    borderRadius: 6,
-                    padding: 10,
+                    borderColor: isActive ? "#0369a1" : undefined,
                     textAlign: "left",
-                    cursor: "pointer",
+                    padding: 10,
                   }}
                 >
                   <div style={{ fontSize: 11, opacity: 0.7 }}>{TRUSS_SECTION_LABELS[sec]}</div>
                   <div style={{ fontSize: 14, fontWeight: 600, marginTop: 2 }}>{TRUSS_SECTION_SHORT[sec]}</div>
                   <div style={{ fontSize: 13, marginTop: 4 }}>
-                    {sel ? sel.profile.name : <span style={{ color: "#dc2626" }}>не подобрано</span>}
+                    {sel ? sel.profile.name : <span className="text-danger">не подобрано</span>}
                   </div>
                   {sel && (
                     <div style={{ fontSize: 11, marginTop: 2, opacity: 0.85 }}>
@@ -458,7 +457,7 @@ function SectionDetail({
 
   return (
     <div>
-      <h2 style={{ fontSize: 16, marginBottom: 8 }}>
+      <h2 className="section-title" style={{ fontSize: 16, marginBottom: 8 }}>
         {TRUSS_SECTION_LABELS[sec]} ({TRUSS_SECTION_SHORT[sec]}) — детали
       </h2>
       <div style={{ display: "flex", gap: 16, marginBottom: 12, flexWrap: "wrap", fontSize: 13 }}>
@@ -481,27 +480,25 @@ function SectionDetail({
       </div>
 
       {result.candidates.length === 0 ? (
-        <div style={{ color: "#dc2626", padding: 16, background: "#fef2f2", borderRadius: 6 }}>
+        <div className="note note--danger">
           Нет проходящих профилей. Попробуйте увеличить макс. ширину или снизить ограничения.
         </div>
       ) : (
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%" }}>
+        <div className="table-wrap">
+          <table className="table">
             <thead>
-              <tr style={{ background: "#f1f5f9" }}>
-                <th style={th}>#</th>
-                <th style={th}>Профиль</th>
-                <th style={th}>Ry, МПа</th>
-                <th style={th}>λx</th>
-                <th style={th}>λy</th>
+              <tr>
+                <th>#</th>
+                <th>Профиль</th>
+                <th>Ry, МПа</th>
+                <th>λx</th>
+                <th>λy</th>
                 {checkNames.map((n) => (
-                  <th key={n} style={th}>
-                    {n}
-                  </th>
+                  <th key={n}>{n}</th>
                 ))}
-                <th style={th}>K макс</th>
-                <th style={th}>Лимит</th>
-                <th style={th}>Масса, кг</th>
+                <th>K макс</th>
+                <th>Лимит</th>
+                <th>Масса, кг</th>
               </tr>
             </thead>
             <tbody>
@@ -512,19 +509,19 @@ function SectionDetail({
                     background: i === 0 ? "#dcfce7" : c.maxUtilization > 0.95 ? "#fef2f2" : undefined,
                   }}
                 >
-                  <td style={td}>{i + 1}</td>
-                  <td style={{ ...td, fontWeight: i === 0 ? 600 : 400 }}>{c.profile.name}</td>
-                  <td style={td}>{c.Ry_MPa.toFixed(0)}</td>
-                  <td style={td}>{c.lambda_x.toFixed(0)}</td>
-                  <td style={td}>{c.lambda_y.toFixed(0)}</td>
+                  <td className="num">{i + 1}</td>
+                  <td style={{ fontWeight: i === 0 ? 600 : 400 }}>{c.profile.name}</td>
+                  <td className="num">{c.Ry_MPa.toFixed(0)}</td>
+                  <td className="num">{c.lambda_x.toFixed(0)}</td>
+                  <td className="num">{c.lambda_y.toFixed(0)}</td>
                   {checkNames.map((n) => (
-                    <td key={n} style={td}>
+                    <td key={n} className="num">
                       {(c.checks[n] ?? 0).toFixed(3)}
                     </td>
                   ))}
-                  <td style={{ ...td, fontWeight: 600 }}>{c.maxUtilization.toFixed(3)}</td>
-                  <td style={td}>{c.limitingCheck}</td>
-                  <td style={td}>{c.totalMass_kg.toFixed(1)}</td>
+                  <td className="num" style={{ fontWeight: 600 }}>{c.maxUtilization.toFixed(3)}</td>
+                  <td>{c.limitingCheck}</td>
+                  <td className="num">{c.totalMass_kg.toFixed(1)}</td>
                 </tr>
               ))}
             </tbody>
@@ -534,9 +531,6 @@ function SectionDetail({
     </div>
   );
 }
-
-const th: React.CSSProperties = { padding: "6px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "left", whiteSpace: "nowrap" };
-const td: React.CSSProperties = { padding: "4px 8px", borderBottom: "1px solid #f1f5f9" };
 
 function Field({
   label,
@@ -550,14 +544,13 @@ function Field({
   step?: number;
 }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+    <div className="field">
+      <label className="field__label">{label}</label>
       <input
         type="number"
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       />
     </div>
   );
@@ -566,8 +559,8 @@ function Field({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div style={{ fontSize: 11, color: "#888" }}>{label}</div>
-      <div style={{ fontSize: 16, fontWeight: 600 }}>{value}</div>
+      <div className="stat__label">{label}</div>
+      <div className="stat__value">{value}</div>
     </div>
   );
 }

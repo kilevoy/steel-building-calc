@@ -21,9 +21,9 @@ export function CranesSection({
   setSuspended: (patch: Partial<CalculationInput["suspendedCrane"]>) => void;
 }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-      <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-        <legend style={{ fontWeight: 600 }}>Кран опорный (по ГОСТ)</legend>
+    <div className="grid grid--2" style={{ marginBottom: 16 }}>
+      <fieldset className="card" style={{ padding: 12 }}>
+        <legend className="section-title">Кран опорный (по ГОСТ)</legend>
         <CheckField
           label="Есть"
           checked={input.overheadCrane.enabled}
@@ -69,8 +69,8 @@ export function CranesSection({
           </>
         )}
       </fieldset>
-      <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
-        <legend style={{ fontWeight: 600 }}>Кран подвесной</legend>
+      <fieldset className="card" style={{ padding: 12 }}>
+        <legend className="section-title">Кран подвесной</legend>
         <CheckField
           label="Есть"
           checked={input.suspendedCrane.enabled}
