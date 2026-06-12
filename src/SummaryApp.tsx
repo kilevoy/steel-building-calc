@@ -571,7 +571,16 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
         <div>Всего колонн здания: <b>{summary.totalFormulaText ?? "—"}</b></div>
         <div>Крайних в подборе: <b>{summary.edgePublished ?? "—"}</b></div>
         <div>Средних в подборе: <b>{summary.middlePublished ?? "—"}</b></div>
-        <div>Режим: <b>{summary.hasCrane ? "с краном" : "без крана"}</b></div>
+        <div
+          title="Правило ГИПа (решение 2026-05-15, подтверждено 2026-06-12): без крана торцевые колонны считаются отдельной группой фахверка; с краном — основными колоннами рам."
+        >
+          Режим:{" "}
+          <b>
+            {summary.hasCrane
+              ? "с краном — торцы как основные рамы"
+              : "без крана — торцы отдельно (фахверк)"}
+          </b>
+        </div>
         <div>Торцевых осей: <b>{summary.endFrameAxes}</b></div>
       </div>
       {summary.mainCountMismatch && (
