@@ -1,6 +1,7 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { BuildingSummaryBanner } from "./components/BuildingSummaryBanner";
+import { ProjectsMenu } from "./components/ProjectsMenu";
 import { ColumnApp } from "./columnTab/ColumnApp";
 
 const TrussApp = lazy(() => import("./TrussApp").then((m) => ({ default: m.TrussApp })));
@@ -54,8 +55,36 @@ function LazyTab({ active, children }: { active: Mode; children: React.ReactNode
   );
 }
 
+/**
+ * Активная вкладка отражается в URL-хеше (`#summary` и т.п.): ссылку на
+ * конкретную вкладку можно сохранить или переслать, кнопки «назад/вперёд»
+ * браузера переключают вкладки.
+ */
+function modeFromHash(): Mode {
+  if (typeof window === "undefined") return "column";
+  const h = window.location.hash.replace(/^#/, "");
+  return (MODES as readonly string[]).includes(h) ? (h as Mode) : "column";
+}
+
 export function App() {
-  const [mode, setMode] = useState<Mode>("column");
+  const [mode, setMode] = useState<Mode>(modeFromHash);
+
+  useEffect(() => {
+    const onHashChange = () => setMode(modeFromHash());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  useEffect(() => {
+    const current = window.location.hash.replace(/^#/, "");
+    if (current === mode) return;
+    // Первый заход без хеша не должен плодить запись в истории.
+    if (current === "") {
+      window.history.replaceState(null, "", `#${mode}`);
+    } else {
+      window.history.pushState(null, "", `#${mode}`);
+    }
+  }, [mode]);
 
   return (
     <div className="app-shell">
@@ -70,7 +99,12 @@ export function App() {
           </button>
         ))}
       </div>
-      <BuildingSummaryBanner />
+      <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <BuildingSummaryBanner />
+        </div>
+        <ProjectsMenu />
+      </div>
       {mode === "column" && (
         <ErrorBoundary key={mode}>
           <ColumnApp />
