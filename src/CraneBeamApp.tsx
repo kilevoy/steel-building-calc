@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { PricesBlock } from "./building/PricesBlock";
 import { Collapsible } from "./building/Collapsible";
+import { useBuilding } from "./building/useBuilding";
 import { useCraneBeamRunner } from "./building/useCraneBeamRunner";
 import { craneOptions } from "./calc/craneBeam/engine";
 import type { CraneCheckValue } from "./calc/craneBeam/types";
@@ -16,23 +18,31 @@ function fmtN(n: number | null | undefined, digits = 2): string {
 }
 
 export function CraneBeamApp() {
+  const { building } = useBuilding();
   const {
     inputs,
     upd,
     result,
     calculating,
     error,
-    autoRecalc,
     setAutoRecalc,
-    handleCalc,
   } = useCraneBeamRunner();
+
+  // Вкладка считается автоматически: после кэширования HyperFormula-книги
+  // повторный расчёт стоит ~60 мс, ручная кнопка «Рассчитать» не нужна.
+  // Флаг остаётся включённым и после ухода с вкладки, чтобы результат
+  // обновлялся при изменении общих параметров здания.
+  useEffect(() => {
+    setAutoRecalc(true);
+  }, [setAutoRecalc]);
 
   return (
     <div>
       <h2 className="page-title">Подкрановая балка</h2>
       <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Расчёт по СП 16.13330 + СП 35.13330. Подбор сечения, проверка прочности / общей и местной
-        устойчивости / усталости (7К–8К) / прогибов. Расчёт занимает ~3–10 секунд.
+        устойчивости / усталости (7К–8К) / прогибов. Пересчитывается автоматически при изменении
+        параметров.
       </p>
 
       <div style={{ marginBottom: 16 }}>
@@ -106,32 +116,11 @@ export function CraneBeamApp() {
           <NumField label="γd (динамика)" value={inputs.gammaDynamic} step={0.05} onChange={(v) => upd("gammaDynamic", v)} />
           <NumField label="γc (условия работы)" value={inputs.gammaC} step={0.05} onChange={(v) => upd("gammaC", v)} />
           <NumField label="kсв (учёт собств.массы)" value={inputs.selfWeightFactor} step={0.01} onChange={(v) => upd("selfWeightFactor", v)} />
-          <button
-            className={calculating ? "btn" : "btn btn--primary"}
-            onClick={handleCalc}
-            disabled={calculating}
-            style={{ marginTop: 12, width: "100%", cursor: calculating ? "wait" : "pointer" }}
-          >
-            {calculating ? "Расчёт..." : "Рассчитать"}
-          </button>
-          <label
-            className="text-small text-muted"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              marginTop: 8,
-              cursor: "pointer",
-            }}
-            title="Пересчитывать автоматически при каждом изменении (расчёт ~3–10 сек)"
-          >
-            <input
-              type="checkbox"
-              checked={autoRecalc}
-              onChange={(e) => setAutoRecalc(e.target.checked)}
-            />
-            Авто-пересчёт <span className="text-muted">(медленно)</span>
-          </label>
+          <div className="text-small text-muted" style={{ marginTop: 12 }}>
+            {calculating
+              ? "⏳ Пересчёт..."
+              : "Считается автоматически при изменении параметров."}
+          </div>
         </fieldset>
       </div>
        </Collapsible>
@@ -141,10 +130,17 @@ export function CraneBeamApp() {
         <PricesBlock />
       </div>
 
-      {error && (
-        <div className="note note--danger" style={{ marginTop: 12 }}>
-          Ошибка: {error}
+      {!building.hasCrane ? (
+        <div className="note note--info" style={{ marginTop: 12 }}>
+          Кран не включён. Включите опорный или подвесной кран на вкладке
+          «Колонна» — подкрановая балка рассчитается автоматически.
         </div>
+      ) : (
+        error && (
+          <div className="note note--danger" style={{ marginTop: 12 }}>
+            Ошибка: {error}
+          </div>
+        )
       )}
 
       {result && (
