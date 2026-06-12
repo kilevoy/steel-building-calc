@@ -31,6 +31,15 @@ export function CraneBeamRunnerProvider({ children }: { children: ReactNode }) {
   }, [building.hasCrane, publishResult]);
 
   useEffect(() => {
+    if (!building.hasCrane) return;
+    // Прогрев: workbook-чанк (~2.7 МБ) и HyperFormula качаются в фоне сразу
+    // после включения крана, чтобы вкладка и сводка не ждали загрузку.
+    void import("../calc/craneBeam/engine").catch(() => {
+      /* офлайн/сбой сети — расчёт сам повторит импорт и покажет ошибку */
+    });
+  }, [building.hasCrane]);
+
+  useEffect(() => {
     const item = buildCraneBeamResultItem(result, {
       buildingLength_m: building.length_m,
       beamSpan_m: inputs.beamSpan,

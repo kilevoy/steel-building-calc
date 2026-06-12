@@ -59,16 +59,29 @@ function cellValue(hf: HyperFormula, sheet: number, cell: string): string | numb
   return normalizeCellValue(hf.getCellValue(address(cell, sheet)));
 }
 
-function buildEngine(inputs: WindowRiegelInputs): { hf: HyperFormula; summarySheet: number } {
-  const hf = HyperFormula.buildFromSheets(windowRiegelWorkbook.sheets as unknown as SheetData, { licenseKey: LICENSE_KEY, useArrayArithmetic: true });
-  const summarySheet = hf.getSheetId(SUMMARY_SHEET);
-  if (summarySheet === undefined) throw new Error('Лист "Лист1" не найден в сгенерированной книге.');
+/**
+ * Кэш построенной книги HyperFormula: построение — самая дорогая часть
+ * расчёта, а каждый вызов перезаписывает ВСЕ входные ячейки, поэтому
+ * результат не зависит от предыдущих расчётов (закреплено тестом).
+ */
+let cachedEngine: { hf: HyperFormula; summarySheet: number } | null = null;
 
-  for (const [key, cell] of Object.entries(inputCells) as [keyof WindowRiegelInputs, string][]) {
-    hf.setCellContents(address(cell, summarySheet), [[inputs[key] as string | number]]);
+function buildEngine(inputs: WindowRiegelInputs): { hf: HyperFormula; summarySheet: number } {
+  if (!cachedEngine) {
+    const hf = HyperFormula.buildFromSheets(windowRiegelWorkbook.sheets as unknown as SheetData, { licenseKey: LICENSE_KEY, useArrayArithmetic: true });
+    const summarySheet = hf.getSheetId(SUMMARY_SHEET);
+    if (summarySheet === undefined) throw new Error('Лист "Лист1" не найден в сгенерированной книге.');
+    cachedEngine = { hf, summarySheet };
   }
 
-  return { hf, summarySheet };
+  const { hf, summarySheet } = cachedEngine;
+  hf.batch(() => {
+    for (const [key, cell] of Object.entries(inputCells) as [keyof WindowRiegelInputs, string][]) {
+      hf.setCellContents(address(cell, summarySheet), [[inputs[key] as string | number]]);
+    }
+  });
+
+  return cachedEngine;
 }
 
 function readOptionRows(hf: HyperFormula, sheet: number, startRow: number): WindowRiegelOption[] {

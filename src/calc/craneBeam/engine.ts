@@ -129,16 +129,32 @@ function rangeValues(hf: HyperFormula, sheet: number, cells: string[], labels: s
   return cells.map((cell, index) => ({ label: labels[index] ?? cell, value: cellValue(hf, sheet, cell) }));
 }
 
-function buildEngine(inputs: CraneCalculatorInputs): { hf: HyperFormula; summarySheet: number } {
-  const hf = HyperFormula.buildFromSheets(craneWorkbook.sheets as unknown as SheetData, { licenseKey: LICENSE_KEY, useArrayArithmetic: true });
-  const summarySheet = hf.getSheetId(SUMMARY_SHEET);
-  if (summarySheet === undefined) throw new Error('Лист "Сводка" не найден в сгенерированной книге.');
+/**
+ * Кэш построенной книги HyperFormula. Построение из ~25 тыс. формул —
+ * самая дорогая часть расчёта (~1 с), а между расчётами меняются только
+ * входные ячейки листа «Сводка»: каждый вызов calculateCraneBeam
+ * перезаписывает ВСЕ входные ячейки, поэтому состояние предыдущего
+ * расчёта не может протечь в следующий (закреплено тестом
+ * «не зависит от предыдущих расчётов»).
+ */
+let cachedEngine: { hf: HyperFormula; summarySheet: number } | null = null;
 
-  for (const [key, cell] of Object.entries(inputCells) as [keyof CraneCalculatorInputs, string][]) {
-    hf.setCellContents(address(cell, summarySheet), [[inputs[key] as string | number]]);
+function buildEngine(inputs: CraneCalculatorInputs): { hf: HyperFormula; summarySheet: number } {
+  if (!cachedEngine) {
+    const hf = HyperFormula.buildFromSheets(craneWorkbook.sheets as unknown as SheetData, { licenseKey: LICENSE_KEY, useArrayArithmetic: true });
+    const summarySheet = hf.getSheetId(SUMMARY_SHEET);
+    if (summarySheet === undefined) throw new Error('Лист "Сводка" не найден в сгенерированной книге.');
+    cachedEngine = { hf, summarySheet };
   }
 
-  return { hf, summarySheet };
+  const { hf, summarySheet } = cachedEngine;
+  hf.batch(() => {
+    for (const [key, cell] of Object.entries(inputCells) as [keyof CraneCalculatorInputs, string][]) {
+      hf.setCellContents(address(cell, summarySheet), [[inputs[key] as string | number]]);
+    }
+  });
+
+  return cachedEngine;
 }
 
 export function calculateCraneBeam(inputs: CraneCalculatorInputs): CraneCalculationResult {
