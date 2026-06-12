@@ -1,7 +1,20 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { BuildingSummaryBanner } from "./components/BuildingSummaryBanner";
+import { BuildingSketch } from "./components/BuildingSketch";
 import { ProjectsMenu } from "./components/ProjectsMenu";
+import { ThemeToggle } from "./components/ThemeToggle";
+import {
+  BeamIcon,
+  ColumnIcon,
+  CraneIcon,
+  PurlinIcon,
+  RiegelIcon,
+  SummaryIcon,
+  TrussIcon,
+} from "./components/tabIcons";
+import { Collapsible } from "./building/Collapsible";
 import { ColumnApp } from "./columnTab/ColumnApp";
 
 const TrussApp = lazy(() => import("./TrussApp").then((m) => ({ default: m.TrussApp })));
@@ -38,6 +51,16 @@ const MODES: readonly Mode[] = [
   "craneBeam",
   "summary",
 ] as const;
+
+const MODE_ICONS: Record<Mode, ReactNode> = {
+  column: ColumnIcon,
+  truss: TrussIcon,
+  purlins: PurlinIcon,
+  beamCell: BeamIcon,
+  windowRiegel: RiegelIcon,
+  craneBeam: CraneIcon,
+  summary: SummaryIcon,
+};
 
 /**
  * Lazy-loaded tab wrapped in its own ErrorBoundary + Suspense. Each tab
@@ -94,7 +117,10 @@ export function App() {
           <span className="app-header__title">Калькулятор стального каркаса</span>
           <span className="app-header__subtitle">СП 16.13330 · СП 20.13330</span>
         </div>
-        <ProjectsMenu />
+        <div style={{ display: "flex", gap: 8 }}>
+          <ThemeToggle />
+          <ProjectsMenu />
+        </div>
       </header>
       <div className="tabs">
         {MODES.map((m) => (
@@ -103,11 +129,17 @@ export function App() {
             onClick={() => setMode(m)}
             className={mode === m ? "tab tab--active" : "tab"}
           >
+            {MODE_ICONS[m]}
             {MODE_LABELS[m]}
           </button>
         ))}
       </div>
       <BuildingSummaryBanner />
+      <div className="no-print" style={{ marginBottom: 12 }}>
+        <Collapsible title="📐 Схема здания" storageKey="building-sketch" defaultOpen>
+          <BuildingSketch />
+        </Collapsible>
+      </div>
       {mode === "column" && (
         <ErrorBoundary key={mode}>
           <ColumnApp />

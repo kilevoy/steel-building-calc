@@ -533,7 +533,7 @@ export function PurlinApp() {
               gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
               gap: 12,
               padding: 10,
-              background: "#f8fafc",
+              background: "var(--c-soft)",
               borderRadius: 6,
               marginBottom: 16,
             }}

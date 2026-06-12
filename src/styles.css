@@ -11,6 +11,7 @@
   /* Палитра (slate / sky, как в исходных inline-стилях) */
   --c-bg: #f1f5f9;
   --c-surface: #ffffff;
+  --c-soft: #f8fafc;
   --c-border: #cbd5e1;
   --c-border-soft: #e2e8f0;
   --c-text: #0f172a;
@@ -236,7 +237,7 @@ select:focus {
 }
 
 input[readonly] {
-  background: #f8fafc;
+  background: var(--c-soft);
   color: var(--c-text-secondary);
 }
 
@@ -377,7 +378,7 @@ legend {
   justify-content: space-between;
   gap: 8px;
   padding: 7px 12px;
-  background: #f8fafc;
+  background: var(--c-soft);
   border-radius: var(--radius) var(--radius) 0 0;
   cursor: pointer;
   font-weight: 600;
@@ -449,7 +450,7 @@ legend {
   text-align: left;
   font-weight: 600;
   color: var(--c-text-secondary);
-  background: #f8fafc;
+  background: var(--c-soft);
   padding: 6px 10px;
   border-bottom: 2px solid var(--c-border-soft);
   white-space: nowrap;
@@ -461,7 +462,7 @@ legend {
 }
 
 .table tbody tr:hover {
-  background: #f8fafc;
+  background: var(--c-soft);
 }
 
 .table .num {
@@ -472,7 +473,7 @@ legend {
 .table tfoot td,
 .table .total-row td {
   font-weight: 600;
-  background: #f8fafc;
+  background: var(--c-soft);
 }
 
 /* Принятый/лучший вариант подбора */
@@ -660,6 +661,125 @@ legend {
 .projects-menu__delete {
   padding: 2px 8px;
   font-size: 12px;
+}
+
+/* ---------- Иконки вкладок ---------- */
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.tab svg {
+  display: block;
+  opacity: 0.75;
+}
+
+.tab--active svg {
+  opacity: 1;
+}
+
+/* ---------- Схема здания ---------- */
+
+.sketch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sketch-row svg {
+  flex: 1 1 320px;
+  min-width: 260px;
+  height: auto;
+}
+
+/* ---------- Тёмная тема ---------- */
+
+:root[data-theme="dark"] {
+  --c-bg: #0b1220;
+  --c-surface: #16202f;
+  --c-soft: #1c2940;
+  --c-border: #3a4a66;
+  --c-border-soft: #283853;
+  --c-text: #e6edf6;
+  --c-text-secondary: #b7c3d6;
+  --c-text-muted: #8696ad;
+  --c-text-faint: #5d6e87;
+
+  --c-accent: #2e96cf;
+  --c-accent-hover: #4fb1e3;
+  --c-accent-soft: #11324a;
+
+  --c-ok: #4ade80;
+  --c-ok-soft: #12301e;
+  --c-danger: #f87171;
+  --c-danger-soft: #3a181b;
+  --c-warn: #fbbf24;
+  --c-warn-soft: #33270f;
+
+  --c-sync-bg: #1c2940;
+  --c-sync-text: #d4a72c;
+
+  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.4);
+}
+
+[data-theme="dark"] .note--info {
+  background: #0d2a3d;
+  color: #9bd7f5;
+  border-color: #155a82;
+}
+
+[data-theme="dark"] .note--ok {
+  background: var(--c-ok-soft);
+  color: #86efac;
+  border-color: #1e5e38;
+}
+
+[data-theme="dark"] .note--warn {
+  background: var(--c-warn-soft);
+  color: #fcd34d;
+  border-color: #6b5310;
+}
+
+[data-theme="dark"] .note--danger {
+  background: var(--c-danger-soft);
+  color: #fca5a5;
+  border-color: #7a2e2e;
+}
+
+[data-theme="dark"] .table .row-accepted td {
+  background: var(--c-ok-soft);
+}
+
+[data-theme="dark"] .table .row-accepted:hover td {
+  background: #17402a;
+}
+
+[data-theme="dark"] .table .row-over td {
+  background: var(--c-danger-soft);
+}
+
+[data-theme="dark"] .btn--danger {
+  background: #3a181b;
+  border-color: #7a2e2e;
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .building-banner {
+  border-left-color: #8a6d1a;
+}
+
+[data-theme="dark"] .synced-field {
+  border-left-color: #8a6d1a;
+}
+
+[data-theme="dark"] input[type="number"]:focus,
+[data-theme="dark"] input[type="text"]:focus,
+[data-theme="dark"] select:focus {
+  box-shadow: 0 0 0 3px rgb(46 150 207 / 0.25);
 }
 
 /* ---------- Печать ---------- */
