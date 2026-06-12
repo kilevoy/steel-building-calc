@@ -88,6 +88,14 @@ export function App() {
 
   return (
     <div className="app-shell">
+      <header className="app-header">
+        <div className="app-header__brand">
+          <span className="app-header__logo" aria-hidden>I</span>
+          <span className="app-header__title">Калькулятор стального каркаса</span>
+          <span className="app-header__subtitle">СП 16.13330 · СП 20.13330</span>
+        </div>
+        <ProjectsMenu />
+      </header>
       <div className="tabs">
         {MODES.map((m) => (
           <button
@@ -99,12 +107,7 @@ export function App() {
           </button>
         ))}
       </div>
-      <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <BuildingSummaryBanner />
-        </div>
-        <ProjectsMenu />
-      </div>
+      <BuildingSummaryBanner />
       {mode === "column" && (
         <ErrorBoundary key={mode}>
           <ColumnApp />

@@ -113,7 +113,7 @@ export function BeamCellApp() {
 
   return (
     <div>
-      <h2 style={{ marginTop: 0 }}>Балка покрытия</h2>
+      <h2 className="page-title">Балка покрытия</h2>
       <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Подбор главной балки (ГБ) покрытия — прокатный двутавр по сортаменту, с учётом снеговой
         нагрузки и собственного веса. Расчёт по СП 16.13330.
@@ -123,7 +123,7 @@ export function BeamCellApp() {
        <Collapsible title="📥 Исходные данные" storageKey="beamcell-inputs" defaultOpen={true}>
       <div className="grid grid--3" style={{ gap: 12 }}>
         {/* Column 1: Geometry */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+        <fieldset>
           <legend style={{ fontWeight: 600 }}>Геометрия</legend>
           <NumField label="Вдоль ГБ, м" value={inputs.lengthAlongMain} step={0.5} onChange={(v) => upd("lengthAlongMain", v)} />
           <NumField label="Поперёк ГБ, м" value={inputs.widthAcrossMain} step={0.5} onChange={(v) => upd("widthAcrossMain", v)} />
@@ -133,7 +133,7 @@ export function BeamCellApp() {
         </fieldset>
 
         {/* Column 2: Loads */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+        <fieldset>
           <legend style={{ fontWeight: 600 }}>Нагрузка</legend>
           <NumField
             label="Снеговая + кровля, кг/м²"
@@ -150,7 +150,7 @@ export function BeamCellApp() {
         </fieldset>
 
         {/* Column 3: Steel */}
-        <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+        <fieldset>
           <legend style={{ fontWeight: 600 }}>Сталь</legend>
           <SelField
             label="Сталь ГБ (для итога ★)"
@@ -213,7 +213,7 @@ function ResultTable({
           {rows.map((r) => {
             const isAccepted = r.material === accepted;
             return (
-              <tr key={r.material} style={isAccepted ? { background: "#fffbeb" } : undefined}>
+              <tr key={r.material} className={isAccepted ? "row-accepted" : undefined}>
                 <td>
                   <b>{r.material}</b>
                   {isAccepted ? " ★" : ""}

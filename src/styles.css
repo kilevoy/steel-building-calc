@@ -72,6 +72,59 @@ body {
   }
 }
 
+/* ---------- Шапка приложения ---------- */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.app-header__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--c-accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: 16px;
+  flex: none;
+  align-self: center;
+}
+
+.app-header__title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--c-text);
+  white-space: nowrap;
+}
+
+.app-header__subtitle {
+  font-size: 12px;
+  color: var(--c-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  .app-header__subtitle {
+    display: none;
+  }
+}
+
 /* ---------- Вкладки ---------- */
 
 .tabs {
@@ -118,24 +171,33 @@ body {
   border-bottom-color: var(--c-accent);
 }
 
-/* ---------- Баннер общего здания ---------- */
+/* ---------- Баннер общего здания ----------
+ * Нейтральная справочная полоса: жёлтый зарезервирован за полями 🔗,
+ * чтобы баннер не считывался как предупреждение. */
 
 .building-banner {
   margin-bottom: 12px;
-  padding: 8px 12px;
-  background: var(--c-sync-bg);
-  border: 1px dashed var(--c-sync-border);
+  padding: 7px 12px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-soft);
+  border-left: 3px solid var(--c-sync-border);
   border-radius: var(--radius);
   font-size: 12px;
-  color: #78350f;
+  color: var(--c-text-secondary);
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 16px;
+  gap: 4px 14px;
   align-items: center;
+  box-shadow: var(--shadow-card);
+}
+
+.building-banner b {
+  color: var(--c-text);
 }
 
 .building-banner__title {
   font-weight: 600;
+  color: var(--c-text);
 }
 
 /* ---------- Поля форм ---------- */
@@ -207,13 +269,16 @@ input[type="checkbox"] {
   margin-right: 6px;
 }
 
-/* Синхронизированное поле (пишет в общий BuildingContext) */
+/* Синхронизированное поле (пишет в общий BuildingContext).
+ * Спокойная маркировка: тонкая жёлтая кромка слева + бейдж 🔗 вместо
+ * сплошной жёлтой заливки — сигнал остаётся, шум уходит. */
 
 .synced-field {
   margin-bottom: 6px;
-  padding: 4px 6px;
-  background: var(--c-sync-bg);
-  border: 1px dashed var(--c-sync-border);
+  padding: 4px 6px 4px 8px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-soft);
+  border-left: 3px solid var(--c-sync-border);
   border-radius: var(--radius-sm);
 }
 
@@ -280,6 +345,25 @@ input[type="checkbox"] {
   box-shadow: var(--shadow-card);
 }
 
+/* Нативные fieldset выглядят как карточки — единый стиль блоков
+ * во всех вкладках без переразметки. */
+fieldset {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 12px;
+  margin: 0;
+  min-width: 0;
+}
+
+legend {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--c-text);
+  padding: 0 6px;
+}
+
 .collapsible {
   background: var(--c-surface);
   border: 1px solid var(--c-border-soft);
@@ -344,7 +428,11 @@ input[type="checkbox"] {
 /* ---------- Таблицы результатов ---------- */
 
 .table-wrap {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 80vh;
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--radius);
+  background: var(--c-surface);
 }
 
 .table {
@@ -355,6 +443,9 @@ input[type="checkbox"] {
 }
 
 .table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   text-align: left;
   font-weight: 600;
   color: var(--c-text-secondary);
@@ -382,6 +473,35 @@ input[type="checkbox"] {
 .table .total-row td {
   font-weight: 600;
   background: #f8fafc;
+}
+
+/* Принятый/лучший вариант подбора */
+.table .row-accepted td {
+  background: var(--c-ok-soft);
+}
+
+.table .row-accepted:hover td {
+  background: #c9f3d6;
+}
+
+/* Строка с превышением (коэффициент использования > 0.95 и т.п.) */
+.table .row-over td {
+  background: var(--c-danger-soft);
+}
+
+.badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: 1px;
+  white-space: nowrap;
+}
+
+.badge--ok {
+  background: var(--c-ok);
+  color: #fff;
 }
 
 /* ---------- Stat (метрика в строке результата) ---------- */
@@ -462,11 +582,20 @@ input[type="checkbox"] {
 
 /* ---------- Заголовки секций ---------- */
 
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--c-text);
+  letter-spacing: -0.015em;
+}
+
 .section-title {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 650;
   margin: 0 0 8px;
   color: var(--c-text);
+  letter-spacing: -0.01em;
 }
 
 /* ---------- Меню проектов ---------- */
@@ -565,7 +694,18 @@ input[type="checkbox"] {
     border: 1px solid #bbb;
   }
 
+  .table th {
+    position: static;
+  }
+
   .table-wrap {
     overflow: visible;
+    max-height: none;
+    border: none;
+  }
+
+  .app-header,
+  .projects-menu {
+    display: none;
   }
 }

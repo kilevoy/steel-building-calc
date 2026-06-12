@@ -269,7 +269,7 @@ export function PurlinApp() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Калькулятор прогонов покрытия</h1>
+      <h1 className="page-title">Калькулятор прогонов покрытия</h1>
       <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Два каталога рядом: ЛСТК (2ТПС/2ПС/Z, МП350/МП390) и прокатные трубы (кв./пр., С245/С345). Шаг прокатных прогонов фиксирован 1500&nbsp;мм.
       </p>
@@ -278,7 +278,7 @@ export function PurlinApp() {
         <Collapsible title="📥 Исходные данные" storageKey="purlin-inputs" defaultOpen={true}>
           <div className="grid grid--3" style={{ marginBottom: 16 }}>
             {/* Column 1: geometry */}
-            <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+            <fieldset>
               <legend style={{ fontWeight: 600 }}>Геометрия здания</legend>
               <SyncedSelectField
                 label="Тип кровли"
@@ -303,7 +303,7 @@ export function PurlinApp() {
             </fieldset>
 
             {/* Column 2: loads */}
-            <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+            <fieldset>
               <legend style={{ fontWeight: 600 }}>Климат и нагрузки</legend>
               <div className="synced-field" title="Синхронизировано со всеми вкладками">
                 <label className="field__label">
@@ -381,7 +381,7 @@ export function PurlinApp() {
             </fieldset>
 
             {/* Column 3: snow drift + step constraints */}
-            <fieldset style={{ border: "1px solid #ccc", padding: 12, borderRadius: 6 }}>
+            <fieldset>
               <legend style={{ fontWeight: 600 }}>Снеговой мешок и параметры подбора</legend>
               <SyncedSelectField
                 label="Принятый тип прогонов"
@@ -526,7 +526,7 @@ export function PurlinApp() {
             ?????? ???????? ???????? ??? ????????? ???????? ????????? ?? Excel-??????: ???????? ????? ?? ???????? ??????? ?????? ?????????? ?? ?????? ????? ?????? ?????? ? ??? ???.
           </div>
 
-          <h2 className="section-title" style={{ fontSize: 18 }}>Нагрузки</h2>
+          <h2 className="section-title">Нагрузки</h2>
           <div
             style={{
               display: "grid",
@@ -549,7 +549,7 @@ export function PurlinApp() {
             <Stat label="μ₂" value={out.mu2.toFixed(3)} />
           </div>
 
-          <h2 className="section-title" style={{ fontSize: 18 }}>Подобранные сечения по типам и маркам стали</h2>
+          <h2 className="section-title">Подобранные сечения по типам и маркам стали</h2>
           <div className="table-wrap" style={{ marginBottom: 16 }}>
             <table className="table" style={{ minWidth: 880 }}>
               <thead>
@@ -588,7 +588,7 @@ export function PurlinApp() {
                   return (
                     <tr
                       key={key}
-                      style={{ background: c.K > 0.95 ? "#fef2f2" : undefined }}
+                      className={c.K > 0.95 ? "row-over" : undefined}
                     >
                       <td>{GRADE_LABELS[s.grade]}</td>
                       <td>{TYPE_LABELS[s.type]}</td>
@@ -615,7 +615,7 @@ export function PurlinApp() {
 
           {diagnostics && (
             <div className="card" style={{ padding: 10, marginBottom: 16 }}>
-              <h2 className="section-title" style={{ fontSize: 17 }}>
+              <h2 className="section-title">
                 Диагностика выбора ЛСТК-прогонов
               </h2>
               <div style={{ fontSize: 13, marginBottom: 8 }}>
@@ -683,7 +683,7 @@ export function PurlinApp() {
             }}
           >
             <div>
-              <h2 className="section-title" style={{ fontSize: 17 }}>
+              <h2 className="section-title">
                 Топ-10 ЛСТК (по массе на здание)
               </h2>
               <div className="table-wrap">
@@ -704,7 +704,7 @@ export function PurlinApp() {
                     {out.top10.map((c, i) => (
                       <tr
                         key={i}
-                        style={{ background: c.K > 0.95 ? "#fef2f2" : undefined }}
+                        className={c.K > 0.95 ? "row-over" : undefined}
                       >
                         <td>{i + 1}</td>
                         <td>{c.profile.Ry_MPa === 350 ? "МП350" : "МП390"}</td>
@@ -722,7 +722,7 @@ export function PurlinApp() {
             </div>
 
             <div>
-              <h2 className="section-title" style={{ fontSize: 17 }}>
+              <h2 className="section-title">
                 Топ-10 прокатных труб (по стоимости, шаг 1500&nbsp;мм)
               </h2>
               {rolledTop10.length === 0 ? (
@@ -748,7 +748,7 @@ export function PurlinApp() {
                       {rolledTop10.map((c, i) => (
                         <tr
                           key={i}
-                          style={{ background: c.K > 0.95 ? "#fef2f2" : undefined }}
+                          className={c.K > 0.95 ? "row-over" : undefined}
                         >
                           <td>{i + 1}</td>
                           <td>{c.steel}</td>

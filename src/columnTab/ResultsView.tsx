@@ -90,13 +90,16 @@ export function ResultsView({
             </tr>
           </thead>
           <tbody>
-            {result.results.map((r) => (
+            {result.results.map((r, i) => (
               <tr
                 key={`${r.profileName}-${r.steel}-${r.struts}`}
-                style={{ background: r.maxUtilization > 0.95 ? "#fef2f2" : undefined }}
+                className={i === 0 ? "row-accepted" : r.maxUtilization > 0.95 ? "row-over" : undefined}
               >
                 <td className="num">{r.rank}</td>
-                <td style={{ fontWeight: 600 }}>{r.profileName}</td>
+                <td style={{ fontWeight: 600 }}>
+                  {r.profileName}
+                  {i === 0 && <> <span className="badge badge--ok">принято</span></>}
+                </td>
                 <td>{r.steel}</td>
                 <td className="num">{r.struts}</td>
                 <td className="num" style={{ fontWeight: 600 }}>{r.maxUtilization.toFixed(3)}</td>

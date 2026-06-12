@@ -211,7 +211,7 @@ export function TrussApp() {
 
   return (
     <div>
-      <h1 className="section-title" style={{ fontSize: 22, marginBottom: 4 }}>Калькулятор стальной фермы покрытия</h1>
+      <h1 className="page-title">Калькулятор стальной фермы покрытия</h1>
       <p className="text-muted text-small" style={{ marginTop: 0 }}>
         Подбор сечений 5 элементов фермы (ВП, НП, ОРб, ОР, РР) по СП 16.13330. Каталог 579 трубных профилей с исключением нестандартных толщин.
       </p>
@@ -457,7 +457,7 @@ function SectionDetail({
 
   return (
     <div>
-      <h2 className="section-title" style={{ fontSize: 16, marginBottom: 8 }}>
+      <h2 className="section-title">
         {TRUSS_SECTION_LABELS[sec]} ({TRUSS_SECTION_SHORT[sec]}) — детали
       </h2>
       <div style={{ display: "flex", gap: 16, marginBottom: 12, flexWrap: "wrap", fontSize: 13 }}>
@@ -505,9 +505,7 @@ function SectionDetail({
               {result.candidates.map((c, i) => (
                 <tr
                   key={c.profile.name + i}
-                  style={{
-                    background: i === 0 ? "#dcfce7" : c.maxUtilization > 0.95 ? "#fef2f2" : undefined,
-                  }}
+                  className={i === 0 ? "row-accepted" : c.maxUtilization > 0.95 ? "row-over" : undefined}
                 >
                   <td className="num">{i + 1}</td>
                   <td style={{ fontWeight: i === 0 ? 600 : 400 }}>{c.profile.name}</td>
