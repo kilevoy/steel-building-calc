@@ -1,5 +1,5 @@
 /**
- * Boolean checkbox with a single label. Extracted from `App.tsx`.
+ * Boolean checkbox with a single label.
  */
 export function CheckField({
   label,
@@ -11,13 +11,12 @@ export function CheckField({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13 }}>
+    <div className="check">
+      <label>
         <input
           type="checkbox"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
-          style={{ marginRight: 6 }}
         />
         {label}
       </label>

@@ -1,0 +1,489 @@
+/*
+ * Дизайн-система калькулятора стального каркаса.
+ *
+ * Единственный источник визуального стиля: цвета, типографика, поля,
+ * кнопки, таблицы, сворачиваемые блоки, вкладки, сетки. Компоненты
+ * используют классы отсюда; inline-стили допустимы только для значений,
+ * вычисляемых в рантайме (например, цвет статуса проверки).
+ */
+
+:root {
+  /* Палитра (slate / sky, как в исходных inline-стилях) */
+  --c-bg: #f1f5f9;
+  --c-surface: #ffffff;
+  --c-border: #cbd5e1;
+  --c-border-soft: #e2e8f0;
+  --c-text: #0f172a;
+  --c-text-secondary: #475569;
+  --c-text-muted: #64748b;
+  --c-text-faint: #94a3b8;
+
+  --c-accent: #0369a1;
+  --c-accent-hover: #075985;
+  --c-accent-soft: #e0f2fe;
+
+  --c-ok: #15803d;
+  --c-ok-soft: #dcfce7;
+  --c-danger: #b91c1c;
+  --c-danger-dark: #7f1d1d;
+  --c-danger-soft: #fee2e2;
+  --c-warn: #b45309;
+  --c-warn-soft: #fef3c7;
+
+  /* Синхронизированные поля (жёлтая маркировка 🔗) */
+  --c-sync-bg: #fefce8;
+  --c-sync-border: #eab308;
+  --c-sync-text: #92400e;
+
+  --radius: 6px;
+  --radius-sm: 4px;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.08);
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* ---------- Каркас приложения ---------- */
+
+.app-shell {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 8px;
+  }
+}
+
+/* ---------- Вкладки ---------- */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--c-border-soft);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+}
+
+.tab {
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  background: transparent;
+  color: var(--c-text-secondary);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  cursor: pointer;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s;
+}
+
+.tab:hover {
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+}
+
+.tab--active,
+.tab--active:hover {
+  background: var(--c-accent);
+  color: #fff;
+  border-bottom-color: var(--c-accent);
+}
+
+/* ---------- Баннер общего здания ---------- */
+
+.building-banner {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--c-sync-bg);
+  border: 1px dashed var(--c-sync-border);
+  border-radius: var(--radius);
+  font-size: 12px;
+  color: #78350f;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  align-items: center;
+}
+
+.building-banner__title {
+  font-weight: 600;
+}
+
+/* ---------- Поля форм ---------- */
+
+.field {
+  margin-bottom: 6px;
+}
+
+.field__label {
+  display: block;
+  font-size: 13px;
+  color: var(--c-text-secondary);
+  margin-bottom: 2px;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+  width: 100%;
+  padding: 5px 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--c-text);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus,
+select:focus {
+  outline: none;
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 3px rgb(3 105 161 / 0.15);
+}
+
+input[readonly] {
+  background: #f8fafc;
+  color: var(--c-text-secondary);
+}
+
+input[type="checkbox"] {
+  accent-color: var(--c-accent);
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+}
+
+.field__hint {
+  font-size: 11px;
+  color: var(--c-text-muted);
+  margin-top: 2px;
+}
+
+.field__error {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--c-danger);
+}
+
+.check {
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--c-text-secondary);
+}
+
+.check input {
+  margin-right: 6px;
+}
+
+/* Синхронизированное поле (пишет в общий BuildingContext) */
+
+.synced-field {
+  margin-bottom: 6px;
+  padding: 4px 6px;
+  background: var(--c-sync-bg);
+  border: 1px dashed var(--c-sync-border);
+  border-radius: var(--radius-sm);
+}
+
+.synced-field__badge {
+  color: var(--c-sync-text);
+  margin-right: 4px;
+}
+
+/* ---------- Кнопки ---------- */
+
+.btn {
+  display: inline-block;
+  padding: 7px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--c-text-secondary);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.btn:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
+.btn--primary {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--c-accent-hover);
+  border-color: var(--c-accent-hover);
+  color: #fff;
+}
+
+.btn--danger {
+  background: #fff1f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.btn--danger:hover {
+  border-color: var(--c-danger);
+  color: var(--c-danger);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- Сворачиваемые блоки / карточки ---------- */
+
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.collapsible {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.collapsible__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 12px;
+  background: #f8fafc;
+  border-radius: var(--radius) var(--radius) 0 0;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--c-text);
+  user-select: none;
+}
+
+.collapsible--closed .collapsible__header {
+  border-radius: var(--radius);
+}
+
+.collapsible--open .collapsible__header {
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.collapsible__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.collapsible__chevron {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--c-text-secondary);
+  transition: transform 0.15s;
+}
+
+.collapsible--open .collapsible__chevron {
+  transform: rotate(90deg);
+}
+
+.collapsible__right {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--c-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collapsible__body {
+  padding: 12px;
+}
+
+/* ---------- Таблицы результатов ---------- */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: var(--c-surface);
+}
+
+.table th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-text-secondary);
+  background: #f8fafc;
+  padding: 6px 10px;
+  border-bottom: 2px solid var(--c-border-soft);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.table tfoot td,
+.table .total-row td {
+  font-weight: 600;
+  background: #f8fafc;
+}
+
+/* ---------- Stat (метрика в строке результата) ---------- */
+
+.stat__label {
+  font-size: 11px;
+  color: var(--c-text-muted);
+}
+
+.stat__value {
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Сетки ---------- */
+
+.grid {
+  display: grid;
+  gap: 8px;
+}
+
+.grid--2 { grid-template-columns: repeat(2, 1fr); }
+.grid--3 { grid-template-columns: repeat(3, 1fr); }
+.grid--4 { grid-template-columns: repeat(4, 1fr); }
+.grid--5 { grid-template-columns: repeat(5, 1fr); }
+.grid--6 { grid-template-columns: repeat(6, 1fr); }
+
+@media (max-width: 1024px) {
+  .grid--4, .grid--5, .grid--6 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .grid--3, .grid--4, .grid--5, .grid--6 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .grid--2, .grid--3, .grid--4, .grid--5, .grid--6 { grid-template-columns: 1fr; }
+}
+
+/* ---------- Сообщения и статусы ---------- */
+
+.note {
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+.note--info {
+  background: var(--c-accent-soft);
+  color: #0c4a6e;
+  border: 1px solid #bae6fd;
+}
+
+.note--ok {
+  background: var(--c-ok-soft);
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.note--warn {
+  background: var(--c-warn-soft);
+  color: var(--c-warn);
+  border: 1px solid #fde68a;
+}
+
+.note--danger {
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+  border: 1px solid #fecaca;
+}
+
+.text-muted { color: var(--c-text-muted); }
+.text-ok { color: var(--c-ok); }
+.text-danger { color: var(--c-danger); }
+.text-warn { color: var(--c-warn); }
+.text-small { font-size: 12px; }
+
+/* ---------- Заголовки секций ---------- */
+
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--c-text);
+}
+
+/* ---------- Печать ---------- */
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .tabs,
+  .btn {
+    display: none;
+  }
+
+  .collapsible,
+  .card {
+    box-shadow: none;
+    border-color: #999;
+  }
+}

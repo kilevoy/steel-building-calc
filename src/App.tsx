@@ -11,7 +11,7 @@ const CraneBeamApp = lazy(() => import("./CraneBeamApp").then((m) => ({ default:
 const SummaryApp = lazy(() => import("./SummaryApp").then((m) => ({ default: m.SummaryApp })));
 
 const TAB_FALLBACK = (
-  <div className="p-4 text-sm text-slate-500">
+  <div className="text-muted" style={{ padding: 16 }}>
     Загрузка модуля расчёта…
   </div>
 );
@@ -58,31 +58,17 @@ export function App() {
   const [mode, setMode] = useState<Mode>("column");
 
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 1400, margin: "0 auto", padding: 16 }}>
-      <div style={{ display: "flex", gap: 8, marginBottom: 16, borderBottom: "2px solid #e2e8f0", flexWrap: "wrap" }}>
-        {MODES.map((m) => {
-          const isActive = mode === m;
-          return (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
-              style={{
-                padding: "10px 24px",
-                fontSize: 15,
-                fontWeight: 600,
-                background: isActive ? "#0369a1" : "transparent",
-                color: isActive ? "white" : "#475569",
-                border: "none",
-                borderRadius: "6px 6px 0 0",
-                cursor: "pointer",
-                marginBottom: -2,
-                borderBottom: isActive ? "2px solid #0369a1" : "2px solid transparent",
-              }}
-            >
-              {MODE_LABELS[m]}
-            </button>
-          );
-        })}
+    <div className="app-shell">
+      <div className="tabs">
+        {MODES.map((m) => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            className={mode === m ? "tab tab--active" : "tab"}
+          >
+            {MODE_LABELS[m]}
+          </button>
+        ))}
       </div>
       <BuildingSummaryBanner />
       {mode === "column" && (

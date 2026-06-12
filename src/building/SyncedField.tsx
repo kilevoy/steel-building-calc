@@ -5,8 +5,6 @@ import {
   type ValidationKind,
 } from "../utils/validation";
 
-const SYNCED_BG = "#fef9c3";       // light yellow
-const SYNCED_BORDER = "#eab308";   // amber-500
 const SYNCED_BADGE = "🔗";
 
 /**
@@ -26,19 +24,10 @@ export function SyncedField({
   hint?: string;
 }) {
   return (
-    <div
-      title={hint}
-      style={{
-        marginBottom: 6,
-        padding: "4px 6px",
-        background: SYNCED_BG,
-        border: `1px dashed ${SYNCED_BORDER}`,
-        borderRadius: 4,
-      }}
-    >
+    <div className="synced-field" title={hint}>
       {label && (
-        <label style={{ fontSize: 13, display: "block" }}>
-          <span style={{ color: "#92400e", marginRight: 4 }}>{SYNCED_BADGE}</span>
+        <label className="field__label">
+          <span className="synced-field__badge">{SYNCED_BADGE}</span>
           {label}
         </label>
       )}
@@ -46,14 +35,6 @@ export function SyncedField({
     </div>
   );
 }
-
-const SYNCED_FIELD_STYLE: React.CSSProperties = {
-  background: SYNCED_BG,
-  border: `1px dashed ${SYNCED_BORDER}`,
-  borderRadius: 4,
-  padding: "4px 6px",
-  marginBottom: 6,
-};
 
 /** Inline numeric synced field (label + input together). */
 export function SyncedNumField({
@@ -73,9 +54,9 @@ export function SyncedNumField({
 }) {
   const validationMessage = validateNumberByKind(value, label, validationKind);
   return (
-    <div title={hint} style={SYNCED_FIELD_STYLE}>
-      <label style={{ fontSize: 13, display: "block" }}>
-        <span style={{ color: "#92400e", marginRight: 4 }}>{SYNCED_BADGE}</span>
+    <div className="synced-field" title={hint}>
+      <label className="field__label">
+        <span className="synced-field__badge">{SYNCED_BADGE}</span>
         {label}
       </label>
       <input
@@ -83,10 +64,9 @@ export function SyncedNumField({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       />
       {validationMessage && (
-        <div style={{ marginTop: 3, fontSize: 12, color: "#b91c1c" }}>
+        <div className="field__error">
           {userValidationMessage(validationMessage)}
         </div>
       )}
@@ -109,16 +89,12 @@ export function SyncedSelectField({
   hint?: string;
 }) {
   return (
-    <div title={hint} style={SYNCED_FIELD_STYLE}>
-      <label style={{ fontSize: 13, display: "block" }}>
-        <span style={{ color: "#92400e", marginRight: 4 }}>{SYNCED_BADGE}</span>
+    <div className="synced-field" title={hint}>
+      <label className="field__label">
+        <span className="synced-field__badge">{SYNCED_BADGE}</span>
         {label}
       </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
-      >
+      <select value={value} onChange={(e) => onChange(e.target.value)}>
         {options.map(([v, l]) => (
           <option key={v} value={v}>
             {l}

@@ -1,8 +1,7 @@
 /**
- * Generic numeric input. Mirrors the original `Field` helper from the
- * pre-decomposition `App.tsx` byte-for-byte: same styles, same `Number()`
- * coercion, same fallback step. Behaviour is preserved on purpose so the
- * extraction is a pure file move.
+ * Generic numeric input. Same `Number()` coercion and fallback step as the
+ * original `App.tsx` helper; presentation comes from the shared design
+ * system in `src/styles.css`.
  */
 export function Field({
   label,
@@ -16,14 +15,13 @@ export function Field({
   step?: number;
 }) {
   return (
-    <div style={{ marginBottom: 6 }}>
-      <label style={{ fontSize: 13, display: "block" }}>{label}</label>
+    <div className="field">
+      <label className="field__label">{label}</label>
       <input
         type="number"
         step={step ?? 1}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ width: "100%", padding: 4, boxSizing: "border-box" }}
       />
     </div>
   );

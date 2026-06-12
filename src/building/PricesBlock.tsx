@@ -23,7 +23,7 @@ export function PricesBlock() {
         </span>
       }
     >
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+      <div className="grid grid--3">
         <SyncedNumField
           label="С255Б"
           value={building.priceC255B_rubKg}
