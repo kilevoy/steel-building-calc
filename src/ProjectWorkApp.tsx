@@ -7,15 +7,35 @@ import {
   calculateProjectWork,
   defaultProjectWorkInputs,
 } from "./calc/projectWork/engine";
+import {
+  roofStructureToBook,
+  wallStructureToBook,
+} from "./calc/projectWork/structureMapping";
+import structuresJson from "./data/structures/structures.json";
 import type {
   ParapetMode,
   ProjectWorkInputs,
   RoofKind,
-  RoofingMaterial,
   SeismicCategory,
   StairType,
-  WallMaterial,
 } from "./calc/projectWork/types";
+
+const STRUCTURE_OPTIONS: [string, string][] = (structuresJson as { id: string }[]).map((s) => [
+  s.id,
+  s.id,
+]);
+
+const ROOFING_LABEL: Record<number, string> = {
+  1: "профлист",
+  2: "сэндвич послойной сборки",
+  3: "сэндвич заводской",
+  4: "ПВХ",
+};
+const WALL_LABEL: Record<number, string> = {
+  1: "профлист",
+  2: "сэндвич послойной сборки",
+  3: "сэндвич заводской",
+};
 
 /**
  * Вкладка «Проектные работы» — стоимость и срок проектирования раздела КМ
@@ -36,9 +56,6 @@ function seismicPointsToCategory(points: number): SeismicCategory {
 
 /** Проектные опции, не входящие в общую модель здания. */
 interface ProjectOptions {
-  wallMaterial: WallMaterial;
-  wallThickness: number;
-  roofingMaterial: RoofingMaterial;
   snowGuard: boolean;
   roofFence: boolean;
   drainage: boolean;
@@ -71,9 +88,6 @@ interface ProjectOptions {
 }
 
 const DEFAULT_OPTIONS: ProjectOptions = {
-  wallMaterial: 1,
-  wallThickness: 2,
-  roofingMaterial: 3,
   snowGuard: false,
   roofFence: false,
   drainage: false,
@@ -145,6 +159,10 @@ export function ProjectWorkApp() {
   const roof: RoofKind = building.roofShape === "gable" ? 2 : 1;
   const perSpanWidth = building.span_m / spanCount;
 
+  // Материалы книги ИНСИ выводятся из конструкций основного калькулятора.
+  const wallBook = wallStructureToBook(building.wallStructure);
+  const roofingBook = roofStructureToBook(building.roofStructure);
+
   const inputs: ProjectWorkInputs = useMemo(
     () => ({
       ...defaultProjectWorkInputs,
@@ -160,9 +178,9 @@ export function ProjectWorkApp() {
       overheadCraneCapacity: opt.overheadCraneCapacity,
       suspendedCrane: opt.suspendedCrane,
       suspendedCraneCapacity: opt.suspendedCraneCapacity,
-      wallMaterial: opt.wallMaterial,
-      wallThickness: opt.wallThickness,
-      roofingMaterial: opt.roofingMaterial,
+      wallMaterial: wallStructureToBook(building.wallStructure).material,
+      wallThickness: wallStructureToBook(building.wallStructure).thickness,
+      roofingMaterial: roofStructureToBook(building.roofStructure),
       snowGuard: opt.snowGuard,
       roofFence: opt.roofFence,
       drainage: opt.drainage,
@@ -234,6 +252,18 @@ export function ProjectWorkApp() {
             options={[["6", "до 6 — несейсм."], ["7", "7"], ["8", "8"], ["9", "9"]]}
             onChange={(v) => setB("seismicPoints", Number(v))}
           />
+          <SyncedSelectField
+            label="Конструкция покрытия"
+            value={building.roofStructure}
+            options={STRUCTURE_OPTIONS}
+            onChange={(v) => setB("roofStructure", v)}
+          />
+          <SyncedSelectField
+            label="Конструкция ограждения"
+            value={building.wallStructure}
+            options={STRUCTURE_OPTIONS}
+            onChange={(v) => setB("wallStructure", v)}
+          />
           <ReadOnly label="Опорный кран" value={building.hasCrane ? "есть (из здания)" : "нет"} />
           <ReadOnly label="Площадь застройки, м²" value={fmtNum(area)} />
         </div>
@@ -242,17 +272,14 @@ export function ProjectWorkApp() {
       {/* ——— проектные опции ——— */}
       <Collapsible title="🧱 Ограждающие конструкции" storageKey="pw-walls" defaultOpen>
         <div className="grid grid--3" style={{ gap: 10 }}>
-          <Select label="Материал стен" value={String(opt.wallMaterial)}
-            options={[["1", "профлист"], ["2", "сэндвич послойно"], ["3", "сэндвич заводской"]]}
-            onChange={(v) => upd("wallMaterial", Number(v) as WallMaterial)} />
-          <Num label="Толщина стен (индекс)" value={opt.wallThickness} onChange={(v) => upd("wallThickness", v)} />
-          <Select label="Материал кровли" value={String(opt.roofingMaterial)}
-            options={[["3", "профлист"], ["2", "послойная сборка"]]}
-            onChange={(v) => upd("roofingMaterial", Number(v) as RoofingMaterial)} />
+          <ReadOnly label="Материал кровли (книга ИНСИ)" value={ROOFING_LABEL[roofingBook]} />
+          <ReadOnly label="Материал стен (книга ИНСИ)" value={WALL_LABEL[wallBook.material]} />
+          <ReadOnly label="Толщина стен" value={[100, 150, 200, 250][wallBook.thickness - 1] + " мм"} />
           <Check label="Снегозадержание" checked={opt.snowGuard} onChange={(v) => upd("snowGuard", v)} />
           <Check label="Ограждение кровли" checked={opt.roofFence} onChange={(v) => upd("roofFence", v)} />
           <Check label="Водосточная система" checked={opt.drainage} onChange={(v) => upd("drainage", v)} />
         </div>
+        <div className="field__hint">Материалы определяются конструкциями покрытия/ограждения (общие со зданием).</div>
       </Collapsible>
 
       <Collapsible title="🚪 Проёмы (окна, ворота, двери)" storageKey="pw-openings" defaultOpen>

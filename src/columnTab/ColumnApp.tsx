@@ -63,6 +63,7 @@ function lookupStructure(id: string): StructureRow | undefined {
 export function ColumnApp() {
   const { building, setBuilding } = useBuilding();
   const initialRoof = lookupStructure(building.roofStructure);
+  const initialWall = lookupStructure(building.wallStructure);
   const [input, setInput] = useState<CalculationInput>(() => ({
     ...DEFAULT_COLUMN_INPUT,
     span_m: building.span_m,
@@ -75,7 +76,9 @@ export function ColumnApp() {
     Sg_kPa: building.Sg_kPa,
     terrainType: building.terrainType,
     roofStructure: building.roofStructure,
+    wallStructure: building.wallStructure,
     roofLoad_kPa: initialRoof?.kPa ?? DEFAULT_COLUMN_INPUT.roofLoad_kPa,
+    wallLoad_kPa: initialWall?.kPa ?? DEFAULT_COLUMN_INPUT.wallLoad_kPa,
     responsibilityCoeff: building.responsibilityCoeff,
     prices: {
       "С255Б": building.priceC255B_rubKg,
@@ -149,8 +152,10 @@ export function ColumnApp() {
       Sg_kPa: building.Sg_kPa,
       terrainType: building.terrainType,
       roofStructure: building.roofStructure,
+      wallStructure: building.wallStructure,
       roofType: building.roofShape === "gable" ? "gable" : "single_slope",
       roofLoad_kPa: roofLoad.total_kPa > 0 ? roofLoad.total_kPa : cur.roofLoad_kPa,
+      wallLoad_kPa: lookupStructure(building.wallStructure)?.kPa ?? cur.wallLoad_kPa,
       responsibilityCoeff: building.responsibilityCoeff,
       prices: {
         "С255Б": building.priceC255B_rubKg,
@@ -168,12 +173,9 @@ export function ColumnApp() {
   const upd = (patch: Partial<CalculationInput>) =>
     setInput((p) => ({ ...p, ...patch }));
 
+  // Конструкция ограждения — общий параметр здания (синхронный).
   const setWallStructure = (id: string) => {
-    const s = lookupStructure(id);
-    upd({
-      wallStructure: id,
-      wallLoad_kPa: s ? s.kPa : input.wallLoad_kPa,
-    });
+    setBuilding({ wallStructure: id });
   };
 
   const setOverhead = (patch: Partial<CalculationInput["overheadCrane"]>) => {

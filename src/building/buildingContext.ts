@@ -16,6 +16,7 @@ export interface Building {
   Sg_kPa: number;
   terrainType: TerrainType;
   roofStructure: string;
+  wallStructure: string;
   roofShape: RoofShape;
   spanCount: SpanCount;
   hasCrane: boolean;
@@ -49,6 +50,7 @@ export const DEFAULT_BUILDING: Building = {
   Sg_kPa: 2.45,
   terrainType: "B",
   roofStructure: "профлист",
+  wallStructure: "профлист",
   roofShape: "gable",
   spanCount: "single",
   hasCrane: false,
