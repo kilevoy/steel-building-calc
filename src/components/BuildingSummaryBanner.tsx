@@ -23,6 +23,7 @@ export function BuildingSummaryBanner() {
       <span>Sg <b>{building.Sg_kPa}</b> кПа</span>
       <span>местн. <b>{building.terrainType}</b></span>
       <span>покр. <b>{building.roofStructure}</b></span>
+      <span>сейсм. <b>{building.seismicPoints <= 6 ? "нет" : `${building.seismicPoints} б`}</b></span>
       <span>γₙ <b>{building.responsibilityCoeff}</b></span>
     </div>
   );

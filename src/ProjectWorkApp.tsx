@@ -20,8 +20,18 @@ import type {
  * издержки) задаются здесь и хранятся локально для вкладки.
  */
 
+/**
+ * Сейсмичность площадки (баллы MSK-64) → категория книги ИНСИ:
+ * до 6 — несейсмический (1), 7 → 2, 8 → 3, 9 → 4.
+ */
+function seismicPointsToCategory(points: number): SeismicCategory {
+  if (points <= 6) return 1;
+  if (points === 7) return 2;
+  if (points === 8) return 3;
+  return 4;
+}
+
 interface ProjectOptions {
-  seismic: SeismicCategory;
   wallMaterial: WallMaterial;
   wallThickness: number;
   windows: boolean;
@@ -36,7 +46,6 @@ interface ProjectOptions {
 }
 
 const DEFAULT_OPTIONS: ProjectOptions = {
-  seismic: 1,
   wallMaterial: 1,
   wallThickness: 2,
   windows: true,
@@ -92,7 +101,7 @@ export function ProjectWorkApp() {
       framePitch: building.framePitch_m,
       height: building.height_m,
       roof,
-      seismic: opt.seismic,
+      seismic: seismicPointsToCategory(building.seismicPoints),
       wallMaterial: opt.wallMaterial,
       wallThickness: opt.wallThickness,
       windows: opt.windows,
@@ -179,11 +188,9 @@ export function ProjectWorkApp() {
               onChange={(v) => upd("suspendedCraneCapacity", v)}
             />
           )}
-          <Select
-            label="Сейсмичность"
-            value={String(opt.seismic)}
-            options={[["1", "несейсмический"], ["2", "категория 2"], ["3", "категория 3"], ["4", "категория 4"]]}
-            onChange={(v) => upd("seismic", Number(v) as SeismicCategory)}
+          <ReadOnly
+            label="Сейсмичность (из здания)"
+            value={building.seismicPoints <= 6 ? "несейсмический" : `${building.seismicPoints} баллов`}
           />
           <Num
             label="Издержки, %"

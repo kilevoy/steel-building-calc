@@ -30,6 +30,8 @@ export interface Building {
   purlinSelectionMode: PurlinSelectionMode;
   purlinContinuityScheme: PurlinContinuityScheme;
   windowRiegelCount: number;
+  /** Расчётная сейсмичность площадки, баллы MSK-64 (6 = несейсмический район). */
+  seismicPoints: number;
 }
 
 export interface BuildingContextValue {
@@ -61,6 +63,7 @@ export const DEFAULT_BUILDING: Building = {
   purlinSelectionMode: "auto",
   purlinContinuityScheme: "split",
   windowRiegelCount: 1,
+  seismicPoints: 6,
 };
 
 export const BuildingContext = createContext<BuildingContextValue | null>(null);
