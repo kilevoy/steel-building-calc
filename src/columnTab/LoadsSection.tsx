@@ -1,5 +1,5 @@
 import { SyncedNumField, SyncedSelectField } from "../building/SyncedField";
-import { Field, SelectField } from "../components/form";
+import { Field } from "../components/form";
 import { CityCombobox } from "./CityCombobox";
 import type { Building } from "../building/useBuilding";
 import type { CalculationInput } from "../calc/types";
@@ -70,7 +70,7 @@ export function LoadsSection({
           <b>{roofLoad.total_kPa.toFixed(3)} кПа</b>
         </div>
       )}
-      <SelectField
+      <SyncedSelectField
         label="Конструкция ограждения"
         value={input.wallStructure}
         options={structures.map((s) => [s.id, `${s.id} (${s.kPa.toFixed(3)} кПа)`])}
