@@ -1,0 +1,312 @@
+{
+ "base": {
+  "inputs": {
+   "buildingType": 3,
+   "kmFlag": true,
+   "roof": 2,
+   "seismic": 1,
+   "spanCount": 1,
+   "spanWidth1": 12,
+   "spanWidth2": 0,
+   "length": 24,
+   "framePitch": 6,
+   "height": 6,
+   "wallMaterial": 1,
+   "wallThickness": 2,
+   "windows": true,
+   "windowCount": 13,
+   "gates": false,
+   "doors": true,
+   "doorCount": 3,
+   "overheadCrane": false,
+   "overheadCraneCapacity": 1,
+   "suspendedCrane": false,
+   "suspendedCraneCapacity": 1,
+   "overheadCost": 0
+  },
+  "expected": {
+   "Z9": 236.8,
+   "Z10": 26.311111111,
+   "Z17": 23.492063492
+  }
+ },
+ "monoslope": {
+  "inputs": {
+   "buildingType": 3,
+   "kmFlag": true,
+   "roof": 1,
+   "seismic": 1,
+   "spanCount": 1,
+   "spanWidth1": 12,
+   "spanWidth2": 0,
+   "length": 24,
+   "framePitch": 6,
+   "height": 6,
+   "wallMaterial": 1,
+   "wallThickness": 2,
+   "windows": true,
+   "windowCount": 13,
+   "gates": false,
+   "doors": true,
+   "doorCount": 3,
+   "overheadCrane": false,
+   "overheadCraneCapacity": 1,
+   "suspendedCrane": false,
+   "suspendedCraneCapacity": 1,
+   "overheadCost": 0
+  },
+  "expected": {
+   "Z9": 277.12,
+   "Z10": 30.791111111,
+   "Z17": 27.492063492
+  }
+ },
+ "tall10": {
+  "inputs": {
+   "buildingType": 3,
+   "kmFlag": true,
+   "roof": 2,
+   "seismic": 1,
+   "spanCount": 1,
+   "spanWidth1": 12,
+   "spanWidth2": 0,
+   "length": 24,
+   "framePitch": 6,
+   "height": 10,
+   "wallMaterial": 1,
+   "wallThickness": 2,
+   "windows": true,
+   "windowCount": 13,
+   "gates": false,
+   "doors": true,
+   "doorCount": 3,
+   "overheadCrane": false,
+   "overheadCraneCapacity": 1,
+   "suspendedCrane": false,
+   "suspendedCraneCapacity": 1,
+   "overheadCost": 0
+  },
+  "expected": {
+   "Z9": 326.08,
+   "Z10": 36.231111111,
+   "Z17": 32.349206349
+  }
+ },
+ "span18": {
+  "inputs": {
+   "buildingType": 3,
+   "kmFlag": true,
+   "roof": 2,
+   "seismic": 1,
+   "spanCount": 1,
+   "spanWidth1": 18,
+   "spanWidth2": 0,
+   "length": 24,
+   "framePitch": 6,
+   "height": 6,
+   "wallMaterial": 1,
+   "wallThickness": 2,
+   "windows": true,
+   "windowCount": 13,
+   "gates": false,
+   "doors": true,
+   "doorCount": 3,
+   "overheadCrane": false,
+   "overheadCraneCapacity": 1,
+   "suspendedCrane": false,
+   "suspendedCraneCapacity": 1,
+   "overheadCost": 0
+  },
+  "expected": {
+   "Z9": 280,
+   "Z10": 31.111111111,
+   "Z17": 18.518518519
+  }
+ },
+ "twoSpan": {
+  "inputs": {
+   "buildingType": 3,
+   "kmFlag": true,
+   "roof": 2,
+   "seismic": 1,
+   "spanCount": 2,
+   "spanWidth1": 12,
+   "spanWidth2": 12,
+   "length": 24,
+   "framePitch": 6,
+   "height": 6,
+   "wallMaterial": 1,
+   "wallThickness": 2,
+   "windows": true,
+   "windowCount": 13,
+   "gates": false,
+   "doors": true,
+   "doorCount": 3,
+   "overheadCrane": false,
+   "overheadCraneCapacity": 1,
+   "suspendedCrane": false,
+   "suspendedCraneCapacity": 1,
+   "overheadCost": 0
+  },
+  "expected": {
+   "Z9": 275.2,
+   "Z10": 30.577777778,
+   "Z17": 13.650793651
+  }
+ },
+ "overheadCrane": {
+  "inputs": {
+   "buildingType": 3,
+   "kmFlag": true,
+   "roof": 2,
+   "seismic": 1,
+   "spanCount": 1,
+   "spanWidth1": 12,
+   "spanWidth2": 0,
+   "length": 24,
+   "framePitch": 6,
+   "height": 6,
+   "wallMaterial": 1,
+   "wallThickness": 2,
+   "windows": true,
+   "windowCount": 13,
+   "gates": false,
+   "doors": true,
+   "doorCount": 3,
+   "overheadCrane": true,
+   "overheadCraneCapacity": 1,
+   "suspendedCrane": false,
+   "suspendedCraneCapacity": 1,
+   "overheadCost": 0
+  },
+  "expected": {
+   "Z9": 296.8,
+   "Z10": 32.977777778,
+   "Z17": 29.444444444
+  }
+ },
+ "withGates": {
+  "inputs": {
+   "buildingType": 3,
+   "kmFlag": true,
+   "roof": 2,
+   "seismic": 1,
+   "spanCount": 1,
+   "spanWidth1": 12,
+   "spanWidth2": 0,
+   "length": 24,
+   "framePitch": 6,
+   "height": 6,
+   "wallMaterial": 1,
+   "wallThickness": 2,
+   "windows": true,
+   "windowCount": 13,
+   "gates": true,
+   "doors": true,
+   "doorCount": 3,
+   "overheadCrane": false,
+   "overheadCraneCapacity": 1,
+   "suspendedCrane": false,
+   "suspendedCraneCapacity": 1,
+   "overheadCost": 0
+  },
+  "expected": {
+   "Z9": 232.8,
+   "Z10": 25.866666667,
+   "Z17": 23.095238095
+  }
+ },
+ "seismic3": {
+  "inputs": {
+   "buildingType": 3,
+   "kmFlag": true,
+   "roof": 2,
+   "seismic": 3,
+   "spanCount": 1,
+   "spanWidth1": 12,
+   "spanWidth2": 0,
+   "length": 24,
+   "framePitch": 6,
+   "height": 6,
+   "wallMaterial": 1,
+   "wallThickness": 2,
+   "windows": true,
+   "windowCount": 13,
+   "gates": false,
+   "doors": true,
+   "doorCount": 3,
+   "overheadCrane": false,
+   "overheadCraneCapacity": 1,
+   "suspendedCrane": false,
+   "suspendedCraneCapacity": 1,
+   "overheadCost": 0
+  },
+  "expected": {
+   "Z9": 265.44,
+   "Z10": 29.493333333,
+   "Z17": 26.333333333
+  }
+ },
+ "overhead10pct": {
+  "inputs": {
+   "buildingType": 3,
+   "kmFlag": true,
+   "roof": 2,
+   "seismic": 1,
+   "spanCount": 1,
+   "spanWidth1": 12,
+   "spanWidth2": 0,
+   "length": 24,
+   "framePitch": 6,
+   "height": 6,
+   "wallMaterial": 1,
+   "wallThickness": 2,
+   "windows": true,
+   "windowCount": 13,
+   "gates": false,
+   "doors": true,
+   "doorCount": 3,
+   "overheadCrane": false,
+   "overheadCraneCapacity": 1,
+   "suspendedCrane": false,
+   "suspendedCraneCapacity": 1,
+   "overheadCost": 0.1
+  },
+  "expected": {
+   "Z9": 260.48,
+   "Z10": 26.311111111,
+   "Z17": 23.492063492
+  }
+ },
+ "big": {
+  "inputs": {
+   "buildingType": 3,
+   "kmFlag": true,
+   "roof": 2,
+   "seismic": 1,
+   "spanCount": 2,
+   "spanWidth1": 18,
+   "spanWidth2": 18,
+   "length": 60,
+   "framePitch": 6,
+   "height": 9,
+   "wallMaterial": 1,
+   "wallThickness": 2,
+   "windows": true,
+   "windowCount": 13,
+   "gates": false,
+   "doors": true,
+   "doorCount": 3,
+   "overheadCrane": true,
+   "overheadCraneCapacity": 1,
+   "suspendedCrane": false,
+   "suspendedCraneCapacity": 1,
+   "overheadCost": 0
+  },
+  "expected": {
+   "Z9": 534.08,
+   "Z10": 59.342222222,
+   "Z17": 7.0645502646
+  }
+ }
+}

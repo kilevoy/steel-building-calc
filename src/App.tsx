@@ -9,6 +9,7 @@ import {
   BeamIcon,
   ColumnIcon,
   CraneIcon,
+  ProjectIcon,
   PurlinIcon,
   RiegelIcon,
   SummaryIcon,
@@ -22,6 +23,7 @@ const PurlinApp = lazy(() => import("./PurlinApp").then((m) => ({ default: m.Pur
 const BeamCellApp = lazy(() => import("./BeamCellApp").then((m) => ({ default: m.BeamCellApp })));
 const WindowRiegelApp = lazy(() => import("./WindowRiegelApp").then((m) => ({ default: m.WindowRiegelApp })));
 const CraneBeamApp = lazy(() => import("./CraneBeamApp").then((m) => ({ default: m.CraneBeamApp })));
+const ProjectWorkApp = lazy(() => import("./ProjectWorkApp").then((m) => ({ default: m.ProjectWorkApp })));
 const SummaryApp = lazy(() => import("./SummaryApp").then((m) => ({ default: m.SummaryApp })));
 
 const TAB_FALLBACK = (
@@ -30,7 +32,15 @@ const TAB_FALLBACK = (
   </div>
 );
 
-type Mode = "column" | "truss" | "purlins" | "beamCell" | "windowRiegel" | "craneBeam" | "summary";
+type Mode =
+  | "column"
+  | "truss"
+  | "purlins"
+  | "beamCell"
+  | "windowRiegel"
+  | "craneBeam"
+  | "projectWork"
+  | "summary";
 
 const MODE_LABELS: Record<Mode, string> = {
   column: "Колонна",
@@ -39,6 +49,7 @@ const MODE_LABELS: Record<Mode, string> = {
   beamCell: "Балка покрытия",
   windowRiegel: "Оконные ригели",
   craneBeam: "Подкрановая балка",
+  projectWork: "Проектные работы",
   summary: "Сводка",
 };
 
@@ -49,6 +60,7 @@ const MODES: readonly Mode[] = [
   "beamCell",
   "windowRiegel",
   "craneBeam",
+  "projectWork",
   "summary",
 ] as const;
 
@@ -59,6 +71,7 @@ const MODE_ICONS: Record<Mode, ReactNode> = {
   beamCell: BeamIcon,
   windowRiegel: RiegelIcon,
   craneBeam: CraneIcon,
+  projectWork: ProjectIcon,
   summary: SummaryIcon,
 };
 
@@ -152,6 +165,7 @@ export function App() {
       {mode === "beamCell" && <LazyTab active={mode}><BeamCellApp /></LazyTab>}
       {mode === "windowRiegel" && <LazyTab active={mode}><WindowRiegelApp /></LazyTab>}
       {mode === "craneBeam" && <LazyTab active={mode}><CraneBeamApp /></LazyTab>}
+      {mode === "projectWork" && <LazyTab active={mode}><ProjectWorkApp /></LazyTab>}
       {mode === "summary" && <LazyTab active={mode}><SummaryApp /></LazyTab>}
     </div>
   );
