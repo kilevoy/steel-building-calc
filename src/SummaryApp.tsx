@@ -319,7 +319,7 @@ function BuildingBlock() {
       <legend style={{ fontWeight: 600 }}>Исходные данные</legend>
       <div className="grid grid--4" style={{ fontSize: 13 }}>
         {building.city && <div>Город: <b>{building.city}</b></div>}
-        <div>Пролёт: <b>{building.span_m} м</b></div>
+        <div>Ширина: <b>{building.span_m} м</b></div>
         <div>Длина: <b>{building.length_m} м</b></div>
         <div>Высота: <b>{building.height_m} м</b></div>
         <div>Уклон: <b>{building.roofSlope_deg}°</b></div>

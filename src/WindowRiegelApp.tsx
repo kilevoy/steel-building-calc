@@ -142,7 +142,7 @@ export function WindowRiegelApp() {
             onChange={(v) => upd("windowType", Number(v))}
           />
           <SyncedNumField label="Высота здания, м" value={inputs.buildingHeightM} step={0.5} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
-          <SyncedNumField label="Пролёт здания, м" value={inputs.buildingSpanM} step={1} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+          <SyncedNumField label="Ширина здания, м" value={inputs.buildingSpanM} step={1} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
           <SyncedNumField label="Длина здания, м" value={inputs.buildingLengthM} step={1} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
           <SyncedNumField
             label="Кол-во ригелей для сводки, шт."

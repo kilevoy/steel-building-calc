@@ -127,7 +127,7 @@ export function BeamCellApp() {
           <legend style={{ fontWeight: 600 }}>Геометрия</legend>
           <NumField label="Вдоль ГБ, м" value={inputs.lengthAlongMain} step={0.5} onChange={(v) => upd("lengthAlongMain", v)} />
           <NumField label="Поперёк ГБ, м" value={inputs.widthAcrossMain} step={0.5} onChange={(v) => upd("widthAcrossMain", v)} />
-          <SyncedNumField label="Пролёт здания, м" value={building.span_m} step={0.5} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+          <SyncedNumField label="Ширина здания, м" value={building.span_m} step={0.5} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
           <ReadOnlyField label="Расчётная длина балки покрытия, м" value={inputs.mainBeamSpan.toFixed(2)} />
           <SyncedNumField label="Шаг ГБ (= шаг рам), м" value={inputs.mainBeamStep} step={0.5} onChange={(v) => updSynced("framePitch_m", v)} validationKind="positive" />
         </fieldset>

@@ -289,7 +289,7 @@ export function PurlinApp() {
                 ]}
                 onChange={(v) => updSynced("roofShape", v as Building["roofShape"])}
               />
-              <SyncedNumField label="Пролёт, м" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+              <SyncedNumField label="Ширина здания, м" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
               <SyncedNumField label="Длина здания, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
               <SyncedNumField label="Высота до низа фермы, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
               <SyncedNumField label="Уклон кровли, °" value={input.roofSlope_deg} onChange={(v) => updSynced("roofSlope_deg", v)} />

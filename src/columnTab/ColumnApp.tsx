@@ -215,6 +215,7 @@ export function ColumnApp() {
             <GeometrySection input={input} building={building} updSynced={updSynced} upd={upd} />
             <LoadsSection
               input={input}
+              building={building}
               structures={STRUCTURES}
               roofLoad={roofLoad}
               updSynced={updSynced}

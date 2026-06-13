@@ -23,6 +23,7 @@ interface RoofLoadBreakdown {
  */
 export function LoadsSection({
   input,
+  building,
   structures,
   roofLoad,
   updSynced,
@@ -30,6 +31,7 @@ export function LoadsSection({
   setWallStructure,
 }: {
   input: CalculationInput;
+  building: Building;
   structures: readonly StructureRow[];
   roofLoad: RoofLoadBreakdown;
   updSynced: <K extends keyof Building>(key: K, value: Building[K]) => void;
@@ -76,6 +78,17 @@ export function LoadsSection({
       />
       <Field label="Нагрузка от ограждения, кПа" value={input.wallLoad_kPa} onChange={(v) => upd({ wallLoad_kPa: v })} step={0.001} />
       <SyncedNumField label="Ур. ответственности γₙ" value={input.responsibilityCoeff} onChange={(v) => updSynced("responsibilityCoeff", v)} step={0.05} />
+      <SyncedSelectField
+        label="Сейсмичность, баллы (MSK-64)"
+        value={String(building.seismicPoints)}
+        options={[
+          ["6", "до 6 — несейсмический"],
+          ["7", "7 баллов"],
+          ["8", "8 баллов"],
+          ["9", "9 баллов"],
+        ]}
+        onChange={(v) => updSynced("seismicPoints", Number(v))}
+      />
     </fieldset>
   );
 }

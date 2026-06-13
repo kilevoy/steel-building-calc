@@ -222,7 +222,7 @@ export function TrussApp() {
         {/* Column 1: geometry */}
         <div className="card" style={{ padding: 12 }}>
           <div className="section-title">Геометрия фермы</div>
-          <SyncedNumField label="Пролёт, м (18–30)" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
+          <SyncedNumField label="Ширина здания, м (18–30)" value={input.span_m} onChange={(v) => updSynced("span_m", v)} validationKind="positive" />
           <SyncedNumField label="Длина здания, м" value={input.length_m} onChange={(v) => updSynced("length_m", v)} validationKind="positive" />
           <SyncedNumField label="Высота до низа фермы, м" value={input.height_m} onChange={(v) => updSynced("height_m", v)} validationKind="positive" />
           <SyncedNumField label="Уклон кровли, °" value={input.roofSlope_deg} onChange={(v) => updSynced("roofSlope_deg", v)} />
