@@ -136,7 +136,9 @@ export function App() {
       </div>
       <BuildingSummaryBanner />
       <div className="no-print" style={{ marginBottom: 12 }}>
-        <Collapsible title="📐 Схема здания" storageKey="building-sketch" defaultOpen>
+        {/* storageKey сменён вместе с defaultOpen, чтобы блок свернулся и у
+            тех, у кого прежнее «раскрыто» уже сохранено в localStorage. */}
+        <Collapsible title="📐 Схема здания" storageKey="building-sketch-v2" defaultOpen={false}>
           <BuildingSketch />
         </Collapsible>
       </div>
