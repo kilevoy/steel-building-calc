@@ -71,17 +71,20 @@ export function ProjectWorkApp() {
   const { building } = useBuilding();
   const [opt, setOpt] = useState<ProjectOptions>(DEFAULT_OPTIONS);
 
-  // Геометрия из общего здания. Форма кровли gable→двускатная(2),
-  // monoslope→односкатная(1). Несколько пролётов считаем равными.
+  // Геометрия из общего здания. span_m — ПОЛНАЯ ширина здания поперёк;
+  // при нескольких пролётах она делится поровну между ними (книга ИНСИ
+  // подбирает коэффициент по ширине каждого пролёта). Форма кровли
+  // gable→двускатная(2), monoslope→односкатная(1).
   const spanCount = building.spanCount === "multi" ? 2 : 1;
   const roof: RoofKind = building.roofShape === "gable" ? 2 : 1;
+  const perSpanWidth = building.span_m / spanCount;
 
   const inputs: ProjectWorkInputs = useMemo(
     () => ({
       ...defaultProjectWorkInputs,
       spanCount,
-      spanWidth1: building.span_m,
-      spanWidth2: spanCount >= 2 ? building.span_m : 0,
+      spanWidth1: perSpanWidth,
+      spanWidth2: spanCount >= 2 ? perSpanWidth : 0,
       spanWidth3: 0,
       spanWidth4: 0,
       spanWidth5: 0,
@@ -103,7 +106,7 @@ export function ProjectWorkApp() {
       suspendedCraneCapacity: opt.suspendedCraneCapacity,
       overheadCost: opt.overheadCostPercent / 100,
     }),
-    [building, spanCount, roof, opt],
+    [building, spanCount, perSpanWidth, roof, opt],
   );
 
   const [result, setResult] = useState(() => calculateProjectWork(inputs));
@@ -114,7 +117,8 @@ export function ProjectWorkApp() {
   const upd = <K extends keyof ProjectOptions>(k: K, v: ProjectOptions[K]) =>
     setOpt((cur) => ({ ...cur, [k]: v }));
 
-  const area = building.span_m * spanCount * building.length_m;
+  // Площадь застройки = полная ширина × длина (совпадает со Сводкой).
+  const area = building.span_m * building.length_m;
 
   return (
     <div>
@@ -127,8 +131,8 @@ export function ProjectWorkApp() {
       <div className="grid grid--3" style={{ gap: 12, marginBottom: 16 }}>
         <fieldset>
           <legend>Геометрия (из здания)</legend>
+          <ReadOnly label="Ширина здания, м" value={fmtNum(building.span_m)} />
           <ReadOnly label="Пролётов поперёк" value={String(spanCount)} />
-          <ReadOnly label="Ширина пролёта, м" value={fmtNum(building.span_m)} />
           <ReadOnly label="Длина, м" value={fmtNum(building.length_m)} />
           <ReadOnly label="Шаг рам, м" value={fmtNum(building.framePitch_m)} />
           <ReadOnly label="Высота, м" value={fmtNum(building.height_m)} />

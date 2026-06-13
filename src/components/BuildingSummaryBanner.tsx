@@ -14,7 +14,7 @@ export function BuildingSummaryBanner() {
     >
       <span className="building-banner__title">🔗 Здание (общее):</span>
       {building.city && <span>город <b>{building.city}</b></span>}
-      <span>пролёт <b>{building.span_m}</b> м</span>
+      <span>ширина <b>{building.span_m}</b> м</span>
       <span>длина <b>{building.length_m}</b> м</span>
       <span>высота <b>{building.height_m}</b> м</span>
       <span>уклон <b>{building.roofSlope_deg}°</b></span>
