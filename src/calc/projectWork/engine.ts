@@ -36,18 +36,51 @@ export const defaultProjectWorkInputs: ProjectWorkInputs = {
   height: 6,
   roof: 2,
   seismic: 1,
-  wallMaterial: 1,
-  wallThickness: 2,
-  windows: true,
-  windowCount: 13,
-  gates: false,
-  doors: true,
-  doorCount: 3,
   overheadCrane: false,
   overheadCraneCapacity: 1,
   suspendedCrane: false,
   suspendedCraneCapacity: 1,
+  wallMaterial: 1,
+  wallThickness: 2,
+  roofingMaterial: 3,
+  snowGuard: false,
+  roofFence: false,
+  drainage: false,
+  windows: true,
+  windowCount: 13,
+  gates: false,
+  gateCount: 1,
+  gateSpanCount: 1,
+  doors: true,
+  doorCount: 3,
+  partitionGvl: false,
+  partitionSandwichLayered: false,
+  partitionSandwichFactory: false,
+  partitionOpeningsDoors: false,
+  partitionOpeningsGates: false,
+  parapetLongSide: 3,
+  parapetEnd: 3,
+  parapetOverhang: false,
+  floor: false,
+  mezzanine1: false,
+  mezzanine2: false,
+  mezzanine3: false,
+  stairType: "none",
+  stairCount: 1,
+  fireResistance: 1,
   overheadCost: 0,
+};
+
+/** 8 типов лестниц → ячейка-флаг и ячейка-счётчик книги. */
+const STAIR_CELLS: Record<Exclude<ProjectWorkInputs["stairType"], "none">, { flag: string; count: string }> = {
+  rcSingle: { flag: "stairRcSingle", count: "stairRcSingleCount" },
+  rcDouble: { flag: "stairRcDouble", count: "stairRcDoubleCount" },
+  rcTriple: { flag: "stairRcTriple", count: "stairRcTripleCount" },
+  rcQuad: { flag: "stairRcQuad", count: "stairRcQuadCount" },
+  metalSingle: { flag: "stairMetalSingle", count: "stairMetalSingleCount" },
+  metalDouble: { flag: "stairMetalDouble", count: "stairMetalDoubleCount" },
+  metalTriple: { flag: "stairMetalTriple", count: "stairMetalTripleCount" },
+  metalQuad: { flag: "stairMetalQuad", count: "stairMetalQuadCount" },
 };
 
 function colToIndex(letters: string): number {
@@ -70,7 +103,7 @@ let cached: { hf: HyperFormula; summarySheet: number } | null = null;
  * книги (TRUE/FALSE, числовые коды).
  */
 function buildCellValues(inputs: ProjectWorkInputs): Record<string, string | number | boolean> {
-  return {
+  const values: Record<string, string | number | boolean> = {
     buildingType: 3, // Великан — всегда
     kmFlag: true, // раздел КМ — всегда
     spanCount: inputs.spanCount,
@@ -84,19 +117,48 @@ function buildCellValues(inputs: ProjectWorkInputs): Record<string, string | num
     height: inputs.height,
     roof: inputs.roof,
     seismic: inputs.seismic,
-    wallMaterial: inputs.wallMaterial,
-    wallThickness: inputs.wallThickness,
-    windows: inputs.windows,
-    windowCount: inputs.windowCount,
-    gates: inputs.gates,
-    doors: inputs.doors,
-    doorCount: inputs.doorCount,
     overheadCrane: inputs.overheadCrane,
     overheadCraneCapacity: inputs.overheadCraneCapacity,
     suspendedCrane: inputs.suspendedCrane,
     suspendedCraneCapacity: inputs.suspendedCraneCapacity,
+    wallMaterial: inputs.wallMaterial,
+    wallThickness: inputs.wallThickness,
+    roofingMaterial: inputs.roofingMaterial,
+    snowGuard: inputs.snowGuard,
+    roofFence: inputs.roofFence,
+    drainage: inputs.drainage,
+    windows: inputs.windows,
+    windowCount: inputs.windowCount,
+    gates: inputs.gates,
+    gateCount: inputs.gateCount,
+    gateSpanCount: inputs.gateSpanCount,
+    doors: inputs.doors,
+    doorCount: inputs.doorCount,
+    partitionGvl: inputs.partitionGvl,
+    partitionSandwichLayered: inputs.partitionSandwichLayered,
+    partitionSandwichFactory: inputs.partitionSandwichFactory,
+    partitionOpeningsDoors: inputs.partitionOpeningsDoors,
+    partitionOpeningsGates: inputs.partitionOpeningsGates,
+    parapetLongSide: inputs.parapetLongSide,
+    parapetEnd: inputs.parapetEnd,
+    parapetOverhang: inputs.parapetOverhang,
+    floor: inputs.floor,
+    mezzanine1: inputs.mezzanine1,
+    mezzanine2: inputs.mezzanine2,
+    mezzanine3: inputs.mezzanine3,
+    fireResistance: inputs.fireResistance,
     overheadCost: inputs.overheadCost,
+    // все 8 флагов лестниц по умолчанию выключены; нужный включается ниже
+    stairs: inputs.stairType !== "none",
+    stairRcSingle: false, stairRcDouble: false, stairRcTriple: false, stairRcQuad: false,
+    stairMetalSingle: false, stairMetalDouble: false, stairMetalTriple: false, stairMetalQuad: false,
   };
+  if (inputs.stairType !== "none") {
+    const { flag, count } = STAIR_CELLS[inputs.stairType];
+    values[flag] = true;
+    values[count] = inputs.stairCount;
+  }
+  return values;
 }
 
 function getEngine(inputs: ProjectWorkInputs): { hf: HyperFormula; summarySheet: number } {
