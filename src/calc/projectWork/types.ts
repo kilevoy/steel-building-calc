@@ -55,6 +55,10 @@ export interface ProjectWorkInputs {
   partitionGvl: boolean;
   partitionSandwichLayered: boolean;
   partitionSandwichFactory: boolean;
+  /** Площади перегородок по типам, м². */
+  partitionGvlArea: number;
+  partitionSandwichLayeredArea: number;
+  partitionSandwichFactoryArea: number;
   partitionOpeningsDoors: boolean;
   partitionOpeningsGates: boolean;
 

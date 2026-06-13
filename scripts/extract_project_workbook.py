@@ -78,6 +78,9 @@ input_cells = {
     "partitionGvl": "AM42",
     "partitionSandwichLayered": "AM43",
     "partitionSandwichFactory": "AM44",
+    "partitionGvlArea": "B81",                 # площадь перегородок ГВЛ, м²
+    "partitionSandwichLayeredArea": "B85",     # площадь перегородок СП послойной, м²
+    "partitionSandwichFactoryArea": "B88",     # площадь перегородок СП заводской, м²
     "partitionOpeningsDoors": "AM45",
     "partitionOpeningsGates": "AM46",
     # парапет (3=нет, 1=одна сторона, 2=обе)
