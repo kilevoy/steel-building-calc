@@ -156,8 +156,24 @@ export function ProjectWorkApp() {
     setOpt((cur) => ({ ...cur, [k]: v }));
 
   const spanCount = building.spanCount === "multi" ? 2 : 1;
-  const roof: RoofKind = building.roofShape === "gable" ? 2 : 1;
   const perSpanWidth = building.span_m / spanCount;
+
+  // Форма кровли Великана (AM11): 1=односк, 2=двуск, 3=плоск, 4=многоск.
+  // Модель здания знает только двускатную/односкатную, поэтому форма —
+  // локальное поле вкладки, посеянное из roofShape; плоская/многоскатная
+  // живут только здесь, а двускатная/односкатная синхронизируются обратно.
+  const [roofForm, setRoofForm] = useState<RoofKind>(
+    building.roofShape === "monoslope" ? 1 : 2,
+  );
+  useEffect(() => {
+    setRoofForm((cur) => (cur === 1 || cur === 2 ? (building.roofShape === "monoslope" ? 1 : 2) : cur));
+  }, [building.roofShape]);
+  const changeRoofForm = (v: RoofKind) => {
+    setRoofForm(v);
+    if (v === 1) setB("roofShape", "monoslope");
+    else if (v === 2) setB("roofShape", "gable");
+  };
+  const roof = roofForm;
 
   // Материалы книги ИНСИ выводятся из конструкций основного калькулятора.
   const wallBook = wallStructureToBook(building.wallStructure);
@@ -234,11 +250,11 @@ export function ProjectWorkApp() {
           <SyncedNumField label="Длина, м" value={building.length_m} onChange={(v) => setB("length_m", v)} validationKind="positive" />
           <SyncedNumField label="Высота, м" value={building.height_m} onChange={(v) => setB("height_m", v)} validationKind="positive" />
           <SyncedNumField label="Шаг рам, м" value={building.framePitch_m} onChange={(v) => setB("framePitch_m", v)} validationKind="positive" />
-          <SyncedSelectField
-            label="Форма кровли"
-            value={building.roofShape}
-            options={[["gable", "Двускатная"], ["monoslope", "Односкатная"]]}
-            onChange={(v) => setB("roofShape", v as Building["roofShape"])}
+          <Select
+            label="Форма кровли (Великан)"
+            value={String(roofForm)}
+            options={[["1", "односкатная"], ["2", "двускатная"], ["3", "плоская"], ["4", "многоскатная"]]}
+            onChange={(v) => changeRoofForm(Number(v) as RoofKind)}
           />
           <SyncedSelectField
             label="Число пролётов"
