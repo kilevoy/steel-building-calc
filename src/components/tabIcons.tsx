@@ -74,3 +74,12 @@ export const SummaryIcon = (
     <path d="M10.5 3.5H4l3.5 3.5L4 10.5h6.5" />
   </Icon>
 );
+
+/* Проектные работы: лист с уголком (чертёж/документ) */
+export const ProjectIcon = (
+  <Icon label="project">
+    <path d="M3 1.5h5l3 3v8H3z" />
+    <path d="M8 1.5v3h3" />
+    <path d="M5 7.5h4M5 9.5h4" strokeWidth={1.1} />
+  </Icon>
+);
