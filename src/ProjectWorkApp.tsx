@@ -69,6 +69,9 @@ interface ProjectOptions {
   partitionGvl: boolean;
   partitionSandwichLayered: boolean;
   partitionSandwichFactory: boolean;
+  partitionGvlArea: number;
+  partitionSandwichLayeredArea: number;
+  partitionSandwichFactoryArea: number;
   partitionOpeningsDoors: boolean;
   partitionOpeningsGates: boolean;
   parapetLongSide: ParapetMode;
@@ -101,6 +104,9 @@ const DEFAULT_OPTIONS: ProjectOptions = {
   partitionGvl: false,
   partitionSandwichLayered: false,
   partitionSandwichFactory: false,
+  partitionGvlArea: 0,
+  partitionSandwichLayeredArea: 0,
+  partitionSandwichFactoryArea: 0,
   partitionOpeningsDoors: false,
   partitionOpeningsGates: false,
   parapetLongSide: 3,
@@ -210,6 +216,9 @@ export function ProjectWorkApp() {
       partitionGvl: opt.partitionGvl,
       partitionSandwichLayered: opt.partitionSandwichLayered,
       partitionSandwichFactory: opt.partitionSandwichFactory,
+      partitionGvlArea: opt.partitionGvlArea,
+      partitionSandwichLayeredArea: opt.partitionSandwichLayeredArea,
+      partitionSandwichFactoryArea: opt.partitionSandwichFactoryArea,
       partitionOpeningsDoors: opt.partitionOpeningsDoors,
       partitionOpeningsGates: opt.partitionOpeningsGates,
       parapetLongSide: opt.parapetLongSide,
@@ -314,11 +323,24 @@ export function ProjectWorkApp() {
       <Collapsible title="🧩 Перегородки" storageKey="pw-partitions" defaultOpen={false}>
         <div className="grid grid--3" style={{ gap: 10 }}>
           <Check label="ГВЛ" checked={opt.partitionGvl} onChange={(v) => upd("partitionGvl", v)} />
+          {opt.partitionGvl && (
+            <Num label="Площадь ГВЛ, м²" value={opt.partitionGvlArea} onChange={(v) => upd("partitionGvlArea", v)} />
+          )}
+          {opt.partitionGvl && <div />}
           <Check label="Сэндвич послойно" checked={opt.partitionSandwichLayered} onChange={(v) => upd("partitionSandwichLayered", v)} />
+          {opt.partitionSandwichLayered && (
+            <Num label="Площадь послойно, м²" value={opt.partitionSandwichLayeredArea} onChange={(v) => upd("partitionSandwichLayeredArea", v)} />
+          )}
+          {opt.partitionSandwichLayered && <div />}
           <Check label="Сэндвич заводской" checked={opt.partitionSandwichFactory} onChange={(v) => upd("partitionSandwichFactory", v)} />
+          {opt.partitionSandwichFactory && (
+            <Num label="Площадь заводской, м²" value={opt.partitionSandwichFactoryArea} onChange={(v) => upd("partitionSandwichFactoryArea", v)} />
+          )}
+          {opt.partitionSandwichFactory && <div />}
           <Check label="Проёмы: окна/двери" checked={opt.partitionOpeningsDoors} onChange={(v) => upd("partitionOpeningsDoors", v)} />
           <Check label="Проёмы: ворота" checked={opt.partitionOpeningsGates} onChange={(v) => upd("partitionOpeningsGates", v)} />
         </div>
+        <div className="field__hint">Проёмы в перегородках влияют на раздел АС; на стоимость КМ не влияют.</div>
       </Collapsible>
 
       <Collapsible title="📐 Парапет" storageKey="pw-parapet" defaultOpen={false}>
