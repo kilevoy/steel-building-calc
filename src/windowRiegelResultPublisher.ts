@@ -1,5 +1,6 @@
 import type { ResultItem } from "./building/resultsContext";
 import type { WindowRiegelResult } from "./calc/windowRiegel/types";
+import { getUsableWindowRiegelOptions } from "./windowRiegelOptionVisibility";
 
 export function buildWindowRiegelResultItem(
   result: WindowRiegelResult | null,
@@ -9,8 +10,12 @@ export function buildWindowRiegelResultItem(
     priceC345_rubKg?: number;
   },
 ): ResultItem | null {
-  const top = result?.lowerAndUpperProfiles?.[0];
-  if (!top || top.profile == null || top.weightKg == null) {
+  if (!result) {
+    return null;
+  }
+
+  const top = getUsableWindowRiegelOptions(result.lowerAndUpperProfiles)[0];
+  if (!top) {
     return null;
   }
 

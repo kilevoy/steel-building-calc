@@ -9,8 +9,10 @@ export interface ColumnCountSummary {
   edgePublished: number | null;
   middlePublished: number | null;
   fachwerkPublished: number | null;
+  acceptedFachwerk: number | null;
   totalAccepted: number | null;
   totalFormulaText: string | null;
+  excludedEndFachwerk: number;
   endFrameAxes: number;
   hasCrane: boolean;
   mainCountMismatch: boolean;
@@ -28,12 +30,18 @@ export function buildColumnCountSummary(
   const fachwerkPublished = columnResults?.fachwerk?.count ?? null;
   const publishedMain =
     hasPublishedColumns ? (edgePublished ?? 0) + (middlePublished ?? 0) : null;
+  const excludedEndFachwerk =
+    building.hasCrane && fachwerkPublished !== null
+      ? Math.min(fachwerkPublished, layout.columns.endTotal)
+      : 0;
+  const acceptedFachwerk =
+    fachwerkPublished === null ? null : fachwerkPublished - excludedEndFachwerk;
   const totalAccepted =
-    fachwerkPublished === null ? null : layout.columns.mainTotal + fachwerkPublished;
+    acceptedFachwerk === null ? null : layout.columns.mainTotal + acceptedFachwerk;
   const totalFormulaText =
     totalAccepted === null
       ? null
-      : `${totalAccepted} = ${layout.columns.mainTotal} основных + ${fachwerkPublished} фахверковых`;
+      : `${totalAccepted} = ${layout.columns.mainTotal} основных + ${acceptedFachwerk} фахверковых`;
 
   return {
     hasPublishedColumns,
@@ -42,8 +50,10 @@ export function buildColumnCountSummary(
     edgePublished,
     middlePublished,
     fachwerkPublished,
+    acceptedFachwerk,
     totalAccepted,
     totalFormulaText,
+    excludedEndFachwerk,
     endFrameAxes: layout.frames.endFrameAxes,
     hasCrane: building.hasCrane,
     mainCountMismatch:

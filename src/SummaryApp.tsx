@@ -491,9 +491,7 @@ function BuildingCountDiagnostics() {
   const { results } = useBuildingResults();
   const layoutInput = deriveUnifiedBuildingLayoutInput(building);
   const layout = deriveUnifiedBuildingLayoutFromBuilding(building);
-  const fachwerkColumnCount = results.column?.fachwerk?.count;
-  const totalAcceptedColumnCount =
-    fachwerkColumnCount === undefined ? null : layout.columns.mainTotal + fachwerkColumnCount;
+  const countSummary = buildColumnCountSummary(building, results);
 
   return (
     <details
@@ -517,9 +515,9 @@ function BuildingCountDiagnostics() {
         основными колоннами рам. Текущий режим: <b>{building.hasCrane ? "с краном" : "без крана"}</b>.
       </div>
       <div className="note note--warn" style={{ marginBottom: 10, fontWeight: 600 }}>
-        {totalAcceptedColumnCount === null
+        {countSummary.totalAccepted === null
           ? "Итого колонн здания появится после расчёта вкладки «Колонна»."
-          : `Итого колонн здания: ${totalAcceptedColumnCount} = основных по ГИП ${layout.columns.mainTotal} + фахверковых стоек ${fachwerkColumnCount}`}
+          : `Итого колонн здания: ${countSummary.totalFormulaText}`}
       </div>
       <div className="grid grid--4" style={{ fontSize: 13 }}>
         <div>Рам всего: <b>{layout.frames.totalFrameAxes}</b></div>
@@ -538,8 +536,10 @@ function BuildingCountDiagnostics() {
         <div>Основных средних по ГИП: <b>{layout.columns.mainMiddle}</b></div>
         <div>Основных колонн по ГИП: <b>{layout.columns.mainTotal}</b></div>
         <div>В том числе угловых стоек фахверка: <b>{layout.columns.endFachwerkEdge}</b></div>
-        <div>Фахверковых стоек по торцам всего: <b>{fachwerkColumnCount ?? "—"}</b></div>
-        <div>Всего колонн здания: <b>{totalAcceptedColumnCount ?? "—"}</b></div>
+        <div>Фахверковых стоек опубликовано: <b>{countSummary.fachwerkPublished ?? "—"}</b></div>
+        <div>Фахверковых принято к сумме: <b>{countSummary.acceptedFachwerk ?? "—"}</b></div>
+        <div>Торцевых фахверковых исключено: <b>{countSummary.excludedEndFachwerk}</b></div>
+        <div>Всего колонн здания: <b>{countSummary.totalAccepted ?? "—"}</b></div>
       </div>
     </details>
   );
@@ -568,8 +568,10 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
       <div className="grid grid--4" style={{ fontSize: 13 }}>
         <div>Основных колонн по ГИП: <b>{summary.mainByGip}</b></div>
         <div>Опубликовано подбором: <b>{summary.publishedMain ?? "—"}</b></div>
-        <div>Фахверковых стоек: <b>{summary.fachwerkPublished ?? "—"}</b></div>
+        <div>Фахверковых опубликовано: <b>{summary.fachwerkPublished ?? "—"}</b></div>
         <div>Всего колонн здания: <b>{summary.totalFormulaText ?? "—"}</b></div>
+        <div>Фахверковых к сумме: <b>{summary.acceptedFachwerk ?? "—"}</b></div>
+        <div>Торцевых исключено: <b>{summary.excludedEndFachwerk}</b></div>
         <div>Крайних в подборе: <b>{summary.edgePublished ?? "—"}</b></div>
         <div>Средних в подборе: <b>{summary.middlePublished ?? "—"}</b></div>
         <div
@@ -589,6 +591,24 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
           Внимание: количество основных колонн по ГИП отличается от количества,
           опубликованного текущим подбором колонн. Это нужно сверить перед
           использованием итоговой ведомости.
+        </div>
+      )}
+      {summary.excludedEndFachwerk > 0 && (
+        <div
+          style={{
+            marginTop: 10,
+            border: "1px solid #f59e0b",
+            background: "#fffbeb",
+            color: "#92400e",
+            borderRadius: 6,
+            padding: "8px 10px",
+            fontSize: 12,
+          }}
+        >
+          При кране торцевые колонны считаются основными рамами, поэтому совпадающие
+          торцевые позиции фахверка исключены только из диагностического количества.
+          Масса и стоимость колонн остаются по опубликованным строкам подбора до
+          отдельной инженерной сверки.
         </div>
       )}
     </fieldset>

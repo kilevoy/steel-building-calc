@@ -14,6 +14,7 @@ import { buildWindowRiegelResultItem } from "../windowRiegelResultPublisher";
 import type { CalculationInput, ColumnType } from "../calc/types";
 import type { Building } from "./buildingContext";
 import { calculateAutoPurlinResult } from "./autoPurlinResult";
+import { toWindowRiegelTerrainType } from "./windowRiegelTerrainType";
 import {
   calculateRoofTotalLoad_kPa,
   type RoofLoadBreakdown,
@@ -80,12 +81,6 @@ function trussInputFromBuilding(
     maxWidth_mm: { VP: 500, NP: 500 },
     minWidth_mm: { ORb: 80, OR: 80, RR: 60 },
   };
-}
-
-function windowRiegelTerrainType(value: Building["terrainType"]): string {
-  if (value === "A") return "А";
-  if (value === "B") return "В";
-  return "С";
 }
 
 export function calculateBuildingResultsForSummary(
@@ -183,7 +178,7 @@ export function calculateBuildingResultsForSummary(
       frameStepM: building.framePitch_m,
       windLoadKpa: building.w0_kPa,
       city: building.city || defaultWindowRiegelInputs.city,
-      terrainType: windowRiegelTerrainType(building.terrainType),
+      terrainType: toWindowRiegelTerrainType(building.terrainType),
       responsibilityLevel: building.responsibilityCoeff,
     };
     results.windowRiegel = buildWindowRiegelResultItem(calculateWindowRiegel(input), {

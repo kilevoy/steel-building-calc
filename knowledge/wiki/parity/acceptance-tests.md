@@ -6,29 +6,32 @@ Acceptance и smoke tests проверяют, что расчётный движ
 
 ## Текущий статус
 
-- Есть smoke-тест для `runCalculation(DEFAULT_COLUMN_INPUT)`.
-- Есть helper-тесты для общих типов и validation.
-- Есть acceptance-тест `SCN-WINDOW-RIEGEL-001` для оконного ригеля: сверяются расчётные нагрузки, расчётные длины и первые наблюдаемые профили из Excel-oracle `EXCEL-005`.
-- Есть acceptance-тест `SCN-BEAM-CELL-001` для балочной клетки: сверяется главная балка ГБ и фиксируется известное отсутствие решения ВБ для сценария `балка покрытия`.
-- Есть тесты `SCN-BUILDING-COUNT-001`...`003` для helper `deriveUnifiedBuildingLayout`: проверяется раздельный подсчёт внутренних, торцевых и всех рамных колонн. Сценарии вынесены в `src/building/__fixtures__/building-count-scenarios.ts`.
-- Требуется добавить ещё несколько smoke/acceptance-тестов для truss, purlins, beam-cell и crane-beam.
-## Актуализация 2026-06-03
-
-Старый пункт про необходимость добавить тесты для `truss`, `purlins`, `beam-cell` и `crane-beam` считается устаревшим. На текущем состоянии проекта автоматические parity/acceptance-проверки уже есть для основных расчётных модулей:
-
 - колонны: `src/calc/engine.acceptance.test.ts`;
 - ферма: `src/calc/truss/engine.acceptance.test.ts`;
-- прогоны ЛСТК: `src/calc/purlin/engine.acceptance.test.ts`;
+- прогоны ЛСТК: `src/calc/purlin/engine.acceptance.test.ts`, `src/calc/purlin/autoStep.test.ts`;
 - прогоны прокатные: `src/calc/purlin/rolled.acceptance.test.ts`;
 - балочная клетка / балка покрытия: `src/calc/beamCell/engine.acceptance.test.ts`;
 - оконные ригели: `src/calc/windowRiegel/engine.acceptance.test.ts`;
 - подкрановая балка: `src/calc/craneBeam/engine.acceptance.test.ts`;
-- сводные publisher/summary helpers: `src/building/*test.ts` и `src/*ResultPublisher.test.ts`.
+- единая модель количества здания: `src/building/unifiedLayout.test.ts`, `src/building/unifiedBuildingInput.test.ts`, `src/building/columnCountSummary.test.ts`;
+- сводные publisher/summary helpers: `src/building/*test.ts` и `src/*ResultPublisher.test.ts`;
+- метаданные и публичная сборка: `src/generatedPublicMetadata.test.ts` и `scripts/check-public-bundle.mjs`.
 
 Эти тесты не означают, что модуль полностью инженерно принят. Они фиксируют текущую сверку с Excel/generated oracle и защищают от грубой регрессии. Для результата `1 в 1` с Excel по каждому модулю нужно расширять не количество smoke-тестов, а набор конкретных сценариев с описанными входами, источником и допусками.
 
-Следующий приоритет:
+## Закреплённые сценарии
 
-- выбрать дополнительные Excel-сценарии для оконных ригелей и подкрановой балки;
-- проверить, какие поля workbook сейчас не выведены в UI как диагностические;
+- `SCN-COLUMN-*`: 10 frozen-сценариев по колоннам, включая default Excel anchors.
+- `SCN-TRUSS-001`: ферма Молодечно.
+- `SCN-PURLINS-001/002/003`: ЛСТК/шаг/снегозадержание/ручное ограничение; прокатная ветка покрыта отдельным тестом.
+- `SCN-BEAM-CELL-001/002`: сценарий с `NO_SOLUTION` и полный сценарий ВБ/ГБ/К.
+- `SCN-WINDOW-RIEGEL-001/002`: два типа окна, нагрузки, расчётные длины, top-1 профили и массы.
+- `SCN-CRANE-BEAM-001/002/003`: 5 т, 10 т, два крана 10 т.
+- `SCN-BUILDING-COUNT-001/002/002-CRANE/003`: количество рам, внутренних/торцевых колонн и режим `hasCrane`.
+
+## Следующий приоритет
+
+- для оконных ригелей сопоставить top-10 выдачу с расчётными строками, чтобы безопасно добавить диагностические коэффициенты;
+- для подкрановой балки решить `B19` vs `D19` по шагу рёбер и проверить связь с колонной;
+- для колонн при кране подтвердить профили/длины торцевых основных колонн перед переносом правила в массу/стоимость;
 - фиксировать каждое расхождение в `knowledge/wiki/parity/known-differences.md`, а не подгонять формулы без решения.

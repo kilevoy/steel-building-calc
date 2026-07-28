@@ -16,6 +16,8 @@ import type {
   WindowRiegelOption,
 } from "./calc/windowRiegel/types";
 import { buildWindowRiegelResultItem } from "./windowRiegelResultPublisher";
+import { getUsableWindowRiegelOptions } from "./windowRiegelOptionVisibility";
+import { toWindowRiegelTerrainType } from "./building/windowRiegelTerrainType";
 
 function fmt(n: number | null | undefined, digits = 3): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return "—";
@@ -44,7 +46,7 @@ export function WindowRiegelApp() {
     frameStepM: building.framePitch_m,
     windLoadKpa: building.w0_kPa,
     city: building.city || defaultWindowRiegelInputs.city,
-    terrainType: building.terrainType,
+    terrainType: toWindowRiegelTerrainType(building.terrainType),
     responsibilityLevel: building.responsibilityCoeff,
   }));
 
@@ -57,7 +59,7 @@ export function WindowRiegelApp() {
       frameStepM: building.framePitch_m,
       windLoadKpa: building.w0_kPa,
       city: building.city || cur.city,
-      terrainType: building.terrainType,
+      terrainType: toWindowRiegelTerrainType(building.terrainType),
       responsibilityLevel: building.responsibilityCoeff,
     }));
   }, [building]);
@@ -214,11 +216,11 @@ export function WindowRiegelApp() {
       <div className="grid grid--2" style={{ gap: 12 }}>
         <RiegelTable
           title="Нижний ригель (для типов 1–5) и верхний (для типов 2–5)"
-          rows={result?.lowerAndUpperProfiles ?? []}
+          rows={getUsableWindowRiegelOptions(result?.lowerAndUpperProfiles ?? [])}
         />
         <RiegelTable
           title="Верхний ригель для типа 1 (более жёсткий)"
-          rows={result?.upperType1Profiles ?? []}
+          rows={getUsableWindowRiegelOptions(result?.upperType1Profiles ?? [])}
         />
       </div>
     </div>
@@ -242,7 +244,7 @@ function RiegelTable({ title, rows }: { title: string; rows: WindowRiegelOption[
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={4}>Нет данных</td>
+                <td colSpan={4}>Подходящих профилей не найдено. Проверьте исходные данные.</td>
               </tr>
             ) : (
               rows.map((r, i) => (

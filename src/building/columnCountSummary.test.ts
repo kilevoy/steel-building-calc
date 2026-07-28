@@ -52,13 +52,15 @@ describe("column count summary", () => {
       mainByGip: 22,
       publishedMain: 22,
       fachwerkPublished: 10,
+      acceptedFachwerk: 10,
       totalAccepted: 32,
       totalFormulaText: "32 = 22 основных + 10 фахверковых",
+      excludedEndFachwerk: 0,
       mainCountMismatch: false,
     });
   });
 
-  it("warns when crane mode expects end columns in the main frame group", () => {
+  it("excludes end-fachwerk positions when crane mode counts end columns as main", () => {
     const summary = buildColumnCountSummary({
       ...DEFAULT_BUILDING,
       hasCrane: true,
@@ -75,9 +77,33 @@ describe("column count summary", () => {
       hasCrane: true,
       mainByGip: 26,
       publishedMain: 22,
-      totalAccepted: 36,
-      totalFormulaText: "36 = 26 основных + 10 фахверковых",
+      fachwerkPublished: 10,
+      acceptedFachwerk: 6,
+      excludedEndFachwerk: 4,
+      totalAccepted: 32,
+      totalFormulaText: "32 = 26 основных + 6 фахверковых",
       mainCountMismatch: true,
+    });
+  });
+
+  it("does not subtract more fachwerk positions than the column tab published", () => {
+    const summary = buildColumnCountSummary({
+      ...DEFAULT_BUILDING,
+      hasCrane: true,
+    }, {
+      ...emptyResults,
+      column: {
+        edge: item(22),
+        middle: null,
+        fachwerk: item(2),
+      },
+    });
+
+    expect(summary).toMatchObject({
+      acceptedFachwerk: 0,
+      excludedEndFachwerk: 2,
+      totalAccepted: 26,
+      totalFormulaText: "26 = 26 основных + 0 фахверковых",
     });
   });
 });

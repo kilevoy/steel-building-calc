@@ -1,7 +1,7 @@
 import type { WorkbookReferenceData } from './types';
 
 export const workbookData = {
-  "sourceWorkbook": "C:\\Users\\work\\Downloads\\Подбор элементов балочной клетки v3.1.xlsx",
+  "sourceWorkbook": "EXCEL-007: Подбор элементов балочной клетки v3.1.xlsx",
   "floorDeadLoads": [
     {
       "name": "сборные ЖБ плиты",
