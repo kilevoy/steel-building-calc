@@ -100,7 +100,7 @@ export function CraneBeamApp() {
             options={craneOptions.brakeStructures.map((b) => [String(b), String(b)])}
             onChange={(v) => upd("brakeStructure", v)}
           />
-          <NumField label="Шаг рёбер, м (0 = авто)" value={inputs.ribStep} step={0.1} onChange={(v) => upd("ribStep", v)} />
+          <NumField label="Шаг рёбер, м (B19; 0 = авто)" value={inputs.ribStep} step={0.1} onChange={(v) => upd("ribStep", v)} />
           <SelField
             label="Расчёт на усталость"
             value={String(inputs.fatigueCalculation)}
@@ -151,7 +151,7 @@ export function CraneBeamApp() {
               <Stat label="Профиль" value={result.profile ?? "—"} />
               <Stat label="K (Iпр+IIпр), %" value={fmtN(result.utilizationPercent, 2)} />
               <Stat label="Масса, кг" value={fmtN(result.weightKg, 1)} />
-              <Stat label="Шаг рёбер, м" value={fmtN(result.ribStepSelectedM, 2)} />
+              <Stat label="Подобранный шаг рёбер, м (D19)" value={fmtN(result.ribStepSelectedM, 2)} />
             </div>
             <div className="grid grid--6" style={{ gap: 12, marginTop: 12 }}>
               <Stat label="Нагрузка от колеса, кН" value={fmtN(result.wheelLoadKn, 2)} />
