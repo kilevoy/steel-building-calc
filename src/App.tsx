@@ -65,14 +65,14 @@ const MODES: readonly Mode[] = [
 ] as const;
 
 const MODE_ICONS: Record<Mode, ReactNode> = {
-  column: ColumnIcon,
-  truss: TrussIcon,
-  purlins: PurlinIcon,
-  beamCell: BeamIcon,
-  windowRiegel: RiegelIcon,
-  craneBeam: CraneIcon,
-  projectWork: ProjectIcon,
-  summary: SummaryIcon,
+  column: <ColumnIcon />,
+  truss: <TrussIcon />,
+  purlins: <PurlinIcon />,
+  beamCell: <BeamIcon />,
+  windowRiegel: <RiegelIcon />,
+  craneBeam: <CraneIcon />,
+  projectWork: <ProjectIcon />,
+  summary: <SummaryIcon />,
 };
 
 /**
