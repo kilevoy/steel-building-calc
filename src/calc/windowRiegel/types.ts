@@ -19,6 +19,11 @@ export interface WindowRiegelOption {
   profile: string | null;
   steel: string | null;
   weightKg: number | null;
+  utilizationFlexibility?: number | null;
+  utilizationStrengthLower?: number | null;
+  utilizationStrengthUpper?: number | null;
+  utilizationDeflectionLower?: number | null;
+  utilizationDeflectionUpper?: number | null;
 }
 
 export interface ClimateSettlement {

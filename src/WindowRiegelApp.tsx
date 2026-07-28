@@ -239,12 +239,15 @@ function RiegelTable({ title, rows }: { title: string; rows: WindowRiegelOption[
               <th>Профиль</th>
               <th>Сталь</th>
               <th className="num">Масса 1 ригеля</th>
+              <th className="num">K гибк.</th>
+              <th className="num">K прочн. Н/В</th>
+              <th className="num">K прогиб. Н/В</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={4}>Подходящих профилей не найдено. Проверьте исходные данные.</td>
+                <td colSpan={7}>Подходящих профилей не найдено. Проверьте исходные данные.</td>
               </tr>
             ) : (
               rows.map((r, i) => (
@@ -253,6 +256,9 @@ function RiegelTable({ title, rows }: { title: string; rows: WindowRiegelOption[
                   <td>{r.profile ?? "—"}</td>
                   <td>{r.steel ?? "—"}</td>
                   <td className="num">{fmtKg(r.weightKg)}</td>
+                  <td className="num">{fmtPair(r.utilizationFlexibility, r.utilizationFlexibility)}</td>
+                  <td className="num">{fmtPair(r.utilizationStrengthLower, r.utilizationStrengthUpper)}</td>
+                  <td className="num">{fmtPair(r.utilizationDeflectionLower, r.utilizationDeflectionUpper)}</td>
                 </tr>
               ))
             )}
@@ -261,6 +267,11 @@ function RiegelTable({ title, rows }: { title: string; rows: WindowRiegelOption[
       </div>
     </div>
   );
+}
+
+function fmtPair(lower: number | null | undefined, upper: number | null | undefined): string {
+  const format = (value: number | null | undefined) => value == null ? "—" : value.toFixed(3);
+  return `${format(lower)} / ${format(upper)}`;
 }
 
 function NumField({

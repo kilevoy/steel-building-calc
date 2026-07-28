@@ -84,16 +84,28 @@ function buildEngine(inputs: WindowRiegelInputs): { hf: HyperFormula; summaryShe
   return cachedEngine;
 }
 
-function readOptionRows(hf: HyperFormula, sheet: number, startRow: number): WindowRiegelOption[] {
+function readOptionRows(
+  hf: HyperFormula,
+  summarySheet: number,
+  calculationSheet: number,
+  summaryStartRow: number,
+  calculationStartRow: number,
+): WindowRiegelOption[] {
   return Array.from({ length: 10 }, (_, index) => {
-    const row = startRow + index;
-    const profile = cellValue(hf, sheet, `B${row}`);
-    const steel = cellValue(hf, sheet, `C${row}`);
+    const summaryRow = summaryStartRow + index;
+    const calculationRow = calculationStartRow + index;
+    const profile = cellValue(hf, summarySheet, `B${summaryRow}`);
+    const steel = cellValue(hf, summarySheet, `C${summaryRow}`);
     return {
       number: index + 1,
       profile: profile === null ? null : String(profile),
       steel: steel === null ? null : String(steel),
-      weightKg: numberOrNull(cellValue(hf, sheet, `D${row}`)),
+      weightKg: numberOrNull(cellValue(hf, summarySheet, `D${summaryRow}`)),
+      utilizationFlexibility: numberOrNull(cellValue(hf, calculationSheet, `AH${calculationRow}`)),
+      utilizationStrengthLower: numberOrNull(cellValue(hf, calculationSheet, `AK${calculationRow}`)),
+      utilizationStrengthUpper: numberOrNull(cellValue(hf, calculationSheet, `AN${calculationRow}`)),
+      utilizationDeflectionLower: numberOrNull(cellValue(hf, calculationSheet, `AQ${calculationRow}`)),
+      utilizationDeflectionUpper: numberOrNull(cellValue(hf, calculationSheet, `AT${calculationRow}`)),
     };
   });
 }
@@ -116,8 +128,8 @@ export function calculateWindowRiegel(inputs: WindowRiegelInputs): WindowRiegelR
     inPlaneLengthM: numberOrNull(cellValue(hf, calculationSheet, 'D18')),
     effectiveWindLoadKpa: effectiveInputs.windLoadKpa,
     climateSettlement,
-    lowerAndUpperProfiles: readOptionRows(hf, summarySheet, 24),
-    upperType1Profiles: readOptionRows(hf, summarySheet, 37),
+    lowerAndUpperProfiles: readOptionRows(hf, summarySheet, calculationSheet, 24, 22),
+    upperType1Profiles: readOptionRows(hf, summarySheet, calculationSheet, 37, 27),
     warnings: climateSettlement ? [] : ['Город не найден в справочнике климата; ветровая нагрузка задается вручную.'],
   };
 }

@@ -42,12 +42,18 @@ describe("window riegel Excel acceptance scenarios", () => {
       steel: expected.lowerFirstSteel,
     });
     expect(result.lowerAndUpperProfiles[0].weightKg).toBeCloseTo(expected.lowerFirstWeightKg, 6);
+    expect(result.lowerAndUpperProfiles[0].utilizationFlexibility).toEqual(expect.any(Number));
+    expect(result.lowerAndUpperProfiles[0].utilizationStrengthLower).toEqual(expect.any(Number));
+    expect(result.lowerAndUpperProfiles[0].utilizationDeflectionLower).toEqual(expect.any(Number));
 
     expect(result.upperType1Profiles[0]).toMatchObject({
       profile: expected.upperFirstProfile,
       steel: expected.upperFirstSteel,
     });
     expect(result.upperType1Profiles[0].weightKg).toBeCloseTo(expected.upperFirstWeightKg, 6);
+    expect(result.upperType1Profiles[0].utilizationFlexibility).toEqual(expect.any(Number));
+    expect(result.upperType1Profiles[0].utilizationStrengthUpper).toEqual(expect.any(Number));
+    expect(result.upperType1Profiles[0].utilizationDeflectionUpper).toEqual(expect.any(Number));
   });
 
   it("matches the second observed options for SCN-WINDOW-RIEGEL-002", () => {
