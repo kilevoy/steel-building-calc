@@ -10,3 +10,4 @@
 - `deflection-checks.md` — проверки прогибов.
 - `steel-checks.md` — проверки стали.
 - `building-element-counts.md` — стартовая модель подсчёта элементов единого здания по PDF-схемам VELICAN.
+- `cladding-areas.md` — геометрический подсчёт площади кровельной и стеновой облицовки.

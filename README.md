@@ -3,7 +3,7 @@
 [![CI](https://github.com/kilevoy/steel-building-calc/actions/workflows/ci.yml/badge.svg)](https://github.com/kilevoy/steel-building-calc/actions/workflows/ci.yml)
 [![Deploy to GitHub Pages](https://github.com/kilevoy/steel-building-calc/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/kilevoy/steel-building-calc/actions/workflows/deploy-pages.yml)
 
-Веб-калькулятор для подбора оптимальных стальных конструкций промышленных зданий по СП 16.13330 / СП 20.13330. 7 вкладок, общий контекст здания, автопередача нагрузок, сверка с исходными Excel-калькуляторами.
+Веб-калькулятор для подбора оптимальных стальных конструкций промышленных зданий по СП 16.13330 / СП 20.13330. 9 вкладок, общий контекст здания, автопередача нагрузок, сверка с исходными Excel-калькуляторами.
 
 **Демо:** https://kilevoy.github.io/steel-building-calc/
 
@@ -17,6 +17,8 @@
 | Балка покрытия | ВБ, ГБ, колонны балочной клетки | Excel «Балочная клетка v3.1» |
 | Оконные ригели | Нижний и верхний ригель | Excel «Оконные ригели v2.0» |
 | Подкрановая балка | Профиль ПБ с проверками по СП 16.13330 | Excel «Подкрановая балка v2.0» |
+| Проектные работы | Предварительная стоимость и срок проектирования КМ | Excel «Великан» |
+| Облицовки | Площади кровли и стен с проёмами, свесами и запасом | Геометрическая модель, требует Excel-parity |
 | Сводка | Общая масса и стоимость каркаса | — |
 
 Внутри:
@@ -31,7 +33,7 @@
 ## Стек
 
 - **Frontend:** Vite 8 + React 18 + TypeScript 5 (strict).
-- **Тесты:** Vitest 4 — 184 теста в 52 файлах, включая Excel/workbook acceptance-сценарии по основным расчётным модулям.
+- **Тесты:** Vitest 4 — 231 тест в 55 файлах, включая Excel/workbook acceptance-сценарии по основным расчётным модулям.
 - **Линт:** ESLint 10 + typescript-eslint 8.
 - **CI:** GitHub Actions — typecheck → lint → test → build на каждый push и PR.
 - **Pre-commit / pre-push:** Husky + lint-staged. Pre-push прогоняет typecheck и тесты, не даёт уйти красному коду на сервер.
@@ -45,7 +47,7 @@ cd steel-building-calc
 npm ci          # ставит зависимости и активирует git-хуки
 npm run dev     # dev-сервер на localhost:5173
 npm run build   # production-сборка в dist/
-npm test        # 184 теста в 52 файлах
+npm test        # 231 тест в 55 файлах
 ```
 
 > **Важно:** не размещай рабочий клон в синхронизирующихся облаках (Google Drive, Dropbox, OneDrive). Они засоряют `.git/` своими служебными файлами и ломают git. Источник синхронизации между машинами — сам GitHub.
@@ -83,6 +85,7 @@ src/
     beamCell/                 балка покрытия
     craneBeam/                подкрановая балка (HyperFormula)
     windowRiegel/             оконные ригели
+    cladding/                 геометрический подсчёт площадей облицовки
     __fixtures__/             замороженные ground-truth сценарии
   columnTab/                  UI колонной вкладки
     ColumnApp.tsx             оркестратор state и эффектов

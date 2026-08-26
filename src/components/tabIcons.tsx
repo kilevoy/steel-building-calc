@@ -99,3 +99,13 @@ export function ProjectIcon() {
     </Icon>
   );
 }
+
+/* Облицовки: лист профиля на контуре здания */
+export function CladdingIcon() {
+  return (
+    <Icon label="cladding">
+      <path d="M1.5 6.5 7 2l5.5 4.5v5H1.5z" />
+      <path d="M4 6.5v5M7 4.5v7M10 6.5v5" strokeWidth={1.1} />
+    </Icon>
+  );
+}

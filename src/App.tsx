@@ -7,6 +7,7 @@ import { ProjectsMenu } from "./components/ProjectsMenu";
 import { ThemeToggle } from "./components/ThemeToggle";
 import {
   BeamIcon,
+  CladdingIcon,
   ColumnIcon,
   CraneIcon,
   ProjectIcon,
@@ -24,6 +25,7 @@ const BeamCellApp = lazy(() => import("./BeamCellApp").then((m) => ({ default: m
 const WindowRiegelApp = lazy(() => import("./WindowRiegelApp").then((m) => ({ default: m.WindowRiegelApp })));
 const CraneBeamApp = lazy(() => import("./CraneBeamApp").then((m) => ({ default: m.CraneBeamApp })));
 const ProjectWorkApp = lazy(() => import("./ProjectWorkApp").then((m) => ({ default: m.ProjectWorkApp })));
+const CladdingApp = lazy(() => import("./CladdingApp").then((m) => ({ default: m.CladdingApp })));
 const SummaryApp = lazy(() => import("./SummaryApp").then((m) => ({ default: m.SummaryApp })));
 
 const TAB_FALLBACK = (
@@ -40,6 +42,7 @@ type Mode =
   | "windowRiegel"
   | "craneBeam"
   | "projectWork"
+  | "cladding"
   | "summary";
 
 const MODE_LABELS: Record<Mode, string> = {
@@ -50,6 +53,7 @@ const MODE_LABELS: Record<Mode, string> = {
   windowRiegel: "Оконные ригели",
   craneBeam: "Подкрановая балка",
   projectWork: "Проектные работы",
+  cladding: "Облицовки",
   summary: "Сводка",
 };
 
@@ -61,6 +65,7 @@ const MODES: readonly Mode[] = [
   "windowRiegel",
   "craneBeam",
   "projectWork",
+  "cladding",
   "summary",
 ] as const;
 
@@ -72,6 +77,7 @@ const MODE_ICONS: Record<Mode, ReactNode> = {
   windowRiegel: <RiegelIcon />,
   craneBeam: <CraneIcon />,
   projectWork: <ProjectIcon />,
+  cladding: <CladdingIcon />,
   summary: <SummaryIcon />,
 };
 
@@ -166,6 +172,7 @@ export function App() {
       {mode === "windowRiegel" && <LazyTab active={mode}><WindowRiegelApp /></LazyTab>}
       {mode === "craneBeam" && <LazyTab active={mode}><CraneBeamApp /></LazyTab>}
       {mode === "projectWork" && <LazyTab active={mode}><ProjectWorkApp /></LazyTab>}
+      {mode === "cladding" && <LazyTab active={mode}><CladdingApp /></LazyTab>}
       {mode === "summary" && <LazyTab active={mode}><SummaryApp /></LazyTab>}
     </div>
   );

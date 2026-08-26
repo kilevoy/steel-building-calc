@@ -121,6 +121,16 @@ body {
 }
 
 @media (max-width: 640px) {
+  .app-header__brand {
+    overflow: hidden;
+  }
+
+  .app-header__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+  }
+
   .app-header__subtitle {
     display: none;
   }
@@ -597,6 +607,39 @@ legend {
   margin: 0 0 8px;
   color: var(--c-text);
   letter-spacing: -0.01em;
+}
+
+/* ---------- Облицовки ---------- */
+
+.cladding-layout,
+.cladding-results,
+.cladding-metrics {
+  margin-top: 12px;
+}
+
+.cladding-metric {
+  min-height: 92px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+.cladding-metric--total {
+  border-left: 3px solid var(--c-accent);
+}
+
+.cladding-geometry-note {
+  margin-bottom: 8px;
+}
+
+.cladding-table {
+  max-height: none;
+}
+
+.cladding-note {
+  margin-top: 12px;
 }
 
 /* ---------- Меню проектов ---------- */
