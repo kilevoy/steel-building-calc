@@ -7,6 +7,8 @@ export function buildSummaryAutoCalculationKey(building: Building): string {
     height_m: building.height_m,
     roofSlope_deg: building.roofSlope_deg,
     framePitch_m: building.framePitch_m,
+    frameLayoutMode: building.frameLayoutMode,
+    centralBayCount: building.centralBayCount,
     w0_kPa: building.w0_kPa,
     Sg_kPa: building.Sg_kPa,
     terrainType: building.terrainType,

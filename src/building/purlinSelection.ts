@@ -2,6 +2,7 @@ import type { RolledCandidate } from "../calc/purlin/rolled";
 import type { PurlinCandidate, PurlinOutput } from "../calc/purlin/types";
 import type { Building, PurlinSelectionMode } from "./buildingContext";
 import type { ResultItem } from "./resultsContext";
+import { deriveFrameAxisLayout } from "./layout";
 
 export interface PurlinSelectionPrices {
   priceMP350_rubKg: number;
@@ -66,11 +67,64 @@ function estimatePurlinLineCount(building: Building, spacing_mm: number): number
 function purlinQuantityFields(
   candidate: { nPurlins?: number; spacing_mm: number },
   building: Building,
+  item: { profile: string; steel: string; totalMass_kg: number; cost_rub: number },
 ) {
   const lineCount = Math.max(
     1,
     Math.round(candidate.nPurlins ?? estimatePurlinLineCount(building, candidate.spacing_mm)),
   );
+  const note = `${purlinContinuitySchemeLabel(building.purlinContinuityScheme)}, шаг ${candidate.spacing_mm} мм`;
+  if (building.frameLayoutMode === "central_with_end_bays") {
+    const frameLayout = deriveFrameAxisLayout({
+      length_m: building.length_m,
+      framePitch_m: building.framePitch_m,
+      mode: building.frameLayoutMode,
+      centralBayCount: building.centralBayCount,
+    });
+    if (!frameLayout.validationError) {
+      if (building.purlinContinuityScheme === "continuous") {
+        return {
+          count: lineCount,
+          lengthPerPiece_m: building.length_m,
+          totalLength_m: lineCount * building.length_m,
+          note,
+        };
+      }
+
+      const grouped = new Map<number, number>();
+      for (const length_m of frameLayout.bayLengths_m) {
+        grouped.set(length_m, (grouped.get(length_m) ?? 0) + lineCount);
+      }
+      const totalLength_m = lineCount * building.length_m;
+      const massPerMeter = totalLength_m > 0 ? item.totalMass_kg / totalLength_m : 0;
+      const costPerMeter = totalLength_m > 0 ? item.cost_rub / totalLength_m : 0;
+      const breakdown = Array.from(grouped.entries())
+        .sort(([a], [b]) => a - b)
+        .map(([length_m, count]) => ({
+          profile: item.profile,
+          steel: item.steel,
+          count,
+          lengthPerPiece_m: length_m,
+          totalLength_m: count * length_m,
+          massPerPiece_kg: massPerMeter * length_m,
+          totalMass_kg: massPerMeter * count * length_m,
+          cost_rub: costPerMeter * count * length_m,
+          details: `${note}; пролёт ${length_m} м`,
+        }));
+
+      return {
+        count: lineCount * frameLayout.bayLengths_m.length,
+        lengthPerPiece_m:
+          frameLayout.bayLengths_m.every((length) => length === frameLayout.bayLengths_m[0])
+            ? frameLayout.bayLengths_m[0]
+            : undefined,
+        totalLength_m,
+        note,
+        breakdown,
+      };
+    }
+  }
+
   const bayCount = Math.max(1, Math.ceil(building.length_m / building.framePitch_m));
   const count = building.purlinContinuityScheme === "split" ? lineCount * bayCount : lineCount;
   const lengthPerPiece_m =
@@ -80,7 +134,7 @@ function purlinQuantityFields(
     count,
     lengthPerPiece_m,
     totalLength_m: count * lengthPerPiece_m,
-    note: `${purlinContinuitySchemeLabel(building.purlinContinuityScheme)}, шаг ${candidate.spacing_mm} мм`,
+    note,
   };
 }
 
@@ -91,13 +145,20 @@ function resultFromLstkCandidate(
 ): ResultItem {
   const steel = candidate.profile.Ry_MPa >= 380 ? "МП390" : "МП350";
   const pricePerKg = priceForLstk(candidate, prices);
+  const totalMass_kg = candidate.massPerBuilding_kg;
+  const cost_rub = totalMass_kg * pricePerKg;
 
   return {
     profile: candidate.profile.name,
     steel,
-    ...purlinQuantityFields(candidate, building),
-    totalMass_kg: candidate.massPerBuilding_kg,
-    cost_rub: candidate.massPerBuilding_kg * pricePerKg,
+    ...purlinQuantityFields(candidate, building, {
+      profile: candidate.profile.name,
+      steel,
+      totalMass_kg,
+      cost_rub,
+    }),
+    totalMass_kg,
+    cost_rub,
   };
 }
 
@@ -107,13 +168,20 @@ function resultFromRolledCandidate(
   prices: PurlinSelectionPrices,
 ): ResultItem {
   const pricePerKg = priceForRolled(candidate, prices);
+  const totalMass_kg = candidate.massPerBuilding_kg;
+  const cost_rub = totalMass_kg * pricePerKg;
 
   return {
     profile: candidate.profile.name,
     steel: candidate.steel,
-    ...purlinQuantityFields({ spacing_mm: candidate.spacing_mm }, building),
-    totalMass_kg: candidate.massPerBuilding_kg,
-    cost_rub: candidate.massPerBuilding_kg * pricePerKg,
+    ...purlinQuantityFields({ spacing_mm: candidate.spacing_mm }, building, {
+      profile: candidate.profile.name,
+      steel: candidate.steel,
+      totalMass_kg,
+      cost_rub,
+    }),
+    totalMass_kg,
+    cost_rub,
   };
 }
 

@@ -35,6 +35,7 @@ import {
   purlinContinuitySchemeLabel,
   purlinSelectionModeLabel,
 } from "./building/purlinSelection";
+import { deriveFrameAxisLayout } from "./building/layout";
 
 export function SummaryApp() {
   const { building } = useBuilding();
@@ -291,12 +292,15 @@ export function SummaryApp() {
         <ul style={{ marginTop: 8 }}>
           <li>Количество оконных ригелей задаётся вручную на вкладке «Оконные ригели»
               до появления отдельной модели фасадов.</li>
-          <li>Количество элементов (фермы / колонны / балки покрытия) определяется
-              автоматически из длины здания и шага рам.</li>
+          <li>Количество элементов определяется по принятой разбивке продольных осей здания.</li>
         </ul>
         <div style={{ marginTop: 8 }}>
-          Длина здания: <b>{building.length_m} м</b> · шаг рам: <b>{building.framePitch_m} м</b>{" "}
-          → <b>{Math.max(2, Math.floor(building.length_m / building.framePitch_m) + 1)}</b> рам/ферм/балок покрытия.
+          Разбивка: <b>{deriveFrameAxisLayout({
+            length_m: building.length_m,
+            framePitch_m: building.framePitch_m,
+            mode: building.frameLayoutMode,
+            centralBayCount: building.centralBayCount,
+          }).bayLengths_m.join(" + ")} м</b>.
         </div>
       </details>
     </div>
@@ -306,6 +310,12 @@ export function SummaryApp() {
 function BuildingBlock() {
   const { building, setBuilding } = useBuilding();
   const area_m2 = building.span_m * building.length_m;
+  const frameLayout = deriveFrameAxisLayout({
+    length_m: building.length_m,
+    framePitch_m: building.framePitch_m,
+    mode: building.frameLayoutMode,
+    centralBayCount: building.centralBayCount,
+  });
   return (
     <fieldset
       style={{
@@ -324,6 +334,21 @@ function BuildingBlock() {
         <div>Высота: <b>{building.height_m} м</b></div>
         <div>Уклон: <b>{building.roofSlope_deg}°</b></div>
         <div>Шаг рам: <b>{building.framePitch_m} м</b></div>
+        <div>
+          Разбивка: <b>{building.frameLayoutMode === "uniform" ? "равномерная" : "центральные пролёты и торцы"}</b>
+        </div>
+        <div>Осей: <b>{frameLayout.frameCount}</b></div>
+        <div style={{ gridColumn: "span 2" }}>
+          Пролёты: <b>{frameLayout.bayLengths_m.length > 0 ? `${frameLayout.bayLengths_m.join(" + ")} м` : "—"}</b>
+        </div>
+        <div style={{ gridColumn: "span 2" }}>
+          Координаты осей: <b>{frameLayout.axisPositions_m.length > 0 ? `${frameLayout.axisPositions_m.join("; ")} м` : "—"}</b>
+        </div>
+        {building.frameLayoutMode === "central_with_end_bays" && (
+          <div style={{ gridColumn: "span 2" }}>
+            Центральных пролётов: <b>{building.centralBayCount}</b>; торцевые: <b>{frameLayout.endBayLength_m ?? "—"} м + {frameLayout.endBayLength_m ?? "—"} м</b>
+          </div>
+        )}
         <div>Площадь застройки: <b>{area_m2.toFixed(0)} м²</b></div>
         <div>w₀: <b>{building.w0_kPa} кПа</b></div>
         <div>Sg: <b>{building.Sg_kPa} кПа</b></div>
@@ -492,6 +517,12 @@ function BuildingCountDiagnostics() {
   const layoutInput = deriveUnifiedBuildingLayoutInput(building);
   const layout = deriveUnifiedBuildingLayoutFromBuilding(building);
   const countSummary = buildColumnCountSummary(building, results);
+  const frameAxisLayout = deriveFrameAxisLayout({
+    length_m: building.length_m,
+    framePitch_m: building.framePitch_m,
+    mode: building.frameLayoutMode,
+    centralBayCount: building.centralBayCount,
+  });
 
   return (
     <details
@@ -524,6 +555,8 @@ function BuildingCountDiagnostics() {
         <div>Внутренних рам: <b>{layout.frames.interiorFrameAxes}</b></div>
         <div>Торцевых рам: <b>{layout.frames.endFrameAxes}</b></div>
         <div>Шагов вдоль: <b>{layout.frames.frameBays}</b></div>
+        <div>Пролёты вдоль: <b>{frameAxisLayout.bayLengths_m.join(" + ")} м</b></div>
+        <div>Оси вдоль: <b>{frameAxisLayout.axisPositions_m.join("; ")} м</b></div>
         <div>Пролётов поперёк: <b>{layoutInput.crossSpanCount}</b></div>
         <div>Крайних колонн, внутренние: <b>{layout.columns.interiorEdge}</b></div>
         <div>Средних колонн, внутренние: <b>{layout.columns.interiorMiddle}</b></div>
@@ -660,6 +693,11 @@ function TrussBuildingSummaryBlock({ results }: { results: BuildingResults }) {
 function PurlinBuildingSummaryBlock({ results }: { results: BuildingResults }) {
   const { building } = useBuilding();
   const summary = buildPurlinBuildingSummary(building, results.purlin);
+  const pieceLengths = Array.from(new Set(
+    (results.purlin?.breakdown ?? [])
+      .map((item) => item.lengthPerPiece_m)
+      .filter((length): length is number => length !== undefined),
+  )).sort((a, b) => a - b);
 
   return (
     <fieldset
@@ -685,6 +723,9 @@ function PurlinBuildingSummaryBlock({ results }: { results: BuildingResults }) {
         <div>
           Длина 1 шт.: <b>{summary.lengthPerPiece_m == null ? "—" : `${summary.lengthPerPiece_m.toFixed(2)} м`}</b>
         </div>
+        {pieceLengths.length > 1 && (
+          <div>Длины партий: <b>{pieceLengths.map((length) => `${length.toFixed(2)} м`).join("; ")}</b></div>
+        )}
         <div>
           Σ длина: <b>{summary.totalLength_m == null ? "—" : `${summary.totalLength_m.toFixed(2)} м`}</b>
         </div>

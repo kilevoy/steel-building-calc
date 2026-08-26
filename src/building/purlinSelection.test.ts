@@ -87,6 +87,27 @@ describe("purlin selection mode", () => {
     expect(split?.totalMass_kg).toBeCloseTo(continuous?.totalMass_kg ?? 0, 8);
   });
 
+  it("itemizes split purlins for central and symmetric end bays", () => {
+    const building = {
+      ...DEFAULT_BUILDING,
+      length_m: 38,
+      framePitch_m: 6,
+      frameLayoutMode: "central_with_end_bays" as const,
+      centralBayCount: 5,
+      purlinContinuityScheme: "split" as const,
+    };
+    const output = runPurlinCalculation(buildPurlinInputFromBuilding(building));
+    const result = buildSelectedPurlinResultItem(output, [], building, "Z", prices);
+
+    expect(result?.lengthPerPiece_m).toBeUndefined();
+    expect(result?.totalLength_m).toBeGreaterThan(38);
+    expect(result?.breakdown?.map((item) => item.lengthPerPiece_m)).toEqual([4, 6]);
+    expect(result?.breakdown?.reduce((sum, item) => sum + (item.totalLength_m ?? 0), 0))
+      .toBeCloseTo(result?.totalLength_m ?? 0, 8);
+    expect(result?.breakdown?.reduce((sum, item) => sum + item.totalMass_kg, 0))
+      .toBeCloseTo(result?.totalMass_kg ?? 0, 8);
+  });
+
   it("explains when an accepted purlin branch has no candidate", () => {
     expect(getPurlinSelectionWarning("Z", DEFAULT_BUILDING, {
       profile: "Z 140х1,5",

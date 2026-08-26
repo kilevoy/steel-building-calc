@@ -4,8 +4,17 @@ import type { Building } from "./buildingContext";
 import type { BuildingResults, ResultItem } from "./resultsContext";
 import { buildPurlinInputFromBuilding } from "./purlinInputFromBuilding";
 import { buildSelectedPurlinResultItem } from "./purlinSelection";
+import { deriveFrameAxisLayout } from "./layout";
 
 export function calculateAutoPurlinResult(building: Building): ResultItem | null {
+  const frameLayout = deriveFrameAxisLayout({
+    length_m: building.length_m,
+    framePitch_m: building.framePitch_m,
+    mode: building.frameLayoutMode,
+    centralBayCount: building.centralBayCount,
+  });
+  if (frameLayout.validationError) return null;
+
   const input = buildPurlinInputFromBuilding(building);
   const output = runPurlinCalculation(input);
   const cosA = Math.cos((input.roofSlope_deg * Math.PI) / 180);

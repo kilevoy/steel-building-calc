@@ -121,4 +121,18 @@ describe("truss result publisher", () => {
     });
     expect(payload.lengthPerPiece_m).toBe(9);
   });
+
+  it("uses an explicit frame-axis count for a non-uniform longitudinal layout", () => {
+    const output = outputWithSelectedSections({ VP: 100 });
+    const payload = buildTrussResultPayload({
+      input: { length_m: 38, framePitch_m: 6, span_m: 24 },
+      output,
+      spanCount: "single",
+      frameAxisCount: 8,
+      priceC345_rubKg: 150,
+    });
+
+    expect(payload.n_trusses).toBe(6);
+    expect(payload.totalMass_kg).toBe(600);
+  });
 });

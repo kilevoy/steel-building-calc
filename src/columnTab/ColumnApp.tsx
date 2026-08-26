@@ -4,7 +4,7 @@ import { hasColumnCrane } from "../calc/cranes";
 import { useBuilding, type Building } from "../building/useBuilding";
 import { useBuildingResults } from "../building/useBuildingResults";
 import { useRoofTotalLoad_kPa } from "../building/loadPropagation";
-import { deriveColumnLayout } from "../building/layout";
+import { deriveColumnLayout, deriveFrameAxisLayout } from "../building/layout";
 import { PricesBlock } from "../building/PricesBlock";
 import { Collapsible } from "../building/Collapsible";
 import { validateBuildingNumericInput } from "../utils/validation";
@@ -62,6 +62,12 @@ function lookupStructure(id: string): StructureRow | undefined {
  */
 export function ColumnApp() {
   const { building, setBuilding } = useBuilding();
+  const initialFrameLayout = deriveFrameAxisLayout({
+    length_m: building.length_m,
+    framePitch_m: building.framePitch_m,
+    mode: building.frameLayoutMode,
+    centralBayCount: building.centralBayCount,
+  });
   const initialRoof = lookupStructure(building.roofStructure);
   const initialWall = lookupStructure(building.wallStructure);
   const [input, setInput] = useState<CalculationInput>(() => ({
@@ -71,6 +77,7 @@ export function ColumnApp() {
     height_m: building.height_m,
     roofSlope_deg: building.roofSlope_deg,
     framePitch_m: building.framePitch_m,
+    frameAxisPositions_m: initialFrameLayout.axisPositions_m,
     spanCount: building.spanCount,
     w0_kPa: building.w0_kPa,
     Sg_kPa: building.Sg_kPa,
@@ -92,15 +99,36 @@ export function ColumnApp() {
   const inputHasCrane = hasColumnCrane(input);
 
   const validationErrors = useMemo(
-    () => validateBuildingNumericInput({
-      span_m: input.span_m,
-      length_m: input.length_m,
-      height_m: input.height_m,
-      framePitch_m: input.framePitch_m,
-      w0_kPa: input.w0_kPa,
-      Sg_kPa: input.Sg_kPa,
-    }),
-    [input.span_m, input.length_m, input.height_m, input.framePitch_m, input.w0_kPa, input.Sg_kPa],
+    () => {
+      const errors = validateBuildingNumericInput({
+        span_m: input.span_m,
+        length_m: input.length_m,
+        height_m: input.height_m,
+        framePitch_m: input.framePitch_m,
+        w0_kPa: input.w0_kPa,
+        Sg_kPa: input.Sg_kPa,
+      });
+      const frameLayout = deriveFrameAxisLayout({
+        length_m: building.length_m,
+        framePitch_m: building.framePitch_m,
+        mode: building.frameLayoutMode,
+        centralBayCount: building.centralBayCount,
+      });
+      if (frameLayout.validationError) errors.push(frameLayout.validationError);
+      return errors;
+    },
+    [
+      input.span_m,
+      input.length_m,
+      input.height_m,
+      input.framePitch_m,
+      input.w0_kPa,
+      input.Sg_kPa,
+      building.length_m,
+      building.framePitch_m,
+      building.frameLayoutMode,
+      building.centralBayCount,
+    ],
   );
 
   // Auto-recompute results on every input change — no «Рассчитать» button needed.
@@ -140,6 +168,12 @@ export function ColumnApp() {
   // Roof load includes self-weight of purlins / beam-cell (auto-propagation).
   const roofLoad = useRoofTotalLoad_kPa();
   useEffect(() => {
+    const frameLayout = deriveFrameAxisLayout({
+      length_m: building.length_m,
+      framePitch_m: building.framePitch_m,
+      mode: building.frameLayoutMode,
+      centralBayCount: building.centralBayCount,
+    });
     setInput((cur) => ({
       ...cur,
       span_m: building.span_m,
@@ -147,6 +181,7 @@ export function ColumnApp() {
       height_m: building.height_m,
       roofSlope_deg: building.roofSlope_deg,
       framePitch_m: building.framePitch_m,
+      frameAxisPositions_m: frameLayout.axisPositions_m,
       spanCount: building.spanCount,
       w0_kPa: building.w0_kPa,
       Sg_kPa: building.Sg_kPa,

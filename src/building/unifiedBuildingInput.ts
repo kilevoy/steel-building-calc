@@ -4,13 +4,7 @@ import {
   type UnifiedBuildingLayout,
   type UnifiedBuildingLayoutInput,
 } from "./unifiedLayout";
-
-function positiveIntegerFromLength(length_m: number, framePitch_m: number): number {
-  if (!Number.isFinite(length_m) || !Number.isFinite(framePitch_m) || framePitch_m <= 0) {
-    return 0;
-  }
-  return Math.floor(length_m / framePitch_m) + 1;
-}
+import { deriveFrameAxisLayout } from "./layout";
 
 function crossSpanCountFromBuilding(building: Building): number {
   return building.spanCount === "multi" ? 2 : 1;
@@ -19,8 +13,14 @@ function crossSpanCountFromBuilding(building: Building): number {
 export function deriveUnifiedBuildingLayoutInput(
   building: Building,
 ): UnifiedBuildingLayoutInput {
+  const frameLayout = deriveFrameAxisLayout({
+    length_m: building.length_m,
+    framePitch_m: building.framePitch_m,
+    mode: building.frameLayoutMode,
+    centralBayCount: building.centralBayCount,
+  });
   return {
-    mainFrameAxisCount: positiveIntegerFromLength(building.length_m, building.framePitch_m),
+    mainFrameAxisCount: frameLayout.frameCount,
     crossSpanCount: crossSpanCountFromBuilding(building),
     hasCrane: building.hasCrane,
   };

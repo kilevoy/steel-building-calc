@@ -3,6 +3,7 @@ import type { SpanCount } from "../calc/types";
 import type { TerrainType } from "../types/common";
 
 export type RoofShape = "gable" | "monoslope";
+export type FrameLayoutMode = "uniform" | "central_with_end_bays";
 export type PurlinSelectionMode = "auto" | "2TPS" | "2PS" | "Z" | "rolled";
 export type PurlinContinuityScheme = "split" | "continuous";
 
@@ -12,6 +13,8 @@ export interface Building {
   height_m: number;
   roofSlope_deg: number;
   framePitch_m: number;
+  frameLayoutMode: FrameLayoutMode;
+  centralBayCount: number;
   w0_kPa: number;
   Sg_kPa: number;
   terrainType: TerrainType;
@@ -46,6 +49,8 @@ export const DEFAULT_BUILDING: Building = {
   height_m: 12,
   roofSlope_deg: 5,
   framePitch_m: 6,
+  frameLayoutMode: "uniform",
+  centralBayCount: 5,
   w0_kPa: 0.38,
   Sg_kPa: 2.45,
   terrainType: "B",

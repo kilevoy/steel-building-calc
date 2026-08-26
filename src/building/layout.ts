@@ -1,5 +1,5 @@
 import type { RoofType, SpanCount } from "../calc/types";
-import type { RoofShape } from "./buildingContext";
+import type { FrameLayoutMode, RoofShape } from "./buildingContext";
 
 export interface FrameLayout {
   frameCount: number;
@@ -10,6 +10,14 @@ export interface ColumnLayoutGroup {
   count: number;
   maxHeight_m: number;
   totalHeight_m: number;
+}
+
+export interface FrameAxisLayout extends FrameLayout {
+  mode: FrameLayoutMode;
+  axisPositions_m: number[];
+  bayLengths_m: number[];
+  endBayLength_m: number | null;
+  validationError: string | null;
 }
 
 export interface ColumnLengthGroup {
@@ -141,6 +149,108 @@ function groupFromPositions(
   };
 }
 
+function rounded(value: number): number {
+  return Number(value.toFixed(6));
+}
+
+export function deriveFrameAxisLayout(params: {
+  length_m: number;
+  framePitch_m: number;
+  mode?: FrameLayoutMode;
+  centralBayCount?: number;
+}): FrameAxisLayout {
+  const mode = params.mode ?? "uniform";
+  const validBase =
+    Number.isFinite(params.length_m) &&
+    params.length_m > 0 &&
+    Number.isFinite(params.framePitch_m) &&
+    params.framePitch_m > 0;
+
+  if (!validBase) {
+    return {
+      mode,
+      frameCount: 0,
+      interiorFrameCount: 0,
+      axisPositions_m: [],
+      bayLengths_m: [],
+      endBayLength_m: null,
+      validationError: "Длина здания и шаг рам должны быть больше 0.",
+    };
+  }
+
+  if (mode === "uniform") {
+    const frameCount = Math.floor(params.length_m / params.framePitch_m) + 1;
+    const axisPositions_m = Array.from(
+      { length: frameCount },
+      (_, index) => rounded(index * params.framePitch_m),
+    );
+    const coveredLength_m = Math.max(frameCount - 1, 0) * params.framePitch_m;
+    const uncoveredLength_m = rounded(params.length_m - coveredLength_m);
+    return {
+      mode,
+      frameCount,
+      interiorFrameCount: Math.max(frameCount - 2, 0),
+      axisPositions_m,
+      bayLengths_m: Array.from({ length: Math.max(frameCount - 1, 0) }, () => params.framePitch_m),
+      endBayLength_m: null,
+      validationError:
+        Math.abs(uncoveredLength_m) <= 0.000001
+          ? null
+          : `Длина здания не делится на равномерный шаг рам: остаётся ${uncoveredLength_m} м. Выберите режим центральных пролётов и торцов.`,
+    };
+  }
+
+  const centralBayCount = params.centralBayCount ?? 0;
+  if (!Number.isInteger(centralBayCount) || centralBayCount < 1) {
+    return {
+      mode,
+      frameCount: 0,
+      interiorFrameCount: 0,
+      axisPositions_m: [],
+      bayLengths_m: [],
+      endBayLength_m: null,
+      validationError: "Количество центральных пролётов должно быть целым числом не меньше 1.",
+    };
+  }
+
+  const remainingLength_m = params.length_m - centralBayCount * params.framePitch_m;
+  const endBayLength_m = remainingLength_m / 2;
+  if (!Number.isFinite(endBayLength_m) || endBayLength_m <= 0) {
+    return {
+      mode,
+      frameCount: 0,
+      interiorFrameCount: 0,
+      axisPositions_m: [],
+      bayLengths_m: [],
+      endBayLength_m: rounded(endBayLength_m),
+      validationError:
+        "Длина здания должна быть больше суммарной длины центральных пролётов.",
+    };
+  }
+
+  const bayLengths_m = [
+    endBayLength_m,
+    ...Array.from({ length: centralBayCount }, () => params.framePitch_m),
+    endBayLength_m,
+  ].map(rounded);
+  const axisPositions_m = [0];
+  for (const bayLength_m of bayLengths_m) {
+    axisPositions_m.push(rounded(axisPositions_m[axisPositions_m.length - 1] + bayLength_m));
+  }
+  axisPositions_m[axisPositions_m.length - 1] = rounded(params.length_m);
+  const frameCount = axisPositions_m.length;
+
+  return {
+    mode,
+    frameCount,
+    interiorFrameCount: Math.max(frameCount - 2, 0),
+    axisPositions_m,
+    bayLengths_m,
+    endBayLength_m: rounded(endBayLength_m),
+    validationError: null,
+  };
+}
+
 export function groupColumnLengths(
   positions: number[],
   quantityPerPosition: number,
@@ -179,8 +289,11 @@ export function deriveColumnLayout(params: {
   roofSlope_deg: number;
   roofType: RoofType;
   spanCount: SpanCount;
+  frameAxisPositions_m?: readonly number[];
 }): BuildingColumnLayout {
-  const { interiorFrameCount } = deriveFrameLayout(params.length_m, params.framePitch_m);
+  const interiorFrameCount = params.frameAxisPositions_m
+    ? Math.max(params.frameAxisPositions_m.length - 2, 0)
+    : deriveFrameLayout(params.length_m, params.framePitch_m).interiorFrameCount;
   const spanCount = spanCountAsNumber(params.spanCount);
   const heightAt = (x_m: number) =>
     columnHeightAtX({

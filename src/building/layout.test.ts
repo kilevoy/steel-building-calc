@@ -5,6 +5,7 @@ import {
   deriveEndRoofBeamLayout,
   deriveColumnLayout,
   deriveFrameLayout,
+  deriveFrameAxisLayout,
   deriveRoofElementLayout,
   positionsAcrossSpan,
 } from "./layout";
@@ -20,6 +21,34 @@ describe("building layout helpers", () => {
   it("counts end roof beams by span count", () => {
     expect(deriveEndRoofBeamQuantity("single")).toBe(2);
     expect(deriveEndRoofBeamQuantity("multi")).toBe(4);
+  });
+
+  it("builds symmetric end bays around central frame bays", () => {
+    const layout = deriveFrameAxisLayout({
+      length_m: 38,
+      framePitch_m: 6,
+      mode: "central_with_end_bays",
+      centralBayCount: 5,
+    });
+
+    expect(layout.validationError).toBeNull();
+    expect(layout.bayLengths_m).toEqual([4, 6, 6, 6, 6, 6, 4]);
+    expect(layout.axisPositions_m).toEqual([0, 4, 10, 16, 22, 28, 34, 38]);
+    expect(layout.frameCount).toBe(8);
+    expect(layout.interiorFrameCount).toBe(6);
+    expect(layout.bayLengths_m.reduce((sum, bay) => sum + bay, 0)).toBe(38);
+  });
+
+  it("rejects central layouts without positive end bays", () => {
+    const layout = deriveFrameAxisLayout({
+      length_m: 30,
+      framePitch_m: 6,
+      mode: "central_with_end_bays",
+      centralBayCount: 5,
+    });
+
+    expect(layout.validationError).toContain("больше суммарной длины");
+    expect(layout.axisPositions_m).toEqual([]);
   });
 
   it("counts and sizes end roof beams by roof shape", () => {
@@ -85,6 +114,23 @@ describe("building layout helpers", () => {
 
     expect(layout.edge.count).toBe(18);
     expect(layout.middle.count).toBe(0);
+    expect(layout.fachwerk.count).toBe(10);
+  });
+
+  it("uses explicit longitudinal axes for column quantities", () => {
+    const layout = deriveColumnLayout({
+      span_m: 24,
+      length_m: 38,
+      height_m: 5,
+      framePitch_m: 6,
+      fachverkPitch_m: 6,
+      roofSlope_deg: 8,
+      roofType: "gable",
+      spanCount: "single",
+      frameAxisPositions_m: [0, 4, 10, 16, 22, 28, 34, 38],
+    });
+
+    expect(layout.edge.count).toBe(12);
     expect(layout.fachwerk.count).toBe(10);
   });
 

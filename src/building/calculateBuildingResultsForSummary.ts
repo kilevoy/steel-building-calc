@@ -19,7 +19,7 @@ import {
   calculateRoofTotalLoad_kPa,
   type RoofLoadBreakdown,
 } from "./loadPropagation";
-import { deriveColumnLayout, deriveEndRoofBeamLayout } from "./layout";
+import { deriveColumnLayout, deriveEndRoofBeamLayout, deriveFrameAxisLayout } from "./layout";
 import type { BuildingResults } from "./resultsContext";
 const COLUMN_TYPES: ColumnType[] = ["edge", "fachwerk", "middle"];
 
@@ -33,6 +33,12 @@ function columnInputFromBuilding(
   building: Building,
   roofLoad_kPa: number,
 ): CalculationInput {
+  const frameLayout = deriveFrameAxisLayout({
+    length_m: building.length_m,
+    framePitch_m: building.framePitch_m,
+    mode: building.frameLayoutMode,
+    centralBayCount: building.centralBayCount,
+  });
   return {
     ...DEFAULT_COLUMN_INPUT,
     span_m: building.span_m,
@@ -40,6 +46,7 @@ function columnInputFromBuilding(
     height_m: building.height_m,
     roofSlope_deg: building.roofSlope_deg,
     framePitch_m: building.framePitch_m,
+    frameAxisPositions_m: frameLayout.axisPositions_m,
     fachverkPitch_m: building.framePitch_m,
     spanCount: building.spanCount,
     w0_kPa: building.w0_kPa,
@@ -87,6 +94,15 @@ export function calculateBuildingResultsForSummary(
   building: Building,
 ): BuildingSummaryCalculation {
   const errors: string[] = [];
+  const frameLayout = deriveFrameAxisLayout({
+    length_m: building.length_m,
+    framePitch_m: building.framePitch_m,
+    mode: building.frameLayoutMode,
+    centralBayCount: building.centralBayCount,
+  });
+  if (frameLayout.validationError) {
+    errors.push(`Разбивка здания: ${frameLayout.validationError}`);
+  }
   const results: BuildingResults = {
     column: null,
     truss: null,
@@ -96,10 +112,12 @@ export function calculateBuildingResultsForSummary(
     craneBeam: null,
   };
 
-  try {
-    results.purlin = calculateAutoPurlinResult(building);
-  } catch (error) {
-    errors.push(`Прогоны: ${error instanceof Error ? error.message : String(error)}`);
+  if (!frameLayout.validationError) {
+    try {
+      results.purlin = calculateAutoPurlinResult(building);
+    } catch (error) {
+      errors.push(`Прогоны: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   try {
@@ -138,35 +156,38 @@ export function calculateBuildingResultsForSummary(
     beamCell: results.beamCell,
   });
 
-  try {
-    const input = columnInputFromBuilding(building, roofLoad.total_kPa);
-    const layout = deriveColumnLayout(input);
-    const columnResults = Object.fromEntries(
-      COLUMN_TYPES.map((columnType) => {
-        const height_m = layout[columnType].maxHeight_m || input.height_m;
-        return [columnType, runCalculation({ ...input, columnType, height_m })];
-      }),
-    ) as Record<ColumnType, ReturnType<typeof runCalculation>>;
-    results.column = buildColumnResultPayload(input, columnResults);
-  } catch (error) {
-    errors.push(`Колонны: ${error instanceof Error ? error.message : String(error)}`);
-  }
+  if (!frameLayout.validationError) {
+    try {
+      const input = columnInputFromBuilding(building, roofLoad.total_kPa);
+      const layout = deriveColumnLayout(input);
+      const columnResults = Object.fromEntries(
+        COLUMN_TYPES.map((columnType) => {
+          const height_m = layout[columnType].maxHeight_m || input.height_m;
+          return [columnType, runCalculation({ ...input, columnType, height_m })];
+        }),
+      ) as Record<ColumnType, ReturnType<typeof runCalculation>>;
+      results.column = buildColumnResultPayload(input, columnResults);
+    } catch (error) {
+      errors.push(`Колонны: ${error instanceof Error ? error.message : String(error)}`);
+    }
 
-  try {
-    const input = trussInputFromBuilding(building, roofLoad.total_kPa);
-    const output = runTrussCalculation(input);
-    results.truss = buildTrussResultPayload({
-      input: {
-        length_m: input.length_m,
-        framePitch_m: input.framePitch_m,
-        span_m: input.span_m,
-      },
-      output,
-      spanCount: building.spanCount,
-      priceC345_rubKg: building.priceC345_rubKg,
-    });
-  } catch (error) {
-    errors.push(`Фермы: ${error instanceof Error ? error.message : String(error)}`);
+    try {
+      const input = trussInputFromBuilding(building, roofLoad.total_kPa);
+      const output = runTrussCalculation(input);
+      results.truss = buildTrussResultPayload({
+        input: {
+          length_m: input.length_m,
+          framePitch_m: input.framePitch_m,
+          span_m: input.span_m,
+        },
+        output,
+        spanCount: building.spanCount,
+        frameAxisCount: frameLayout.frameCount,
+        priceC345_rubKg: building.priceC345_rubKg,
+      });
+    } catch (error) {
+      errors.push(`Фермы: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   try {

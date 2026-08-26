@@ -12,15 +12,18 @@ export function buildTrussResultPayload(params: {
   input: Pick<TrussInput, "length_m" | "framePitch_m" | "span_m">;
   output: TrussOutput;
   spanCount: SpanCount;
+  frameAxisCount?: number;
   priceC345_rubKg: number;
 }): TrussResult {
   const spanCount = params.spanCount === "multi" ? 2 : 1;
   const lengthPerPiece_m = params.input.span_m / spanCount;
-  const n_trusses = deriveRoofElementLayout({
-    length_m: params.input.length_m,
-    framePitch_m: params.input.framePitch_m,
-    spanCount: params.spanCount,
-  }).trussCount;
+  const n_trusses = params.frameAxisCount === undefined
+    ? deriveRoofElementLayout({
+        length_m: params.input.length_m,
+        framePitch_m: params.input.framePitch_m,
+        spanCount: params.spanCount,
+      }).trussCount
+    : Math.max(Math.floor(params.frameAxisCount) - 2, 0);
 
   const sections = TRUSS_SECTIONS.flatMap((section) => {
     const result = params.output.sections[section];

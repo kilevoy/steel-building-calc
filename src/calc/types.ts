@@ -62,6 +62,8 @@ export interface CalculationInput {
   span_m: number;
   length_m: number;
   framePitch_m: number;
+  /** Longitudinal frame axes for quantity accounting; calculation pitch remains framePitch_m. */
+  frameAxisPositions_m?: readonly number[];
   fachverkPitch_m: number;
   roofSlope_deg: number;
   roofType: RoofType;

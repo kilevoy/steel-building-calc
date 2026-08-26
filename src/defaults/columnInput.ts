@@ -5,6 +5,7 @@ export const DEFAULT_COLUMN_INPUT: CalculationInput = {
   span_m: 40,
   length_m: 80,
   framePitch_m: 6,
+  frameAxisPositions_m: undefined,
   fachverkPitch_m: 6,
   roofSlope_deg: 6,
   roofType: "gable",

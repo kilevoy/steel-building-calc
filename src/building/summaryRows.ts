@@ -91,8 +91,7 @@ export function buildSummaryRows(results: BuildingResults): SummaryRow[] {
   const purlinLabel = purlinSteel.startsWith("МП") || purlinSteel.startsWith("MP")
     ? "Прогоны (ЛСТК)"
     : "Прогоны (прокат)";
-  const purlin = rowFromItem(purlinLabel, results.purlin);
-  if (purlin) rows.push(purlin);
+  pushItemRows(rows, purlinLabel, results.purlin);
 
   const beamCell = rowFromItem("Торцевая балка покрытия", results.beamCell);
   if (beamCell) rows.push(beamCell);

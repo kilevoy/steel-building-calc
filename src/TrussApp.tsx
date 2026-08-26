@@ -21,6 +21,7 @@ import {
   searchSettlementsAsync,
 } from "./services/settlements";
 import { buildTrussResultPayload } from "./trussResultPublisher";
+import { deriveFrameAxisLayout } from "./building/layout";
 import structuresJson from "./data/structures/structures.json";
 
 interface StructureRow {
@@ -114,6 +115,12 @@ export function TrussApp() {
       },
       output: out,
       spanCount: building.spanCount,
+      frameAxisCount: deriveFrameAxisLayout({
+        length_m: building.length_m,
+        framePitch_m: building.framePitch_m,
+        mode: building.frameLayoutMode,
+        centralBayCount: building.centralBayCount,
+      }).frameCount,
       priceC345_rubKg: building.priceC345_rubKg,
     }));
   }, [
@@ -122,6 +129,10 @@ export function TrussApp() {
     input.framePitch_m,
     input.span_m,
     building.spanCount,
+    building.length_m,
+    building.framePitch_m,
+    building.frameLayoutMode,
+    building.centralBayCount,
     building.priceC345_rubKg,
     setResult,
   ]);

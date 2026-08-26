@@ -1,4 +1,5 @@
 import { useBuilding } from "../building/useBuilding";
+import { deriveFrameAxisLayout } from "../building/layout";
 
 /**
  * Cross-tab summary banner shown at the top of the app. Lists the shared
@@ -7,6 +8,12 @@ import { useBuilding } from "../building/useBuilding";
  */
 export function BuildingSummaryBanner() {
   const { building } = useBuilding();
+  const frameLayout = deriveFrameAxisLayout({
+    length_m: building.length_m,
+    framePitch_m: building.framePitch_m,
+    mode: building.frameLayoutMode,
+    centralBayCount: building.centralBayCount,
+  });
   return (
     <div
       className="building-banner"
@@ -19,6 +26,7 @@ export function BuildingSummaryBanner() {
       <span>высота <b>{building.height_m}</b> м</span>
       <span>уклон <b>{building.roofSlope_deg}°</b></span>
       <span>шаг рам <b>{building.framePitch_m}</b> м</span>
+      <span>оси <b>{frameLayout.frameCount}</b></span>
       <span>w₀ <b>{building.w0_kPa}</b> кПа</span>
       <span>Sg <b>{building.Sg_kPa}</b> кПа</span>
       <span>местн. <b>{building.terrainType}</b></span>

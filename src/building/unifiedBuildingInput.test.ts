@@ -35,6 +35,29 @@ describe("unified building input bridge", () => {
     expect(layout.columns.endFachwerkTotal).toBe(6);
   });
 
+  it("uses central bays and symmetric end bays to count frame axes", () => {
+    const input = deriveUnifiedBuildingLayoutInput({
+      ...DEFAULT_BUILDING,
+      length_m: 38,
+      framePitch_m: 6,
+      frameLayoutMode: "central_with_end_bays",
+      centralBayCount: 5,
+    });
+
+    expect(input.mainFrameAxisCount).toBe(8);
+    expect(deriveUnifiedBuildingLayoutFromBuilding({
+      ...DEFAULT_BUILDING,
+      length_m: 38,
+      framePitch_m: 6,
+      frameLayoutMode: "central_with_end_bays",
+      centralBayCount: 5,
+    }).frames).toMatchObject({
+      totalFrameAxes: 8,
+      interiorFrameAxes: 6,
+      frameBays: 7,
+    });
+  });
+
   it("counts end columns as main frame columns when the building has a crane", () => {
     const layout = deriveUnifiedBuildingLayoutFromBuilding({
       ...DEFAULT_BUILDING,

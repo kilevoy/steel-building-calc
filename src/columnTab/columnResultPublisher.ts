@@ -27,7 +27,9 @@ function columnPositions(input: CalculationInput, columnType: ColumnType): {
   if (columnType === "edge") {
     return {
       positions: [0, input.span_m],
-      quantityPerPosition: deriveFrameLayout(input.length_m, input.framePitch_m).interiorFrameCount,
+      quantityPerPosition: input.frameAxisPositions_m
+        ? Math.max(input.frameAxisPositions_m.length - 2, 0)
+        : deriveFrameLayout(input.length_m, input.framePitch_m).interiorFrameCount,
     };
   }
 
@@ -38,7 +40,9 @@ function columnPositions(input: CalculationInput, columnType: ColumnType): {
         spanCount > 1
           ? Array.from({ length: spanCount - 1 }, (_, index) => (input.span_m / spanCount) * (index + 1))
           : [],
-      quantityPerPosition: deriveFrameLayout(input.length_m, input.framePitch_m).interiorFrameCount,
+      quantityPerPosition: input.frameAxisPositions_m
+        ? Math.max(input.frameAxisPositions_m.length - 2, 0)
+        : deriveFrameLayout(input.length_m, input.framePitch_m).interiorFrameCount,
     };
   }
 
