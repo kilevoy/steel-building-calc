@@ -40,6 +40,46 @@ export function calculateBuildingSummaryTotals(results: BuildingResults): Summar
   return total;
 }
 
+export interface ColumnTypeSummary {
+  label: string;
+  profile: string;
+  steel: string;
+  count: number;
+  totalMass_kg: number;
+  cost_rub: number;
+}
+
+/** Итог по колоннам (крайняя / средняя / фахверковая) отдельно от прочих элементов здания. */
+export function calculateColumnSummaryTotals(results: BuildingResults): {
+  groups: ColumnTypeSummary[];
+  total: SummaryTotals;
+} {
+  const groupDefs: [string, ResultItem | null][] = [
+    ["Крайняя", results.column?.edge ?? null],
+    ["Средняя", results.column?.middle ?? null],
+    ["Фахверковая", results.column?.fachwerk ?? null],
+  ];
+
+  const groups: ColumnTypeSummary[] = [];
+  const total: SummaryTotals = { totalMass_kg: 0, totalCost_rub: 0 };
+
+  for (const [label, item] of groupDefs) {
+    if (!item) continue;
+    groups.push({
+      label,
+      profile: item.profile,
+      steel: item.steel,
+      count: item.count ?? 1,
+      totalMass_kg: item.totalMass_kg,
+      cost_rub: item.cost_rub,
+    });
+    total.totalMass_kg += item.totalMass_kg;
+    total.totalCost_rub += item.cost_rub;
+  }
+
+  return { groups, total };
+}
+
 export function calculateBuildingSummaryTotalsBySteel(
   results: BuildingResults,
 ): SteelSummaryTotal[] {

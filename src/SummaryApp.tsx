@@ -15,6 +15,7 @@ import {
 import {
   calculateBuildingSummaryTotals,
   calculateBuildingSummaryTotalsBySteel,
+  calculateColumnSummaryTotals,
 } from "./building/summaryTotals";
 import { applyAutoPurlinResult } from "./building/autoPurlinResult";
 import { buildBeamCellBuildingSummary } from "./building/beamCellBuildingSummary";
@@ -178,6 +179,7 @@ export function SummaryApp() {
       <SummaryReadinessBlock items={readinessItems} hasMissing={hasMissingSummaryItems} />
       <PurlinSelectionWarning warning={purlinWarning} />
       <ColumnCountSummaryBlock results={summaryResults} />
+      <ColumnMassCostSummaryBlock results={summaryResults} />
       <TrussBuildingSummaryBlock results={summaryResults} />
       <PurlinBuildingSummaryBlock results={summaryResults} />
       <BeamCellBuildingSummaryBlock results={summaryResults} />
@@ -645,6 +647,53 @@ function ColumnCountSummaryBlock({ results }: { results: BuildingResults }) {
         </div>
       )}
     </fieldset>
+  );
+}
+
+/**
+ * Отдельный итог по колоннам (крайняя / средняя / фахверковая) — масса и
+ * стоимость, без остальных элементов здания. Дополняет
+ * `ColumnCountSummaryBlock` (который считает только количество).
+ */
+function ColumnMassCostSummaryBlock({ results }: { results: BuildingResults }) {
+  const { groups, total } = calculateColumnSummaryTotals(results);
+  if (groups.length === 0) return null;
+
+  return (
+    <div className="table-wrap" style={{ marginBottom: 24 }}>
+      <h3 style={{ marginBottom: 6 }}>Колонны — итого по массе и стоимости</h3>
+      <table className="table" style={{ maxWidth: 700 }}>
+        <thead>
+          <tr>
+            <th>Тип колонны</th>
+            <th>Профиль</th>
+            <th>Сталь</th>
+            <th className="num">Шт.</th>
+            <th className="num">Σ масса</th>
+            <th className="num">Σ стоимость</th>
+          </tr>
+        </thead>
+        <tbody>
+          {groups.map((g) => (
+            <tr key={g.label}>
+              <td style={{ fontWeight: 600 }}>{g.label}</td>
+              <td>{g.profile}</td>
+              <td>{g.steel}</td>
+              <td className="num">{g.count}</td>
+              <td className="num">{formatSummaryMass(g.totalMass_kg)}</td>
+              <td className="num">{formatSummaryCost(g.cost_rub)}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colSpan={4} style={{ fontWeight: 700 }}>Итого по колоннам</td>
+            <td className="num" style={{ fontWeight: 700 }}>{formatSummaryMass(total.totalMass_kg)}</td>
+            <td className="num" style={{ fontWeight: 700 }}>{formatSummaryCost(total.totalCost_rub)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   );
 }
 
