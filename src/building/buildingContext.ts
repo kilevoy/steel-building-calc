@@ -1,6 +1,7 @@
 import { createContext } from "react";
 import type { OverheadCrane, SpanCount, SuspendedCrane } from "../calc/types";
 import type { TerrainType } from "../types/common";
+import { DEFAULT_EXCLUDED_PROFILES } from "../calc/nonStandardProfiles";
 
 export type RoofShape = "gable" | "monoslope";
 export type FrameLayoutMode = "uniform" | "central_with_end_bays";
@@ -27,6 +28,8 @@ export interface Building {
   /** Полная конфигурация кранов — общая для всех вкладок, переживает переключение между ними. */
   overheadCrane: OverheadCrane;
   suspendedCrane: SuspendedCrane;
+  /** Имена профилей, исключённых из подбора колонны (см. `nonStandardProfiles.ts`). */
+  excludedProfileNames: readonly string[];
   city: string;
   responsibilityCoeff: number;
   priceC255B_rubKg: number;
@@ -80,6 +83,7 @@ export const DEFAULT_BUILDING: Building = {
     capacity_t: 2,
     singleSpan: true,
   },
+  excludedProfileNames: DEFAULT_EXCLUDED_PROFILES,
   city: "",
   responsibilityCoeff: 1,
   priceC255B_rubKg: 148.8,

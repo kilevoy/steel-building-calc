@@ -85,6 +85,8 @@ export interface CalculationInput {
   loadAddition_pct: number;
   overheadCrane: OverheadCrane;
   suspendedCrane: SuspendedCrane;
+  /** Имена профилей, исключённых из подбора (см. `nonStandardProfiles.ts`). */
+  excludedProfileNames: readonly string[];
   prices: SteelPrices;
 }
 

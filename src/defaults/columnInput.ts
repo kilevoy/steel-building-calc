@@ -1,4 +1,5 @@
 import type { CalculationInput } from "../calc/types";
+import { DEFAULT_EXCLUDED_PROFILES } from "../calc/nonStandardProfiles";
 
 export const DEFAULT_COLUMN_INPUT: CalculationInput = {
   height_m: 11.5,
@@ -37,6 +38,7 @@ export const DEFAULT_COLUMN_INPUT: CalculationInput = {
     capacity_t: 2,
     singleSpan: true,
   },
+  excludedProfileNames: DEFAULT_EXCLUDED_PROFILES,
   prices: {
     "С255Б": 148.8,
     "С355Б": 155.88,

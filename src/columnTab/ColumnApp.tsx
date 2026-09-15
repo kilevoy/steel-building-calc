@@ -6,6 +6,7 @@ import { useBuildingResults } from "../building/useBuildingResults";
 import { useRoofTotalLoad_kPa } from "../building/loadPropagation";
 import { deriveColumnLayout, deriveFrameAxisLayout } from "../building/layout";
 import { PricesBlock } from "../building/PricesBlock";
+import { ExcludedProfilesBlock } from "./ExcludedProfilesBlock";
 import { Collapsible } from "../building/Collapsible";
 import { validateBuildingNumericInput } from "../utils/validation";
 import { LoadPropagationBanner } from "./LoadPropagationBanner";
@@ -90,6 +91,7 @@ export function ColumnApp() {
     responsibilityCoeff: building.responsibilityCoeff,
     overheadCrane: building.overheadCrane,
     suspendedCrane: building.suspendedCrane,
+    excludedProfileNames: building.excludedProfileNames,
     prices: {
       "С255Б": building.priceC255B_rubKg,
       "С355Б": building.priceC355B_rubKg,
@@ -198,6 +200,7 @@ export function ColumnApp() {
       responsibilityCoeff: building.responsibilityCoeff,
       overheadCrane: building.overheadCrane,
       suspendedCrane: building.suspendedCrane,
+      excludedProfileNames: building.excludedProfileNames,
       prices: {
         "С255Б": building.priceC255B_rubKg,
         "С355Б": building.priceC355B_rubKg,
@@ -271,6 +274,10 @@ export function ColumnApp() {
           {/* Synced prices block (visible in every tab) */}
           <div style={{ marginBottom: 16 }}>
             <PricesBlock />
+          </div>
+
+          <div style={{ marginBottom: 16 }}>
+            <ExcludedProfilesBlock />
           </div>
 
           <CranesSection input={input} setOverhead={setOverhead} setSuspended={setSuspended} />

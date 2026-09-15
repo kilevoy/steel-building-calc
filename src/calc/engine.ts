@@ -265,9 +265,10 @@ export function runCalculation(input: CalculationInput): CalculationOutput {
 
   const mu = computeMu(input);
   const allResults: ProfileResult[] = [];
+  const excludedProfiles = new Set(input.excludedProfileNames);
 
   for (const profile of PROFILES) {
-    if (profile.nonStandard) continue;
+    if (excludedProfiles.has(profile.name)) continue;
     const steels = steelsForCategory(profile.category);
     for (const steel of steels) {
       const Ry = getRy(steel, profile);
