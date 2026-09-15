@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { SpanCount } from "../calc/types";
+import type { OverheadCrane, SpanCount, SuspendedCrane } from "../calc/types";
 import type { TerrainType } from "../types/common";
 
 export type RoofShape = "gable" | "monoslope";
@@ -23,6 +23,9 @@ export interface Building {
   roofShape: RoofShape;
   spanCount: SpanCount;
   hasCrane: boolean;
+  /** Полная конфигурация кранов — общая для всех вкладок, переживает переключение между ними. */
+  overheadCrane: OverheadCrane;
+  suspendedCrane: SuspendedCrane;
   city: string;
   responsibilityCoeff: number;
   priceC255B_rubKg: number;
@@ -59,6 +62,22 @@ export const DEFAULT_BUILDING: Building = {
   roofShape: "gable",
   spanCount: "single",
   hasCrane: false,
+  overheadCrane: {
+    enabled: false,
+    capacity: "5",
+    span_m: 12,
+    count: "one",
+    singleSpan: true,
+    railLevel_m: 3.5,
+    wheelLoad_kN: 50,
+    base_m: 3.7,
+    gauge_m: 4.7,
+  },
+  suspendedCrane: {
+    enabled: false,
+    capacity_t: 2,
+    singleSpan: true,
+  },
   city: "",
   responsibilityCoeff: 1,
   priceC255B_rubKg: 148.8,

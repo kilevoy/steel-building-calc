@@ -87,6 +87,8 @@ export function ColumnApp() {
     roofLoad_kPa: initialRoof?.kPa ?? DEFAULT_COLUMN_INPUT.roofLoad_kPa,
     wallLoad_kPa: initialWall?.kPa ?? DEFAULT_COLUMN_INPUT.wallLoad_kPa,
     responsibilityCoeff: building.responsibilityCoeff,
+    overheadCrane: building.overheadCrane,
+    suspendedCrane: building.suspendedCrane,
     prices: {
       "С255Б": building.priceC255B_rubKg,
       "С355Б": building.priceC355B_rubKg,
@@ -192,6 +194,8 @@ export function ColumnApp() {
       roofLoad_kPa: roofLoad.total_kPa > 0 ? roofLoad.total_kPa : cur.roofLoad_kPa,
       wallLoad_kPa: lookupStructure(building.wallStructure)?.kPa ?? cur.wallLoad_kPa,
       responsibilityCoeff: building.responsibilityCoeff,
+      overheadCrane: building.overheadCrane,
+      suspendedCrane: building.suspendedCrane,
       prices: {
         "С255Б": building.priceC255B_rubKg,
         "С355Б": building.priceC355B_rubKg,
@@ -213,23 +217,23 @@ export function ColumnApp() {
     setBuilding({ wallStructure: id });
   };
 
+  // Crane config lives in the shared BuildingContext (not tab-local state),
+  // so it survives ColumnApp unmounting when the user switches tabs.
   const setOverhead = (patch: Partial<CalculationInput["overheadCrane"]>) => {
-    setInput((p) => {
-      const next = { ...p.overheadCrane, ...patch };
-      // Re-lookup catalog when (capacity, span) changes.
-      if (patch.capacity !== undefined || patch.span_m !== undefined) {
-        const r = lookupCrane(next.capacity, next.span_m);
-        if (r) {
-          next.wheelLoad_kN = r.wheelLoad_kN;
-          next.base_m = r.base_mm / 1000;
-          next.gauge_m = r.gauge_mm / 1000;
-        }
+    const next = { ...input.overheadCrane, ...patch };
+    // Re-lookup catalog when (capacity, span) changes.
+    if (patch.capacity !== undefined || patch.span_m !== undefined) {
+      const r = lookupCrane(next.capacity, next.span_m);
+      if (r) {
+        next.wheelLoad_kN = r.wheelLoad_kN;
+        next.base_m = r.base_mm / 1000;
+        next.gauge_m = r.gauge_mm / 1000;
       }
-      return { ...p, overheadCrane: next };
-    });
+    }
+    setBuilding({ overheadCrane: next });
   };
   const setSuspended = (patch: Partial<CalculationInput["suspendedCrane"]>) =>
-    setInput((p) => ({ ...p, suspendedCrane: { ...p.suspendedCrane, ...patch } }));
+    setBuilding({ suspendedCrane: { ...input.suspendedCrane, ...patch } });
 
   const muByType: Record<ColumnType, number> = {
     edge: computeMu({ ...input, columnType: "edge" }),
