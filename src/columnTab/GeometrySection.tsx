@@ -89,8 +89,8 @@ export function GeometrySection({
       />
       <CheckField
         label="Связи по периметру"
-        checked={input.perimeterTies}
-        onChange={(v) => upd({ perimeterTies: v })}
+        checked={building.perimeterTies}
+        onChange={(v) => updSynced("perimeterTies", v)}
       />
     </fieldset>
   );

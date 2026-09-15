@@ -22,6 +22,7 @@ export interface Building {
   wallStructure: string;
   roofShape: RoofShape;
   spanCount: SpanCount;
+  perimeterTies: boolean;
   hasCrane: boolean;
   /** Полная конфигурация кранов — общая для всех вкладок, переживает переключение между ними. */
   overheadCrane: OverheadCrane;
@@ -61,6 +62,7 @@ export const DEFAULT_BUILDING: Building = {
   wallStructure: "профлист",
   roofShape: "gable",
   spanCount: "single",
+  perimeterTies: false,
   hasCrane: false,
   overheadCrane: {
     enabled: false,

@@ -23,6 +23,8 @@ export interface ProfileData {
   Iy_cm4: number;
   Wy_cm3: number;
   iy_cm: number;
+  /** Исключён из подбора Excel-калькулятором («исключалка») — неходовой типоразмер, не подлежит закупке. */
+  nonStandard?: boolean;
 }
 
 export type CraneCapacity =

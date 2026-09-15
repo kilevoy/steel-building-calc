@@ -267,6 +267,7 @@ export function runCalculation(input: CalculationInput): CalculationOutput {
   const allResults: ProfileResult[] = [];
 
   for (const profile of PROFILES) {
+    if (profile.nonStandard) continue;
     const steels = steelsForCategory(profile.category);
     for (const steel of steels) {
       const Ry = getRy(steel, profile);
